@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- Master
+ ObjectWindow
                                  A QGIS plugin
- My master assignment
+ Shows all results
                               -------------------
-        begin                : 2017-08-21
+        begin                : 2017-09-05
         git sha              : $Format:%H$
         copyright            : (C) 2017 by Kasper Skjeggestad
         email                : kasper.skjeggestad@gmail.com
@@ -20,18 +20,17 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from PyQt4.QtGui import QAction, QIcon
 # Initialize Qt resources from file resources.py
 import resources
-# Import the code for the dialog
-from master_dialog import MasterDialog
+
+# Import the code for the DockWidget
+from ObjectWindow_dockwidget import ObjectWindowDockWidget
 import os.path
 
-from ObjectWindow.ObjectWindow import ObjectWindow
 
-
-class Master:
+class ObjectWindow:
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
@@ -44,14 +43,16 @@ class Master:
         """
         # Save reference to the QGIS interface
         self.iface = iface
+
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
+
         # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'Master_{}.qm'.format(locale))
+            'ObjectWindow_{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -60,16 +61,18 @@ class Master:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Master')
+        self.menu = self.tr(u'&ObjectWindow')
         # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'Master')
-        self.toolbar.setObjectName(u'Master')
+        self.toolbar = self.iface.addToolBar(u'ObjectWindow')
+        self.toolbar.setObjectName(u'ObjectWindow')
 
+        #print "** INITIALIZING ObjectWindow"
 
-        
+        self.pluginIsActive = False
+        self.dockwidget = None
+
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -84,7 +87,7 @@ class Master:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('Master', message)
+        return QCoreApplication.translate('ObjectWindow', message)
 
 
     def add_action(
@@ -137,9 +140,6 @@ class Master:
         :rtype: QAction
         """
 
-        # Create the dialog (after translation) and keep reference
-        self.dlg = MasterDialog()
-
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
         action.triggered.connect(callback)
@@ -163,46 +163,71 @@ class Master:
 
         return action
 
+
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/Master/icon.png'
+        icon_path = ':/plugins/ObjectWindow/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u''),
+            text=self.tr(u'result from filtering with master'),
             callback=self.run,
             parent=self.iface.mainWindow())
+
+    #--------------------------------------------------------------------------
+
+    def onClosePlugin(self):
+        """Cleanup necessary items here when plugin dockwidget is closed"""
+
+        #print "** CLOSING ObjectWindow"
+
+        # disconnects
+        self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
+
+        # remove this statement if dockwidget is to remain
+        # for reuse if plugin is reopened
+        # Commented next statement since it causes QGIS crashe
+        # when closing the docked window:
+        # self.dockwidget = None
+
+        self.pluginIsActive = False
 
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
+
+        #print "** UNLOAD ObjectWindow"
+
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&Master'),
+                self.tr(u'&ObjectWindow'),
                 action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         del self.toolbar
 
-
+    #--------------------------------------------------------------------------
 
     def run(self):
-        """Run method that performs all the real work"""
+        """Run method that loads and starts the plugin"""
 
-        def launch_Object_Window():
-            ow = ObjectWindow(self.iface)
-            ow.run()
+        if not self.pluginIsActive:
+            self.pluginIsActive = True
 
-        self.dlg.pushButton.clicked.connect(launch_Object_Window)
+            #print "** STARTING ObjectWindow"
 
-        # show the dialog
-        self.dlg.show()
-        #ow = ObjectWindow(self.iface)
-        #ow.run()
-        # Run the dialog event loop
-        result = self.dlg.exec_()
-        # See if OK was pressed
-        if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+            # dockwidget may not exist if:
+            #    first run of plugin
+            #    removed on close (see self.onClosePlugin method)
+            if self.dockwidget == None:
+                # Create the dockwidget (after translation) and keep reference
+                self.dockwidget = ObjectWindowDockWidget()
+
+            # connect to provide cleanup on closing of dockwidget
+            self.dockwidget.closingPlugin.connect(self.onClosePlugin)
+
+            # show the dockwidget
+            # TODO: fix to allow choice of dock location
+            self.iface.addDockWidget(Qt.BottomDockWidgetArea, self.dockwidget)
+            self.dockwidget.show()
+
