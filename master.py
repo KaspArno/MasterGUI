@@ -28,7 +28,8 @@ import resources
 from master_dialog import MasterDialog
 import os.path
 
-from ObjectWindow.ObjectWindow import ObjectWindow
+#from ObjectWindow.ObjectWindow import ObjectWindow
+from AllObjectWidget import AllObjectWidget
 
 
 class Master:
@@ -173,6 +174,8 @@ class Master:
             callback=self.run,
             parent=self.iface.mainWindow())
 
+        self.all_object_widget = AllObjectWidget(self, self.iface, self.iface.mainWindow())
+
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -189,16 +192,10 @@ class Master:
     def run(self):
         """Run method that performs all the real work"""
 
-        def launch_Object_Window():
-            ow = ObjectWindow(self.iface)
-            ow.run()
-
-        self.dlg.pushButton.clicked.connect(launch_Object_Window)
 
         # show the dialog
         self.dlg.show()
-        #ow = ObjectWindow(self.iface)
-        #ow.run()
+
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
