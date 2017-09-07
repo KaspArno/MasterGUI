@@ -30,6 +30,7 @@ import os.path
 
 #from ObjectWindow.ObjectWindow import ObjectWindow
 from AllObjectWidget import AllObjectWidget
+from testDockDialog import testDockDialog
 
 
 class Master:
@@ -174,7 +175,8 @@ class Master:
             callback=self.run,
             parent=self.iface.mainWindow())
 
-        self.all_object_widget = AllObjectWidget(self, self.iface, self.iface.mainWindow())
+        #self.all_object_widget = AllObjectWidget(self, self.iface, self.iface.mainWindow())
+        testDock = testDockDialog(self.iface)
 
 
     def unload(self):
