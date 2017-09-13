@@ -176,7 +176,7 @@ class Master:
             parent=self.iface.mainWindow())
 
         #self.all_object_widget = AllObjectWidget(self, self.iface, self.iface.mainWindow())
-        testDock = testDockDialog(self.iface)
+        
 
 
     def unload(self):
@@ -197,7 +197,8 @@ class Master:
 
         # show the dialog
         self.dlg.show()
-
+        testDock = testDockDialog()
+        testDock.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed

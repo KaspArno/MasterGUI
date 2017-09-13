@@ -11,7 +11,7 @@ class testDockDialog(QtGui.QDockWidget, FORM_CLASS):
     	super(testDockDialog, self).__init__(parent)
         #QtGui.QDockWidget.__init__(self)
         #self.ui = testDock()
-        self.ui.setupUi(self)
+        self.setupUi(self)
 
 
 
