@@ -191,12 +191,21 @@ class Master:
 
 
 
+
     def run(self):
         """Run method that performs all the real work"""
 
 
         # show the dialog
         self.dlg.show()
+
+        # if not self.pluginIsActive:
+        #    self.pluginIsActive = True
+
+        #    # openOtherWin is outside of run method...
+        #    self.dockwidget.but_openOtherWin.clicked.connect(self.openOtherWin)
+
+
         testDock = testDockDialog()
         testDock.show()
         # Run the dialog event loop
@@ -205,4 +214,8 @@ class Master:
         if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
+            #self.pluginIsActive = True
+
+            # openOtherWin is outside of run method...
+            #self.dlg.but_openOtherWin.clicked.connect(self.openOtherWin)
             pass

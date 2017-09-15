@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>854</width>
-    <height>522</height>
+    <width>629</width>
+    <height>449</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -1100,5 +1100,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MasterDialogBase</receiver>
+   <slot>openOtherWin()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>548</x>
+     <y>393</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>476</x>
+     <y>390</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>openOtherWin()</slot>
+ </slots>
 </ui>

@@ -23,13 +23,19 @@
 
 import os
 
-from PyQt4 import QtGui, uic
+from PyQt4 import QtGui, uic, QtCore
+from PyQt4.QtCore import pyqtSignal
+
+from testDockDialog import testDockDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'master_dialog_base.ui'))
 
 
 class MasterDialog(QtGui.QDialog, FORM_CLASS):
+
+    closingPlugin = pyqtSignal()
+
     def __init__(self, parent=None):
         """Constructor."""
         super(MasterDialog, self).__init__(parent)
@@ -39,3 +45,11 @@ class MasterDialog(QtGui.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+
+        def closeEvent(self, event):
+            self.closingPlugin.emit()
+            event.accept()
+
+    @QtCore.pyqtSlot()
+    def openOtherWin(self):
+            testDock = testDockDialog()
