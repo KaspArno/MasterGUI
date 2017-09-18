@@ -20,7 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry
+import sys
+from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry, QgsVectorLayer
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant
 from PyQt4.QtGui import QAction, QIcon
 # Initialize Qt resources from file resources.py
@@ -200,16 +201,21 @@ class Master:
     def connect_database(self):
         uri = QgsDataSourceURI()
         uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
+        sql = "(select * from tilgjengelighet.t_inngangbygg)"
+        uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
+        vlayer = QgsVectorLayer(uri.uri(),"inngangbygg","postgres")
+        QgsMapLayerRegistry.instance().addMapLayer(vlayer)
 
         return uri
 
     def add_layers(self):
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("inngangbygg")
 
-        if layerList: 
+        try:
             inngangbygg = layerList[0]
-
-        return inngangbygg
+            return inngangbygg
+        except IndexError:
+            print "inngangbygg not a layer"
 
     #def add_byggningstyper(self, inngangbygg):
     def fill_combobox(self, layer, feat_name, combobox):
@@ -235,7 +241,7 @@ class Master:
         # show the dialog
         self.dlg.show()
 
-        self.connect_database()
+        uri = self.connect_database()
         inngangbygg = self.add_layers()
         #byggningstyper = self.add_byggningstyper(inngangbygg = inngangbygg)
         self.fill_combobox(inngangbygg, "bygg_funksjon", self.dlg.comboBox_byggningstype)
