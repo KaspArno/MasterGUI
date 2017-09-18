@@ -20,7 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant
 from PyQt4.QtGui import QAction, QIcon
 # Initialize Qt resources from file resources.py
 import resources
@@ -31,6 +32,12 @@ import os.path
 #from ObjectWindow.ObjectWindow import ObjectWindow
 from AllObjectWidget import AllObjectWidget
 from testDockDialog import testDockDialog
+
+try:
+    from PyQt4.QtCore import QString
+except ImportError:
+    # we are using Python3 so QString is not defined
+    QString = str
 
 
 class Master:
@@ -190,6 +197,36 @@ class Master:
         del self.toolbar
 
 
+    def connect_database(self):
+        uri = QgsDataSourceURI()
+        uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
+
+        return uri
+
+    def add_layers(self):
+        layerList = QgsMapLayerRegistry.instance().mapLayersByName("inngangbygg")
+
+        if layerList: 
+            inngangbygg = layerList[0]
+
+        return inngangbygg
+
+    #def add_byggningstyper(self, inngangbygg):
+    def fill_combobox(self, layer, feat_name, combobox):
+        combobox.clear()
+        combobox.addItem("Uspesifisert")
+
+        for feature in layer.getFeatures():
+            try:
+                name = feature[feat_name]
+            except KeyError:
+                print "Layer does not contain given key"
+                return
+
+            if not isinstance(name, QPyNullVariant) and combobox.findText(name) < 0:
+                combobox.addItem(name)
+
+
 
     def run(self):
         """Run method that performs all the real work"""
@@ -197,8 +234,18 @@ class Master:
 
         # show the dialog
         self.dlg.show()
-        testDock = testDockDialog()
-        testDock.show()
+
+        self.connect_database()
+        inngangbygg = self.add_layers()
+        #byggningstyper = self.add_byggningstyper(inngangbygg = inngangbygg)
+        self.fill_combobox(inngangbygg, "bygg_funksjon", self.dlg.comboBox_byggningstype)
+        self.fill_combobox(inngangbygg, "dortype", self.dlg.comboBox_dortype)
+        self.fill_combobox(inngangbygg, "handlist", self.dlg.comboBox_handliste)
+        self.fill_combobox(inngangbygg, "t_rulle", self.dlg.comboBox_manuell_rullestol)
+        self.fill_combobox(inngangbygg, "t_el_rulle_auto", self.dlg.comboBox__el_rullestol)
+        self.fill_combobox(inngangbygg, "t_syn", self.dlg.comboBox_syn)
+        # testDock = testDockDialog()
+        # testDock.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed

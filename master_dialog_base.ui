@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>854</width>
-    <height>522</height>
+    <height>520</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,13 +29,13 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>565</width>
-     <height>393</height>
+     <width>815</width>
+     <height>491</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -80,7 +80,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>3</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -422,7 +422,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QComboBox" name="comboBox_3"/>
+                 <widget class="QComboBox" name="comboBox_byggningstype"/>
                 </item>
                 <item row="2" column="0">
                  <widget class="QLabel" name="label_3">
@@ -442,7 +442,7 @@
                  </widget>
                 </item>
                 <item row="3" column="1">
-                 <widget class="QComboBox" name="comboBox_5"/>
+                 <widget class="QComboBox" name="comboBox_dortype"/>
                 </item>
                 <item row="4" column="0">
                  <widget class="QLabel" name="label_5">
@@ -489,7 +489,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QComboBox" name="comboBox_7"/>
+                 <widget class="QComboBox" name="comboBox_handliste"/>
                 </item>
                 <item row="3" column="0">
                  <widget class="QLabel" name="label_7">
@@ -537,7 +537,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QComboBox" name="comboBox_12"/>
+                 <widget class="QComboBox" name="comboBox_manuell_rullestol"/>
                 </item>
                 <item row="1" column="0">
                  <widget class="QLabel" name="label_11">
@@ -547,7 +547,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QComboBox" name="comboBox_14"/>
+                 <widget class="QComboBox" name="comboBox__el_rullestol"/>
                 </item>
                 <item row="2" column="0">
                  <widget class="QLabel" name="label_13">
@@ -557,7 +557,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QComboBox" name="comboBox_13"/>
+                 <widget class="QComboBox" name="comboBox_syn"/>
                 </item>
                </layout>
               </item>
