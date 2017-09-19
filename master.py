@@ -22,8 +22,8 @@
 """
 import sys
 from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry, QgsVectorLayer
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant
-from PyQt4.QtGui import QAction, QIcon
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant, Qt
+from PyQt4.QtGui import QAction, QIcon, QDockWidget
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
@@ -197,6 +197,15 @@ class Master:
         # remove the toolbar
         del self.toolbar
 
+    def to_unicode(self, in_string):
+        if isinstance(in_string,str):
+            out_string = in_string.decode('utf-8')
+        elif isinstance(in_string,unicode):
+            out_string = in_string
+        else:
+            raise TypeError('not stringy')
+        return out_string
+
 
     def connect_database(self):
         uri = QgsDataSourceURI()
@@ -233,6 +242,43 @@ class Master:
                 combobox.addItem(name)
 
 
+    def OW_pressed(self):
+
+        byggningstype = self.dlg.comboBox_byggningstype.currentText()
+        dortype = self.dlg.comboBox_dortype.currentText()
+        handliste = self.dlg.comboBox_handliste.currentText()
+        m_rullestol = self.dlg.comboBox_manuell_rullestol.currentText()
+        el_rullestol = self.dlg.comboBox_el_rullestol.currentText()
+        syn = self.dlg.comboBox_syn.currentText()
+
+        byggningstype = self.to_unicode(byggningstype)
+        dortype = self.to_unicode(dortype)
+        handliste = self.to_unicode(handliste)
+        m_rullestol = self.to_unicode(m_rullestol)
+        el_rullestol = self.to_unicode(el_rullestol)
+        syn = self.to_unicode(syn)
+
+        sql = "select * from tilgjengelighet.t_inngangbygg"
+        where = ""
+
+        if byggningstype != "Uspesifisert":
+            where = "where bygg_funksjon like '{}'".format(byggningstype)
+        if dortype != "Uspesifisert":
+            if len(where) == 0:
+                where = "where dortype like '{}'".format(dortype)
+
+        sql = "(" + sql + " " + where + ")"
+
+        print sql
+
+        self.uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
+        newlayer = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
+        QgsMapLayerRegistry.instance().addMapLayer(newlayer)
+
+        dockwidget = QDockWidget(self.iface.mainWindow())
+        self.iface.addDockWidget(Qt.BottomDockWidgetArea, dockwidget)
+        print "filtrer pressed"
+
 
     def run(self):
         """Run method that performs all the real work"""
@@ -241,15 +287,23 @@ class Master:
         # show the dialog
         self.dlg.show()
 
-        uri = self.connect_database()
+        self.uri = self.connect_database()
         inngangbygg = self.add_layers()
         #byggningstyper = self.add_byggningstyper(inngangbygg = inngangbygg)
         self.fill_combobox(inngangbygg, "bygg_funksjon", self.dlg.comboBox_byggningstype)
         self.fill_combobox(inngangbygg, "dortype", self.dlg.comboBox_dortype)
         self.fill_combobox(inngangbygg, "handlist", self.dlg.comboBox_handliste)
         self.fill_combobox(inngangbygg, "t_rulle", self.dlg.comboBox_manuell_rullestol)
-        self.fill_combobox(inngangbygg, "t_el_rulle_auto", self.dlg.comboBox__el_rullestol)
+        self.fill_combobox(inngangbygg, "t_el_rulle_auto", self.dlg.comboBox_el_rullestol)
         self.fill_combobox(inngangbygg, "t_syn", self.dlg.comboBox_syn)
+
+        QgsMapLayerRegistry.instance().removeMapLayer( inngangbygg.id() )
+
+        filtrer_btn = self.dlg.pushButton_filtrer
+        filtrer_btn.clicked.connect(self.OW_pressed)
+
+        
+        #ow = self.testDock()
         # testDock = testDockDialog()
         # testDock.show()
         # Run the dialog event loop
