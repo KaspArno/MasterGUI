@@ -231,7 +231,7 @@ class Master:
         combobox.clear()
         combobox.addItem("Uspesifisert")
 
-        for feature in layer.getFeatures():
+        for feature in layer.getFeatures(): #Sett inn error catchment her
             try:
                 name = feature[feat_name]
             except KeyError:
