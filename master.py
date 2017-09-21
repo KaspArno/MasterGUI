@@ -21,18 +21,22 @@
  ***************************************************************************/
 """
 import sys
+import os.path
+import io
+import codecs
+
 from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry, QgsVectorLayer
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant, Qt
-from PyQt4.QtGui import QAction, QIcon, QDockWidget
+from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
 from master_dialog import MasterDialog
-import os.path
 
 #from ObjectWindow.ObjectWindow import ObjectWindow
 from AllObjectWidget import AllObjectWidget
 from testDockDialog import testDockDialog
+from test_table import Table
 
 try:
     from PyQt4.QtCore import QString
@@ -197,6 +201,7 @@ class Master:
         # remove the toolbar
         del self.toolbar
 
+    
     def to_unicode(self, in_string):
         if isinstance(in_string,str):
             out_string = in_string.decode('utf-8')
@@ -241,8 +246,35 @@ class Master:
             if not isinstance(name, QPyNullVariant) and combobox.findText(name) < 0:
                 combobox.addItem(name)
 
+    def fill_komuner(self):
+        self.dlg.comboBox_komuner.clear()
+        self.dlg.comboBox_komuner.addItem("  -  ")
+
+        filename = 'C:\Users\kaspa_000\.qgis2\python\plugins\MasterGUI\komm.txt'
+
+        self.komm_dict = {}
+        self.fylke_dict = {}
+        with io.open(filename,'r',encoding='utf-8') as f:
+            for line in f:
+                komm_nr, komune, fylke = line.rstrip('\n').split(("\t"))
+                komm_nr = self.to_unicode(komm_nr)
+                komune = self.to_unicode(komune)
+                fylke = self.to_unicode(fylke)
+                self.komm_dict[komune] = [komm_nr, fylke]
+                self.dlg.comboBox_komuner.addItem(komune)
+                #print komune
+                if not fylke in self.fylke_dict:
+                    self.fylke_dict[fylke] = []
+                self.fylke_dict[fylke].append(komm_nr)
+
+        #print komm_nr
+
+        
+
+
 
     def OW_pressed(self):
+        komune = self.dlg.comboBox_komuner.currentText()
 
         byggningstype = self.dlg.comboBox_byggningstype.currentText()
         dortype = self.dlg.comboBox_dortype.currentText()
@@ -252,20 +284,28 @@ class Master:
         syn = self.dlg.comboBox_syn.currentText()
 
         byggningstype = self.to_unicode(byggningstype)
+        #byggningstype = byggningstype.decode('iso-8859-1')
         dortype = self.to_unicode(dortype)
         handliste = self.to_unicode(handliste)
         m_rullestol = self.to_unicode(m_rullestol)
         el_rullestol = self.to_unicode(el_rullestol)
         syn = self.to_unicode(syn)
 
+        print byggningstype
+
         sql = "select * from tilgjengelighet.t_inngangbygg"
-        where = ""
+        where = "".decode('utf-8')
+
+        if komune != "  -  ":
+            where = "where komm = " + self.komm_dict[komune][0] + ""
 
         if byggningstype != "Uspesifisert":
-            where = "where bygg_funksjon like '{}'".format(byggningstype)
+            #where = "where bygg_funksjon like '{}'".format(byggningstype)
+            where = where + " and " + "bygg_funksjon like '" + byggningstype + "'"
         if dortype != "Uspesifisert":
             if len(where) == 0:
-                where = "where dortype like '{}'".format(dortype)
+                #where = where + " and " + " dortype like '{}'".format(dortype) #UnicodeEncodeError: 'ascii' codec can't encode character u'\xf8' in position 5: ordinal not in range(128)
+                here = where + " and " + " dortype like '" + dortype + "'"
 
         sql = "(" + sql + " " + where + ")"
 
@@ -275,10 +315,33 @@ class Master:
         newlayer = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
         QgsMapLayerRegistry.instance().addMapLayer(newlayer)
 
-        dockwidget = QDockWidget(self.iface.mainWindow())
-        self.iface.addDockWidget(Qt.BottomDockWidgetArea, dockwidget)
+        #dockwidget = QDockWidget(self.iface.mainWindow())
+        #self.iface.addDockWidget(Qt.BottomDockWidgetArea, dockwidget)
         print "filtrer pressed"
 
+        #tbl = Table()
+        #tbl.show()
+        #self.create_table()
+
+
+    def create_table(self):#experimentiel
+        # self.table = QTableWidget()
+        # self.table.setRowCount(5)
+        # self.table.setColumnCount(5)
+        # layout.addWidget(self.led, 0, 0)
+        # layout.addWidget(self.table, 1, 0)
+        # self.table.setItem(1, 0, QtGui.QTableWidgetItem(self.led.text()))
+
+        layout = QGridLayout() 
+        self.led = QLineEdit("Sample")
+        self.table = QTableWidget()
+        self.table.setRowCount(5)
+        self.table.setColumnCount(5)
+        layout.addWidget(self.led, 0, 0)
+        layout.addWidget(self.table, 1, 0)
+        self.table.setItem(1, 0, QTableWidgetItem(self.led.text()))
+        self.setLayout(layout)
+        layout.show()
 
     def run(self):
         """Run method that performs all the real work"""
@@ -286,7 +349,7 @@ class Master:
 
         # show the dialog
         self.dlg.show()
-
+        self.fill_komuner()
         self.uri = self.connect_database()
         inngangbygg = self.add_layers()
         #byggningstyper = self.add_byggningstyper(inngangbygg = inngangbygg)

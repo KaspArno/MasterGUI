@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>946</width>
-    <height>414</height>
+    <width>1297</width>
+    <height>615</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,8 +34,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>921</width>
-     <height>393</height>
+     <width>1271</width>
+     <height>581</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -44,7 +44,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QComboBox" name="comboBox">
+         <widget class="QComboBox" name="comboBox_komuner">
           <item>
            <property name="text">
             <string>Oslo</string>
@@ -594,8 +594,6 @@
           </item>
          </layout>
          <zorder>verticalSpacer_2</zorder>
-         <zorder>pushButton_filtrer</zorder>
-         <zorder>horizontalSpacer_3</zorder>
         </widget>
         <widget class="QWidget" name="tab_3">
          <attribute name="title">
@@ -1056,9 +1054,6 @@
     </item>
    </layout>
   </widget>
-  <zorder>button_box</zorder>
-  <zorder>layoutWidget</zorder>
-  <zorder>tabWidget</zorder>
  </widget>
  <resources/>
  <connections>
