@@ -300,12 +300,17 @@ class Master:
             where = "where komm = " + self.komm_dict[komune][0] + ""
 
         if byggningstype != "Uspesifisert":
-            #where = "where bygg_funksjon like '{}'".format(byggningstype)
-            where = where + " and " + "bygg_funksjon like '" + byggningstype + "'"
+            if len(where) == 0:
+                where = "where bygg_funksjon like '" + byggningstype + "'"
+            else:
+                #where = "where bygg_funksjon like '{}'".format(byggningstype)
+                where = where + " and " + "bygg_funksjon like '" + byggningstype + "'"
         if dortype != "Uspesifisert":
             if len(where) == 0:
+                where = "where dortype like '" + dortype + "'"
+            else:
                 #where = where + " and " + " dortype like '{}'".format(dortype) #UnicodeEncodeError: 'ascii' codec can't encode character u'\xf8' in position 5: ordinal not in range(128)
-                here = where + " and " + " dortype like '" + dortype + "'"
+                where = where + " and " + " dortype like '" + dortype + "'"
 
         sql = "(" + sql + " " + where + ")"
 
