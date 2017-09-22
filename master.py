@@ -27,7 +27,7 @@ import codecs
 
 from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry, QgsVectorLayer
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant, Qt
-from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem
+from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
@@ -81,6 +81,21 @@ class Master:
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'Master')
         self.toolbar.setObjectName(u'Master')
+
+        #Globale Variabler
+        self.uspesifisert = "  -  "
+        self.mer = "Mer enn" #for combobokser linket til mer eller mindre enn iteratsjoner
+        self.mindre = "Mindre enn"
+
+        #Attributter Inngangbygg
+        self.att_bygg = "bygg_funksjon"
+        self.att_dor = "dortype"
+        self.att_hand = "handlist"
+
+        #Attributter Tilgjengelighet
+        self.att_rulle = "t_rulle"
+        self.att_el_rulle = "el_ruelle_auto"
+        self.att_syn = "t_syn"
 
 
         
@@ -234,7 +249,7 @@ class Master:
     #def add_byggningstyper(self, inngangbygg):
     def fill_combobox(self, layer, feat_name, combobox):
         combobox.clear()
-        combobox.addItem("Uspesifisert")
+        combobox.addItem(self.uspesifisert)
 
         for feature in layer.getFeatures(): #Sett inn error catchment her
             try:
@@ -248,7 +263,7 @@ class Master:
 
     def fill_komuner(self):
         self.dlg.comboBox_komuner.clear()
-        self.dlg.comboBox_komuner.addItem("  -  ")
+        self.dlg.comboBox_komuner.addItem(self.uspesifisert)
 
         filename = 'C:\Users\kaspa_000\.qgis2\python\plugins\MasterGUI\komm.txt'
 
@@ -269,11 +284,18 @@ class Master:
 
         #print komm_nr
 
-        
+
+    def create_where_statement(self, attribute, value, where):
+        if value != self.uspesifisert:
+            if len(where) == 0:
+                where = "where " + attribute + " like '" + value + "'"
+            else: 
+                where = where + " and " + attribute + " like '" + value + "'"
+        return where
 
 
 
-    def OW_pressed(self):
+    def filtrer_inngang(self):
         komune = self.dlg.comboBox_komuner.currentText()
 
         byggningstype = self.dlg.comboBox_byggningstype.currentText()
@@ -291,26 +313,20 @@ class Master:
         el_rullestol = self.to_unicode(el_rullestol)
         syn = self.to_unicode(syn)
 
-        print byggningstype
+        ing_atr = {self.att_bygg : byggningstype, self.att_dor :  dortype, self.att_hand :  handliste, self.att_rulle : m_rullestol, self.att_el_rulle : el_rullestol, self.att_syn : syn}
+
+        #print byggningstype
 
         sql = "select * from tilgjengelighet.t_inngangbygg"
         where = "".decode('utf-8')
 
-        if komune != "  -  ":
+        if komune != self.uspesifisert:
             where = "where komm = " + self.komm_dict[komune][0] + ""
 
-        if byggningstype != "Uspesifisert":
-            if len(where) == 0:
-                where = "where bygg_funksjon like '" + byggningstype + "'"
-            else:
-                #where = "where bygg_funksjon like '{}'".format(byggningstype)
-                where = where + " and " + "bygg_funksjon like '" + byggningstype + "'"
-        if dortype != "Uspesifisert":
-            if len(where) == 0:
-                where = "where dortype like '" + dortype + "'"
-            else:
-                #where = where + " and " + " dortype like '{}'".format(dortype) #UnicodeEncodeError: 'ascii' codec can't encode character u'\xf8' in position 5: ordinal not in range(128)
-                where = where + " and " + " dortype like '" + dortype + "'"
+        for atr, value in ing_atr.iteritems():
+            where = self.create_where_statement(atr, value, where)
+            print where
+
 
         sql = "(" + sql + " " + where + ")"
 
@@ -320,13 +336,45 @@ class Master:
         newlayer = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
         QgsMapLayerRegistry.instance().addMapLayer(newlayer)
 
+        if not newlayer.isValid():
+            print "layer failed to load"
+            self.show_message("søket ga ingen teff", "Advarsel", msg_type=QMessageBox.Warning)
+        else:
+            print "layer succeeded to load"
+
+
         #dockwidget = QDockWidget(self.iface.mainWindow())
         #self.iface.addDockWidget(Qt.BottomDockWidgetArea, dockwidget)
         print "filtrer pressed"
+        #self.show_message("msg_text", "msg_title")
 
         #tbl = Table()
         #tbl.show()
         #self.create_table()
+
+    def show_message(self, msg_text, msg_title=None, msg_info=None, msg_details=None, msg_type=None):
+        msg = QMessageBox()
+        
+        msg.setText(self.to_unicode(msg_text))
+
+        if msg_title is not None:
+            msg.setWindowTitle(msg_title)
+
+        if msg_info is not None:
+            msg.setInformativeText(msg_info)
+        
+        if msg_details is not None:
+            msg.setDetailedText(msg_details)
+        
+        if msg_type is not None:
+            msg.setIcon(msg_type)
+
+        msg.setStandardButtons(QMessageBox.Ok)
+
+        #msg.buttonClicked.connect()
+
+        retval = msg.exec_()
+        print ("value of pressed message box button:", retval)
 
 
     def create_table(self):#experimentiel
@@ -357,18 +405,41 @@ class Master:
         self.fill_komuner()
         self.uri = self.connect_database()
         inngangbygg = self.add_layers()
+
+
         #byggningstyper = self.add_byggningstyper(inngangbygg = inngangbygg)
+        #fyll ut combobosker
         self.fill_combobox(inngangbygg, "bygg_funksjon", self.dlg.comboBox_byggningstype)
         self.fill_combobox(inngangbygg, "dortype", self.dlg.comboBox_dortype)
         self.fill_combobox(inngangbygg, "handlist", self.dlg.comboBox_handliste)
         self.fill_combobox(inngangbygg, "t_rulle", self.dlg.comboBox_manuell_rullestol)
         self.fill_combobox(inngangbygg, "t_el_rulle_auto", self.dlg.comboBox_el_rullestol)
         self.fill_combobox(inngangbygg, "t_syn", self.dlg.comboBox_syn)
-
+        self.dlg.comboBox_avstand_hc.clear()
+        self.dlg.comboBox_avstand_hc.addItem(self.mer)
+        self.dlg.comboBox_avstand_hc.addItem(self.mindre)
+        self.dlg.comboBox_ank_stigning.clear()
+        self.dlg.comboBox_ank_stigning.addItem(self.mer)
+        self.dlg.comboBox_ank_stigning.addItem(self.mindre)
+        self.dlg.comboBox_dorbredde.clear()
+        self.dlg.comboBox_dorbredde.addItem(self.mer)
+        self.dlg.comboBox_dorbredde.addItem(self.mindre)
+        self.dlg.comboBox_rmp_stigning.clear()
+        self.dlg.comboBox_rmp_stigning.addItem(self.mer)
+        self.dlg.comboBox_rmp_stigning.addItem(self.mindre)
+        self.dlg.comboBox_rmp_bredde.clear()
+        self.dlg.comboBox_rmp_bredde.addItem(self.mer)
+        self.dlg.comboBox_rmp_bredde.addItem(self.mindre)
+        self.dlg.comboBox_hand1.clear()
+        self.dlg.comboBox_hand1.addItem(self.mer)
+        self.dlg.comboBox_hand1.addItem(self.mindre)
+        self.dlg.comboBox_hand2.clear()
+        self.dlg.comboBox_hand2.addItem(self.mer)
+        self.dlg.comboBox_hand2.addItem(self.mindre)
         QgsMapLayerRegistry.instance().removeMapLayer( inngangbygg.id() )
 
-        filtrer_btn = self.dlg.pushButton_filtrer
-        filtrer_btn.clicked.connect(self.OW_pressed)
+        filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
+        filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
 
         
         #ow = self.testDock()
