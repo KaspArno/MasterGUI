@@ -23,11 +23,10 @@
 import sys
 import os.path
 import io
-import codecs
 
 from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry, QgsVectorLayer
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant, Qt
-from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox
+from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox, QApplication, QHBoxLayout, QVBoxLayout
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
@@ -35,14 +34,10 @@ from master_dialog import MasterDialog
 
 #from ObjectWindow.ObjectWindow import ObjectWindow
 from AllObjectWidget import AllObjectWidget
-from testDockDialog import testDockDialog
+from testDock import testDock
+from mytable import MyTable
 from test_table import Table
 
-try:
-    from PyQt4.QtCore import QString
-except ImportError:
-    # we are using Python3 so QString is not defined
-    QString = str
 
 
 class Master:
@@ -83,7 +78,7 @@ class Master:
         self.toolbar.setObjectName(u'Master')
 
         #Globale Variabler
-        self.uspesifisert = "  -  "
+        self.uspesifisert = ""
         self.mer = "Mer enn" #for combobokser linket til mer eller mindre enn iteratsjoner
         self.mindre = "Mindre enn"
 
@@ -92,11 +87,19 @@ class Master:
         self.att_dor = "dortype"
         self.att_hand = "handlist"
 
+        self.att_avst_hc = "avstand_hc_park"
+        self.att_ank_stig = "adko_stig_grad"
+        self.att_dorbredde = "inngang_bredde"
+        self.att_rmp_stigning = "rampe_stigning"
+        self.att_rmp_bredde = "rampe_bredde"
+        self.att_hand1 = "hand_hoy_1"
+        self.att_hand2 = "hand_hoy_2"
+
         #Attributter Tilgjengelighet
         self.att_rulle = "t_rulle"
         self.att_el_rulle = "el_ruelle_auto"
         self.att_syn = "t_syn"
-
+        
 
         
 
@@ -285,17 +288,19 @@ class Master:
         #print komm_nr
 
 
-    def create_where_statement(self, attribute, value, where):
+    def create_where_statement(self, attribute, value, opperator, where):
         if value != self.uspesifisert:
             if len(where) == 0:
-                where = "where " + attribute + " like '" + value + "'"
+                where = "where " + attribute + " " + opperator +" '" + value + "'"
             else: 
-                where = where + " and " + attribute + " like '" + value + "'"
+                where = where + " and " + attribute + " " + opperator +" '" + value + "'"
         return where
 
 
 
     def filtrer_inngang(self):
+        print"Filtering Start"
+
         komune = self.dlg.comboBox_komuner.currentText()
 
         byggningstype = self.dlg.comboBox_byggningstype.currentText()
@@ -313,20 +318,36 @@ class Master:
         el_rullestol = self.to_unicode(el_rullestol)
         syn = self.to_unicode(syn)
 
-        ing_atr = {self.att_bygg : byggningstype, self.att_dor :  dortype, self.att_hand :  handliste, self.att_rulle : m_rullestol, self.att_el_rulle : el_rullestol, self.att_syn : syn}
+        ing_atr_combobox = {self.att_bygg : byggningstype, self.att_dor :  dortype, self.att_hand :  handliste, self.att_rulle : m_rullestol, self.att_el_rulle : el_rullestol, self.att_syn : syn}
 
-        #print byggningstype
+        avstand_hc = self.dlg.lineEdit_avstand_hc.text()
+        ank_stigning = self.dlg.lineEdit_ank_stigning.text()
+        dorbredde = self.dlg.lineEdit_dorbredde.text()
+        rmp_stigning = self.dlg.lineEdit_rmp_stigning.text()
+        rmp_bredde = self.dlg.lineEdit_rmp_bredde.text()
+        hand1 = self.dlg.lineEdit_hand1.text()
+        hand2 = self.dlg.lineEdit_hand2.text()
+
+        ing_atr_lineedit = {self.att_avst_hc : [avstand_hc, self.dlg.comboBox_avstand_hc.currentText()], self.att_ank_stig : [ank_stigning, self.dlg.comboBox_ank_stigning.currentText()], self.att_dorbredde : [dorbredde, self.dlg.comboBox_dorbredde.currentText()], self.att_rmp_stigning : [rmp_stigning, self.dlg.comboBox_rmp_stigning.currentText()], self.att_rmp_bredde : [rmp_bredde, self.dlg.comboBox_rmp_bredde.currentText()], self.att_hand1 : [hand1, self.dlg.comboBox_hand1.currentText()], self.att_hand2 : [hand2, self.dlg.comboBox_hand2.currentText()]}
 
         sql = "select * from tilgjengelighet.t_inngangbygg"
         where = "".decode('utf-8')
 
+        print "current text"
+        print avstand_hc
+
         if komune != self.uspesifisert:
             where = "where komm = " + self.komm_dict[komune][0] + ""
 
-        for atr, value in ing_atr.iteritems():
-            where = self.create_where_statement(atr, value, where)
-            print where
+        for atr, value in ing_atr_combobox.iteritems():
+            where = self.create_where_statement(atr, value, "like", where)
+            #print where
 
+        for atr, value in ing_atr_lineedit.iteritems():
+            opperator = ">"
+            if value[1] == self.mindre:
+                opperator = "<"
+            where = self.create_where_statement(atr, value[0], opperator, where)
 
         sql = "(" + sql + " " + where + ")"
 
@@ -343,14 +364,21 @@ class Master:
             print "layer succeeded to load"
 
 
-        #dockwidget = QDockWidget(self.iface.mainWindow())
-        #self.iface.addDockWidget(Qt.BottomDockWidgetArea, dockwidget)
-        print "filtrer pressed"
-        #self.show_message("msg_text", "msg_title")
+        dockwidget = QDockWidget(self.iface.mainWindow())
+        docklayout = QVBoxLayout(dockwidget)
 
+        #tbl = QTableWidget(docklayout)
+        att_table = self.create_table(newlayer)
+        docklayout.addWidget(att_table.show())
+        dockwidget.setLayout(docklayout)
+        self.iface.addDockWidget(Qt.BottomDockWidgetArea, dockwidget)
+        att_table.show()
+        
+        #att_tabel.show()
         #tbl = Table()
         #tbl.show()
-        #self.create_table()
+        print "Filtering End"
+        
 
     def show_message(self, msg_text, msg_title=None, msg_info=None, msg_details=None, msg_type=None):
         msg = QMessageBox()
@@ -377,7 +405,27 @@ class Master:
         print ("value of pressed message box button:", retval)
 
 
-    def create_table(self):#experimentiel
+    def create_table(self, layer):#experimentiel
+
+        #fields = layer.pendingFields()
+        #field_names = [field.name() for fiels in fields]
+        #field_names = [field.name() for field in layer.pendingFields()]
+
+        prov = layer.dataProvider()
+        field_names = [field.name() for field in prov.fields()]
+
+        data = {}
+        for index in prov.fields().allAttributesList():
+            data[prov.fields().field(index).name()] = ""
+
+
+        #app = QApplication(sys.argv)
+        return MyTable(data, 1, prov.fields().size())
+        
+        #table.show()
+        
+        #sys.exit(app.exec_())
+        
         # self.table = QTableWidget()
         # self.table.setRowCount(5)
         # self.table.setColumnCount(5)
@@ -385,16 +433,16 @@ class Master:
         # layout.addWidget(self.table, 1, 0)
         # self.table.setItem(1, 0, QtGui.QTableWidgetItem(self.led.text()))
 
-        layout = QGridLayout() 
-        self.led = QLineEdit("Sample")
-        self.table = QTableWidget()
-        self.table.setRowCount(5)
-        self.table.setColumnCount(5)
-        layout.addWidget(self.led, 0, 0)
-        layout.addWidget(self.table, 1, 0)
-        self.table.setItem(1, 0, QTableWidgetItem(self.led.text()))
-        self.setLayout(layout)
-        layout.show()
+        #layout = QGridLayout() 
+        # self.led = QLineEdit("Sample")
+        # self.table = QTableWidget()
+        # self.table.setRowCount(5)
+        # self.table.setColumnCount(5)
+        # layout.addWidget(self.led, 0, 0)
+        # layout.addWidget(self.table, 1, 0)
+        # self.table.setItem(1, 0, QTableWidgetItem(self.led.text()))
+        # self.setLayout(layout)
+        # layout.show()
 
     def run(self):
         """Run method that performs all the real work"""
@@ -440,11 +488,12 @@ class Master:
 
         filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
         filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
-
         
         #ow = self.testDock()
-        # testDock = testDockDialog()
-        # testDock.show()
+        #td = testDock(self.iface)
+        #td.show()
+
+
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed

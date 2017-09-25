@@ -29,7 +29,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>13</x>
@@ -414,7 +414,7 @@
                  <widget class="QComboBox" name="comboBox_avstand_hc"/>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_8"/>
+                 <widget class="QLineEdit" name="lineEdit_avstand_hc"/>
                 </item>
                </layout>
               </item>
@@ -441,7 +441,7 @@
                  <widget class="QComboBox" name="comboBox_ank_stigning"/>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_7"/>
+                 <widget class="QLineEdit" name="lineEdit_ank_stigning"/>
                 </item>
                </layout>
               </item>
@@ -468,7 +468,7 @@
                  <widget class="QComboBox" name="comboBox_dorbredde"/>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_6"/>
+                 <widget class="QLineEdit" name="lineEdit_dorbredde"/>
                 </item>
                </layout>
               </item>
@@ -496,7 +496,7 @@
                  <widget class="QComboBox" name="comboBox_rmp_stigning"/>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_5"/>
+                 <widget class="QLineEdit" name="lineEdit_rmp_stigning"/>
                 </item>
                </layout>
               </item>
@@ -513,7 +513,7 @@
                  <widget class="QComboBox" name="comboBox_rmp_bredde"/>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_4"/>
+                 <widget class="QLineEdit" name="lineEdit_rmp_bredde"/>
                 </item>
                </layout>
               </item>
@@ -544,7 +544,7 @@
                  <widget class="QComboBox" name="comboBox_hand1"/>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_2"/>
+                 <widget class="QLineEdit" name="lineEdit_hand1"/>
                 </item>
                </layout>
               </item>
@@ -561,7 +561,7 @@
                  <widget class="QComboBox" name="comboBox_hand2"/>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit"/>
+                 <widget class="QLineEdit" name="lineEdit_hand2"/>
                 </item>
                </layout>
               </item>
@@ -650,17 +650,7 @@
          </layout>
         </item>
        </layout>
-       <zorder>verticalSpacer_2</zorder>
-       <zorder>lineEdit_5</zorder>
-       <zorder>lineEdit_4</zorder>
-       <zorder>lineEdit_3</zorder>
-       <zorder>lineEdit_2</zorder>
-       <zorder>lineEdit</zorder>
-       <zorder>lineEdit_8</zorder>
-       <zorder>lineEdit_7</zorder>
-       <zorder>lineEdit_6</zorder>
        <zorder></zorder>
-       <zorder>horizontalSpacer_4</zorder>
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
