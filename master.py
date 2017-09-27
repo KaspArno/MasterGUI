@@ -25,7 +25,7 @@ import os.path
 import io
 
 from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry, QgsVectorLayer
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant, Qt
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant, QDateTime, Qt
 from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox, QApplication, QHBoxLayout, QVBoxLayout
 # Initialize Qt resources from file resources.py
 import resources
@@ -34,7 +34,7 @@ from master_dialog import MasterDialog
 
 #from ObjectWindow.ObjectWindow import ObjectWindow
 from AllObjectWidget import AllObjectWidget
-from testDock import testDock
+from testDockDialog import testDockDialog
 from mytable import MyTable
 from test_table import Table
 
@@ -205,7 +205,56 @@ class Master:
             callback=self.run,
             parent=self.iface.mainWindow())
 
-        #self.all_object_widget = AllObjectWidget(self, self.iface, self.iface.mainWindow())
+        #Connect and create source layer
+        self.uri = self.connect_database()
+        inngangbygg = self.add_layers()
+
+        #fill comboboxes
+        self.fill_komuner()
+        self.fill_combobox(inngangbygg, "bygg_funksjon", self.dlg.comboBox_byggningstype)
+        self.fill_combobox(inngangbygg, "dortype", self.dlg.comboBox_dortype)
+        self.fill_combobox(inngangbygg, "handlist", self.dlg.comboBox_handliste)
+        self.fill_combobox(inngangbygg, "t_rulle", self.dlg.comboBox_manuell_rullestol)
+        self.fill_combobox(inngangbygg, "t_el_rulle_auto", self.dlg.comboBox_el_rullestol)
+        self.fill_combobox(inngangbygg, "t_syn", self.dlg.comboBox_syn)
+        self.dlg.comboBox_avstand_hc.clear()
+        self.dlg.comboBox_avstand_hc.addItem(self.mer)
+        self.dlg.comboBox_avstand_hc.addItem(self.mindre)
+        self.dlg.comboBox_ank_stigning.clear()
+        self.dlg.comboBox_ank_stigning.addItem(self.mer)
+        self.dlg.comboBox_ank_stigning.addItem(self.mindre)
+        self.dlg.comboBox_dorbredde.clear()
+        self.dlg.comboBox_dorbredde.addItem(self.mer)
+        self.dlg.comboBox_dorbredde.addItem(self.mindre)
+        self.dlg.comboBox_rmp_stigning.clear()
+        self.dlg.comboBox_rmp_stigning.addItem(self.mer)
+        self.dlg.comboBox_rmp_stigning.addItem(self.mindre)
+        self.dlg.comboBox_rmp_bredde.clear()
+        self.dlg.comboBox_rmp_bredde.addItem(self.mer)
+        self.dlg.comboBox_rmp_bredde.addItem(self.mindre)
+        self.dlg.comboBox_hand1.clear()
+        self.dlg.comboBox_hand1.addItem(self.mer)
+        self.dlg.comboBox_hand1.addItem(self.mindre)
+        self.dlg.comboBox_hand2.clear()
+        self.dlg.comboBox_hand2.addItem(self.mer)
+        self.dlg.comboBox_hand2.addItem(self.mindre)
+
+        # remove source layer
+        QgsMapLayerRegistry.instance().removeMapLayer( inngangbygg.id() )
+
+        #Set push functions
+        filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
+        filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
+
+
+        #experiment, creating dck view of second window
+        self.dock = testDockDialog()
+        self.obdockwidget=QDockWidget("Seartch Results" , self.iface.mainWindow() )
+        self.obdockwidget.setObjectName("Results")
+        self.obdockwidget.setWidget(self.dock)
+        #experiment, filling dock
+
+        #self.iface.addDockWidget( Qt.BottomDockWidgetArea , self.obdockwidget )
         
 
 
@@ -219,7 +268,16 @@ class Master:
         # remove the toolbar
         del self.toolbar
 
-    
+
+    def add_layers(self):
+        layerList = QgsMapLayerRegistry.instance().mapLayersByName("inngangbygg")
+
+        try:
+            inngangbygg = layerList[0]
+            return inngangbygg
+        except IndexError:
+            print "inngangbygg not a layer"
+
     def to_unicode(self, in_string):
         if isinstance(in_string,str):
             out_string = in_string.decode('utf-8')
@@ -240,16 +298,7 @@ class Master:
 
         return uri
 
-    def add_layers(self):
-        layerList = QgsMapLayerRegistry.instance().mapLayersByName("inngangbygg")
 
-        try:
-            inngangbygg = layerList[0]
-            return inngangbygg
-        except IndexError:
-            print "inngangbygg not a layer"
-
-    #def add_byggningstyper(self, inngangbygg):
     def fill_combobox(self, layer, feat_name, combobox):
         combobox.clear()
         combobox.addItem(self.uspesifisert)
@@ -263,6 +312,41 @@ class Master:
 
             if not isinstance(name, QPyNullVariant) and combobox.findText(name) < 0:
                 combobox.addItem(name)
+
+    def showResults(self, layer):
+        prov = layer.dataProvider()
+        feat = layer.getFeatures()
+        self.dock.tableWidget.setColumnCount(len(prov.fields())) #creating colums
+
+        for i in range(0, len(prov.fields())): #creating header in table         
+            self.dock.tableWidget.setHorizontalHeaderItem(i,QTableWidgetItem(prov.fields().field(i).name()))
+
+        # creating rows
+        nr_objects  = 0
+        for f in feat:
+            nr_objects = nr_objects + 1
+        self.dock.tableWidget.setRowCount(nr_objects)
+        
+        # filling table values
+        current_object = 0
+        feat = layer.getFeatures() #resetting iterator
+        for f in feat:
+            for i in range(0,len(prov.fields())):
+                if isinstance(f[i], QDateTime):
+                    self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem(f[i].toString('dd.MM.yy')))
+                elif hasattr(f[i], 'toString'):
+                    self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem(f[i].toString()))
+                elif isinstance(f[i], (int, float)):
+                    self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem(str(f[i])))
+                elif isinstance(f[i], QPyNullVariant):
+                    self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem("NULL"))
+                else:
+                    self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem(f[i]))
+
+            current_object = current_object + 1
+        self.dock.tableWidget.setSortingEnabled(True) #enabeling sorting
+        self.iface.addDockWidget( Qt.BottomDockWidgetArea , self.obdockwidget ) #adding seartch result Widget
+
 
     def fill_komuner(self):
         self.dlg.comboBox_komuner.clear()
@@ -333,8 +417,6 @@ class Master:
         sql = "select * from tilgjengelighet.t_inngangbygg"
         where = "".decode('utf-8')
 
-        print "current text"
-        print avstand_hc
 
         if komune != self.uspesifisert:
             where = "where komm = " + self.komm_dict[komune][0] + ""
@@ -351,32 +433,21 @@ class Master:
 
         sql = "(" + sql + " " + where + ")"
 
-        print sql
+        #print sql
 
         self.uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
         newlayer = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
         QgsMapLayerRegistry.instance().addMapLayer(newlayer)
+
 
         if not newlayer.isValid():
             print "layer failed to load"
             self.show_message("søket ga ingen teff", "Advarsel", msg_type=QMessageBox.Warning)
         else:
             print "layer succeeded to load"
+            self.showResults(newlayer)
 
 
-        dockwidget = QDockWidget(self.iface.mainWindow())
-        docklayout = QVBoxLayout(dockwidget)
-
-        #tbl = QTableWidget(docklayout)
-        att_table = self.create_table(newlayer)
-        docklayout.addWidget(att_table.show())
-        dockwidget.setLayout(docklayout)
-        self.iface.addDockWidget(Qt.BottomDockWidgetArea, dockwidget)
-        att_table.show()
-        
-        #att_tabel.show()
-        #tbl = Table()
-        #tbl.show()
         print "Filtering End"
         
 
@@ -405,89 +476,18 @@ class Master:
         print ("value of pressed message box button:", retval)
 
 
-    def create_table(self, layer):#experimentiel
-
-        #fields = layer.pendingFields()
-        #field_names = [field.name() for fiels in fields]
-        #field_names = [field.name() for field in layer.pendingFields()]
-
-        prov = layer.dataProvider()
-        field_names = [field.name() for field in prov.fields()]
-
-        data = {}
-        for index in prov.fields().allAttributesList():
-            data[prov.fields().field(index).name()] = ""
-
-
-        #app = QApplication(sys.argv)
-        return MyTable(data, 1, prov.fields().size())
-        
-        #table.show()
-        
-        #sys.exit(app.exec_())
-        
-        # self.table = QTableWidget()
-        # self.table.setRowCount(5)
-        # self.table.setColumnCount(5)
-        # layout.addWidget(self.led, 0, 0)
-        # layout.addWidget(self.table, 1, 0)
-        # self.table.setItem(1, 0, QtGui.QTableWidgetItem(self.led.text()))
-
-        #layout = QGridLayout() 
-        # self.led = QLineEdit("Sample")
-        # self.table = QTableWidget()
-        # self.table.setRowCount(5)
-        # self.table.setColumnCount(5)
-        # layout.addWidget(self.led, 0, 0)
-        # layout.addWidget(self.table, 1, 0)
-        # self.table.setItem(1, 0, QTableWidgetItem(self.led.text()))
-        # self.setLayout(layout)
-        # layout.show()
-
     def run(self):
         """Run method that performs all the real work"""
 
 
         # show the dialog
         self.dlg.show()
-        self.fill_komuner()
-        self.uri = self.connect_database()
-        inngangbygg = self.add_layers()
+        
 
 
         #byggningstyper = self.add_byggningstyper(inngangbygg = inngangbygg)
         #fyll ut combobosker
-        self.fill_combobox(inngangbygg, "bygg_funksjon", self.dlg.comboBox_byggningstype)
-        self.fill_combobox(inngangbygg, "dortype", self.dlg.comboBox_dortype)
-        self.fill_combobox(inngangbygg, "handlist", self.dlg.comboBox_handliste)
-        self.fill_combobox(inngangbygg, "t_rulle", self.dlg.comboBox_manuell_rullestol)
-        self.fill_combobox(inngangbygg, "t_el_rulle_auto", self.dlg.comboBox_el_rullestol)
-        self.fill_combobox(inngangbygg, "t_syn", self.dlg.comboBox_syn)
-        self.dlg.comboBox_avstand_hc.clear()
-        self.dlg.comboBox_avstand_hc.addItem(self.mer)
-        self.dlg.comboBox_avstand_hc.addItem(self.mindre)
-        self.dlg.comboBox_ank_stigning.clear()
-        self.dlg.comboBox_ank_stigning.addItem(self.mer)
-        self.dlg.comboBox_ank_stigning.addItem(self.mindre)
-        self.dlg.comboBox_dorbredde.clear()
-        self.dlg.comboBox_dorbredde.addItem(self.mer)
-        self.dlg.comboBox_dorbredde.addItem(self.mindre)
-        self.dlg.comboBox_rmp_stigning.clear()
-        self.dlg.comboBox_rmp_stigning.addItem(self.mer)
-        self.dlg.comboBox_rmp_stigning.addItem(self.mindre)
-        self.dlg.comboBox_rmp_bredde.clear()
-        self.dlg.comboBox_rmp_bredde.addItem(self.mer)
-        self.dlg.comboBox_rmp_bredde.addItem(self.mindre)
-        self.dlg.comboBox_hand1.clear()
-        self.dlg.comboBox_hand1.addItem(self.mer)
-        self.dlg.comboBox_hand1.addItem(self.mindre)
-        self.dlg.comboBox_hand2.clear()
-        self.dlg.comboBox_hand2.addItem(self.mer)
-        self.dlg.comboBox_hand2.addItem(self.mindre)
-        QgsMapLayerRegistry.instance().removeMapLayer( inngangbygg.id() )
-
-        filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
-        filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
+        
         
         #ow = self.testDock()
         #td = testDock(self.iface)
