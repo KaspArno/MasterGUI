@@ -26,7 +26,7 @@ import io
 
 from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry, QgsVectorLayer
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant, QDateTime, Qt
-from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox, QApplication, QHBoxLayout, QVBoxLayout
+from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox, QApplication, QHBoxLayout, QVBoxLayout, QAbstractItemView, QListWidgetItem
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
@@ -35,6 +35,7 @@ from master_dialog import MasterDialog
 #from ObjectWindow.ObjectWindow import ObjectWindow
 from AllObjectWidget import AllObjectWidget
 from testDockDialog import testDockDialog
+from infoWidgetDialog import infoWidgetDialog
 from mytable import MyTable
 from test_table import Table
 
@@ -96,9 +97,12 @@ class Master:
         self.att_hand2 = "hand_hoy_2"
 
         #Attributter Tilgjengelighet
-        self.att_rulle = "t_rulle"
+        self.att_rulle = "t_rulle_auto"
         self.att_el_rulle = "el_ruelle_auto"
         self.att_syn = "t_syn"
+
+        #Annet
+        self.feature_id = {}
         
 
         
@@ -247,13 +251,19 @@ class Master:
         filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
 
 
-        #experiment, creating dck view of second window
+        #Creating dock view of second window
         self.dock = testDockDialog()
         self.obdockwidget=QDockWidget("Seartch Results" , self.iface.mainWindow() )
         self.obdockwidget.setObjectName("Results")
         self.obdockwidget.setWidget(self.dock)
-        #experiment, filling dock
+        self.dock.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows) #select entire row in table
 
+        self.infoWidget = infoWidgetDialog()
+        self.obj_info_dockwidget=QDockWidget("Info" , self.iface.mainWindow() )
+        self.obj_info_dockwidget.setObjectName("Object Info")
+        self.obj_info_dockwidget.setWidget(self.infoWidget)
+        
+        self.dlg.accepted.connect(self.filtrer_inngang) #OK fillterer foreløpig for inngang, burde endres
         #self.iface.addDockWidget( Qt.BottomDockWidgetArea , self.obdockwidget )
         
 
@@ -329,8 +339,10 @@ class Master:
         
         # filling table values
         current_object = 0
+        self.feature_id = {}
         feat = layer.getFeatures() #resetting iterator
         for f in feat:
+            self.feature_id[f['ogc_fid']] = f.id()
             for i in range(0,len(prov.fields())):
                 if isinstance(f[i], QDateTime):
                     self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem(f[i].toString('dd.MM.yy')))
@@ -352,7 +364,8 @@ class Master:
         self.dlg.comboBox_komuner.clear()
         self.dlg.comboBox_komuner.addItem(self.uspesifisert)
 
-        filename = 'C:\Users\kaspa_000\.qgis2\python\plugins\MasterGUI\komm.txt'
+        #filename = 'C:\Users\kaspa_000\.qgis2\python\plugins\MasterGUI\komm.txt'
+        filename = self.plugin_dir + "\komm.txt"
 
         self.komm_dict = {}
         self.fylke_dict = {}
@@ -433,7 +446,7 @@ class Master:
 
         sql = "(" + sql + " " + where + ")"
 
-        #print sql
+        print sql
 
         self.uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
         newlayer = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
@@ -447,7 +460,18 @@ class Master:
             print "layer succeeded to load"
             self.showResults(newlayer)
 
-
+        
+        self.infoWidget.tableWidget.setColumnCount(7)
+        self.infoWidget.tableWidget.setRowCount(7)
+        i=0
+        for f in self.feature_id:
+            newlayer.setSelectedFeatures([self.feature_id[f]])
+            #item = QListWidgetItem(str(self.feature_id[f]))
+            #self.infoWidget.listView.addItem(item)
+            self.infoWidget.tableWidget.setItem(i,0,QTableWidgetItem(str(self.feature_id[f]))) #Just f for key
+            i += 1
+            print self.feature_id[f]
+        self.iface.addDockWidget( Qt.RightDockWidgetArea , self.obj_info_dockwidget )
         print "Filtering End"
         
 
@@ -483,7 +507,9 @@ class Master:
         # show the dialog
         self.dlg.show()
         
-
+        indexes = self.dock.tableWidget.selectionModel().selectedRows()
+        for index in sorted(indexes):
+            print('Row %d is selected' % index.row())
 
         #byggningstyper = self.add_byggningstyper(inngangbygg = inngangbygg)
         #fyll ut combobosker
