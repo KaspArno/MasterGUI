@@ -26,7 +26,7 @@ import io
 
 from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry, QgsVectorLayer
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant, QDateTime, Qt
-from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox, QApplication, QHBoxLayout, QVBoxLayout, QAbstractItemView, QListWidgetItem
+from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox, QApplication, QHBoxLayout, QVBoxLayout, QAbstractItemView, QListWidgetItem, QAbstractItemView
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
@@ -34,7 +34,7 @@ from master_dialog import MasterDialog
 
 #from ObjectWindow.ObjectWindow import ObjectWindow
 from AllObjectWidget import AllObjectWidget
-from testDockDialog import testDockDialog
+from tabledialog import TableDialog
 from infoWidgetDialog import infoWidgetDialog
 from mytable import MyTable
 from test_table import Table
@@ -250,13 +250,13 @@ class Master:
         filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
         filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
 
-
         #Creating dock view of second window
-        self.dock = testDockDialog()
+        self.dock = TableDialog()
         self.obdockwidget=QDockWidget("Seartch Results" , self.iface.mainWindow() )
         self.obdockwidget.setObjectName("Results")
         self.obdockwidget.setWidget(self.dock)
         self.dock.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows) #select entire row in table
+        self.dock.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers) #Making table unediteble
 
         self.infoWidget = infoWidgetDialog()
         self.obj_info_dockwidget=QDockWidget("Info" , self.iface.mainWindow() )
@@ -265,6 +265,12 @@ class Master:
         
         self.dlg.accepted.connect(self.filtrer_inngang) #OK fillterer foreløpig for inngang, burde endres
         #self.iface.addDockWidget( Qt.BottomDockWidgetArea , self.obdockwidget )
+
+        #Set push functions
+        filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
+        filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
+        self.dock.tableWidget.itemClicked.connect(self.test)
+
         
 
 
@@ -309,6 +315,37 @@ class Master:
         return uri
 
 
+    def test(self):
+        indexes = self.dock.tableWidget.selectionModel().selectedRows()
+        for index in sorted(indexes):
+            for i in range(0, self.nrColumn):
+                if i == 2:
+                    self.infoWidget.label_avstand_hc_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+                if i == 3:
+                    self.infoWidget.label_dortype_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+                if i == 4:
+                    self.infoWidget.label_rampe_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+                if i == 6:
+                    self.infoWidget.label_ank_vei_stigning_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+                if i == 7:
+                    self.infoWidget.label_terskelhoyde_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+                if i == 8:
+                    self.infoWidget.label_ringeklokke_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+                if i == 9:
+                    self.infoWidget.label_ringeklokke_hoyde_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+                if i == 11:
+                    self.infoWidget.label_inngang_bredde_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+                if i == 16:
+                    self.infoWidget.label_byggningstype_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+                if i == 18:
+                    self.infoWidget.label_dorapner_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+                if i == 22:
+                    self.infoWidget.label_kontrast_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+                if i == 29:
+                    self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), i).text())]])
+                    #newlayer.setSelectedFeatures([self.feature_id[f[self.infoWidget.label_kontrast_text.setText(self.dock.tableWidget.item(index.row(), i).text())]]])
+
+
     def fill_combobox(self, layer, feat_name, combobox):
         combobox.clear()
         combobox.addItem(self.uspesifisert)
@@ -326,6 +363,7 @@ class Master:
     def showResults(self, layer):
         prov = layer.dataProvider()
         feat = layer.getFeatures()
+        self.nrColumn = len(prov.fields())
         self.dock.tableWidget.setColumnCount(len(prov.fields())) #creating colums
 
         for i in range(0, len(prov.fields())): #creating header in table         
@@ -345,7 +383,10 @@ class Master:
             self.feature_id[f['ogc_fid']] = f.id()
             for i in range(0,len(prov.fields())):
                 if isinstance(f[i], QDateTime):
-                    self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem(f[i].toString('dd.MM.yy')))
+                    if f[i].isNull:
+                        self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem("NULL"))
+                    else:
+                        self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem(f[i].toString('dd.MM.yy')))
                 elif hasattr(f[i], 'toString'):
                     self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem(f[i].toString()))
                 elif isinstance(f[i], (int, float)):
@@ -449,23 +490,26 @@ class Master:
         print sql
 
         self.uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-        newlayer = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
-        QgsMapLayerRegistry.instance().addMapLayer(newlayer)
+        self.newlayer = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
+        QgsMapLayerRegistry.instance().addMapLayer(self.newlayer)
 
 
-        if not newlayer.isValid():
+        if not self.newlayer.isValid():
             print "layer failed to load"
             self.show_message("søket ga ingen teff", "Advarsel", msg_type=QMessageBox.Warning)
         else:
             print "layer succeeded to load"
-            self.showResults(newlayer)
+            self.showResults(self.newlayer)
 
         
         self.infoWidget.tableWidget.setColumnCount(7)
         self.infoWidget.tableWidget.setRowCount(7)
         i=0
+        print self.feature_id
         for f in self.feature_id:
-            newlayer.setSelectedFeatures([self.feature_id[f]])
+            print type(f)
+            print type(self.feature_id[f])
+            self.newlayer.setSelectedFeatures([self.feature_id[f]])
             #item = QListWidgetItem(str(self.feature_id[f]))
             #self.infoWidget.listView.addItem(item)
             self.infoWidget.tableWidget.setItem(i,0,QTableWidgetItem(str(self.feature_id[f]))) #Just f for key
@@ -507,13 +551,12 @@ class Master:
         # show the dialog
         self.dlg.show()
         
-        indexes = self.dock.tableWidget.selectionModel().selectedRows()
-        for index in sorted(indexes):
-            print('Row %d is selected' % index.row())
+        # indexes = self.dock.tableWidget.selectionModel().selectedRows()
+        # for index in sorted(indexes):
+        #     print('Row %d is selected' % index.row())
 
         #byggningstyper = self.add_byggningstyper(inngangbygg = inngangbygg)
         #fyll ut combobosker
-        
         
         #ow = self.testDock()
         #td = testDock(self.iface)

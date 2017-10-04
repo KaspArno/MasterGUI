@@ -52,156 +52,156 @@
      <item>
       <layout class="QFormLayout" name="formLayout">
        <item row="0" column="0">
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="label_avstand_hc">
          <property name="text">
           <string>Avstand HC</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="label_avstand_hc_text">
          <property name="text">
-          <string>TextLabel</string>
+          <string>Select Object</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="label_byggningstype">
          <property name="text">
           <string>Bygningstype</string>
          </property>
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLabel" name="label_5">
+        <widget class="QLabel" name="label_byggningstype_text">
          <property name="text">
-          <string>TextLabel</string>
+          <string>Select Object</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="label_6">
+        <widget class="QLabel" name="label_ank_vei_stigning">
          <property name="text">
           <string>Ankomst vei stigning</string>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLabel" name="label_7">
+        <widget class="QLabel" name="label_ank_vei_stigning_text">
          <property name="text">
-          <string>TextLabel</string>
+          <string>Select Object</string>
          </property>
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QLabel" name="label_8">
+        <widget class="QLabel" name="label_dortype">
          <property name="text">
           <string>Dørtype</string>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLabel" name="label_9">
+        <widget class="QLabel" name="label_dortype_text">
          <property name="text">
-          <string>TextLabel</string>
+          <string>Select Object</string>
          </property>
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QLabel" name="label_10">
+        <widget class="QLabel" name="label_dorapner">
          <property name="text">
           <string>Døråpner</string>
          </property>
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QLabel" name="label_11">
+        <widget class="QLabel" name="label_dorapner_text">
          <property name="text">
-          <string>TextLabel</string>
+          <string>Select Object</string>
          </property>
         </widget>
        </item>
        <item row="5" column="0">
-        <widget class="QLabel" name="label_13">
+        <widget class="QLabel" name="label_ringeklokke">
          <property name="text">
           <string>Ringeklokke</string>
          </property>
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QLabel" name="label_12">
+        <widget class="QLabel" name="label_ringeklokke_text">
          <property name="text">
-          <string>TextLabel</string>
+          <string>Select Object</string>
          </property>
         </widget>
        </item>
        <item row="6" column="0">
-        <widget class="QLabel" name="label_14">
+        <widget class="QLabel" name="label__ringeklokke_hoyde">
          <property name="text">
           <string>Ringeklokke høyde</string>
          </property>
         </widget>
        </item>
        <item row="6" column="1">
-        <widget class="QLabel" name="label_15">
+        <widget class="QLabel" name="label_ringeklokke_hoyde_text">
          <property name="text">
-          <string>TextLabel</string>
+          <string>Select Object</string>
          </property>
         </widget>
        </item>
        <item row="7" column="0">
-        <widget class="QLabel" name="label_16">
+        <widget class="QLabel" name="label_terskelhoyde">
          <property name="text">
           <string>Terskelhøyde</string>
          </property>
         </widget>
        </item>
        <item row="7" column="1">
-        <widget class="QLabel" name="label_17">
+        <widget class="QLabel" name="label_terskelhoyde_text">
          <property name="text">
-          <string>TextLabel</string>
+          <string>Select Object</string>
          </property>
         </widget>
        </item>
        <item row="8" column="0">
-        <widget class="QLabel" name="label_18">
+        <widget class="QLabel" name="label_inngang_bredde">
          <property name="text">
           <string>inngang bredde</string>
          </property>
         </widget>
        </item>
        <item row="8" column="1">
-        <widget class="QLabel" name="label_19">
+        <widget class="QLabel" name="label_inngang_bredde_text">
          <property name="text">
-          <string>TextLabel</string>
+          <string>Select Object</string>
          </property>
         </widget>
        </item>
        <item row="9" column="0">
-        <widget class="QLabel" name="label_20">
+        <widget class="QLabel" name="label_kontrast">
          <property name="text">
           <string>Kontrast</string>
          </property>
         </widget>
        </item>
        <item row="9" column="1">
-        <widget class="QLabel" name="label_21">
+        <widget class="QLabel" name="label_kontrast_text">
          <property name="text">
-          <string>TextLabel</string>
+          <string>Select Object</string>
          </property>
         </widget>
        </item>
        <item row="10" column="0">
-        <widget class="QLabel" name="label_22">
+        <widget class="QLabel" name="label_rampe">
          <property name="text">
           <string>Rampe</string>
          </property>
         </widget>
        </item>
        <item row="10" column="1">
-        <widget class="QLabel" name="label_23">
+        <widget class="QLabel" name="label_rampe_text">
          <property name="text">
-          <string>TextLabel</string>
+          <string>Select Object</string>
          </property>
         </widget>
        </item>
