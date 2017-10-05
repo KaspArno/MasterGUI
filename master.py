@@ -247,8 +247,8 @@ class Master:
         QgsMapLayerRegistry.instance().removeMapLayer( inngangbygg.id() )
 
         #Set push functions
-        filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
-        filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
+        # filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
+        # filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
 
         #Creating dock view of second window
         self.dock = TableDialog()
@@ -417,11 +417,14 @@ class Master:
                 komune = self.to_unicode(komune)
                 fylke = self.to_unicode(fylke)
                 self.komm_dict[komune] = [komm_nr, fylke]
-                self.dlg.comboBox_komuner.addItem(komune)
+                #self.dlg.comboBox_komuner.addItem(komune)
                 #print komune
                 if not fylke in self.fylke_dict:
                     self.fylke_dict[fylke] = []
+                    self.dlg.comboBox_komuner.addItem(fylke)
                 self.fylke_dict[fylke].append(komm_nr)
+                self.dlg.comboBox_komuner.addItem("    " + komune)
+        #print self.fylke_dict
 
         #print komm_nr
 
@@ -473,7 +476,12 @@ class Master:
 
 
         if komune != self.uspesifisert:
-            where = "where komm = " + self.komm_dict[komune][0] + ""
+            if komune[0:4] == "    ":
+                where = "where komm = " + self.komm_dict[komune][0][4:len(self.komm_dict[komune][0])] + ""
+            else:
+                where = "where komm = " + self.fylke_dict[komune][0]
+                for kommnr in range(1,len(self.fylke_dict)-1):
+                    where = where + " or komm = " + self.fylke_dict[komune][kommnr]
 
         for atr, value in ing_atr_combobox.iteritems():
             where = self.create_where_statement(atr, value, "like", where)
@@ -500,22 +508,10 @@ class Master:
         else:
             print "layer succeeded to load"
             self.showResults(self.newlayer)
+            self.iface.addDockWidget( Qt.RightDockWidgetArea , self.obj_info_dockwidget )
+
 
         
-        self.infoWidget.tableWidget.setColumnCount(7)
-        self.infoWidget.tableWidget.setRowCount(7)
-        i=0
-        print self.feature_id
-        for f in self.feature_id:
-            print type(f)
-            print type(self.feature_id[f])
-            self.newlayer.setSelectedFeatures([self.feature_id[f]])
-            #item = QListWidgetItem(str(self.feature_id[f]))
-            #self.infoWidget.listView.addItem(item)
-            self.infoWidget.tableWidget.setItem(i,0,QTableWidgetItem(str(self.feature_id[f]))) #Just f for key
-            i += 1
-            print self.feature_id[f]
-        self.iface.addDockWidget( Qt.RightDockWidgetArea , self.obj_info_dockwidget )
         print "Filtering End"
         
 
