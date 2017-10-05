@@ -90,7 +90,14 @@ class Master:
 
         self.att_avst_hc = "avstand_hc_park"
         self.att_ank_stig = "adko_stig_grad"
+        self.att_dortype = "dortype"
         self.att_dorbredde = "inngang_bredde"
+        self.att_dorapner = "dorapner"
+        self.att_ringeklokke = "ringeklokke"
+        self.att_ringeklokke_hoyde = "ringekl_hoyde"
+        self.att_terslelhoyde = "terskel_hoyde"
+        self.att_kontrast = "kontrast"
+        self.att_rampe = "rampe"
         self.att_rmp_stigning = "rampe_stigning"
         self.att_rmp_bredde = "rampe_bredde"
         self.att_hand1 = "hand_hoy_1"
@@ -103,6 +110,7 @@ class Master:
 
         #Annet
         self.feature_id = {}
+        self.canvas = self.iface.mapCanvas()
         
 
         
@@ -221,9 +229,9 @@ class Master:
         self.fill_combobox(inngangbygg, "t_rulle", self.dlg.comboBox_manuell_rullestol)
         self.fill_combobox(inngangbygg, "t_el_rulle_auto", self.dlg.comboBox_el_rullestol)
         self.fill_combobox(inngangbygg, "t_syn", self.dlg.comboBox_syn)
-        self.dlg.comboBox_avstand_hc.clear()
-        self.dlg.comboBox_avstand_hc.addItem(self.mer)
-        self.dlg.comboBox_avstand_hc.addItem(self.mindre)
+        #self.dlg.comboBox_avstand_hc.clear()
+        #self.dlg.comboBox_avstand_hc.addItem(self.mer)
+        #self.dlg.comboBox_avstand_hc.addItem(self.mindre)
         self.dlg.comboBox_ank_stigning.clear()
         self.dlg.comboBox_ank_stigning.addItem(self.mer)
         self.dlg.comboBox_ank_stigning.addItem(self.mindre)
@@ -316,34 +324,99 @@ class Master:
 
 
     def test(self):
+        #print dir(self.dock.tableWidget.selectionModel().selectedRows().index())
+        #self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), i).text())]])
         indexes = self.dock.tableWidget.selectionModel().selectedRows()
         for index in sorted(indexes):
-            for i in range(0, self.nrColumn):
-                if i == 2:
-                    self.infoWidget.label_avstand_hc_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-                if i == 3:
-                    self.infoWidget.label_dortype_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-                if i == 4:
-                    self.infoWidget.label_rampe_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-                if i == 6:
-                    self.infoWidget.label_ank_vei_stigning_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-                if i == 7:
-                    self.infoWidget.label_terskelhoyde_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-                if i == 8:
-                    self.infoWidget.label_ringeklokke_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-                if i == 9:
-                    self.infoWidget.label_ringeklokke_hoyde_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-                if i == 11:
-                    self.infoWidget.label_inngang_bredde_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-                if i == 16:
-                    self.infoWidget.label_byggningstype_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-                if i == 18:
-                    self.infoWidget.label_dorapner_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-                if i == 22:
-                    self.infoWidget.label_kontrast_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-                if i == 29:
-                    self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), i).text())]])
-                    #newlayer.setSelectedFeatures([self.feature_id[f[self.infoWidget.label_kontrast_text.setText(self.dock.tableWidget.item(index.row(), i).text())]]])
+            self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), 29).text())]])
+            selection = self.newlayer.selectedFeatures()
+
+            for feature in selection:
+                print feature[self.att_avst_hc]
+                self.infoWidget.label_avstand_hc_text.setText(str(feature[self.att_avst_hc]))
+                self.infoWidget.label_byggningstype_text.setText(feature[self.att_bygg])
+                self.infoWidget.label_ank_vei_stigning_text.setText(str(feature[self.att_ank_stig]))
+                self.infoWidget.label_dortype_text.setText(feature[self.att_dortype])
+                self.infoWidget.label_dorapner_text.setText(feature[self.att_dorapner])
+                self.infoWidget.label_ringeklokke_text.setText(feature[self.att_ringeklokke])
+                self.infoWidget.label_ringeklokke_hoyde_text.setText(str(feature[self.att_ringeklokke_hoyde]))
+                self.infoWidget.label_terskelhoyde_text.setText(str(feature[self.att_terslelhoyde]))
+                self.infoWidget.label_inngang_bredde_text.setText(str(feature[self.att_dorbredde]))
+                self.infoWidget.label_kontrast_text.setText(feature[self.att_kontrast])
+                self.infoWidget.label_rampe_text.setText(feature[self.att_rampe])
+                self.infoWidget.label_Inngang.setText(self.tilgjengelighet(selection, feature["ogc_fid"]))
+
+            # for i in range(0, self.nrColumn):
+            #     if i == 2:
+            #         self.infoWidget.label_avstand_hc_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+            #     if i == 3:
+            #         self.infoWidget.label_dortype_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+            #     if i == 4:
+            #         self.infoWidget.label_rampe_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+            #     if i == 6:
+            #         self.infoWidget.label_ank_vei_stigning_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+            #     if i == 7:
+            #         self.infoWidget.label_terskelhoyde_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+            #     if i == 8:
+            #         self.infoWidget.label_ringeklokke_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+            #     if i == 9:
+            #         self.infoWidget.label_ringeklokke_hoyde_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+            #     if i == 11:
+            #         self.infoWidget.label_inngang_bredde_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+            #     if i == 16:
+            #         self.infoWidget.label_byggningstype_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+            #     if i == 18:
+            #         self.infoWidget.label_dorapner_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+            #     if i == 22:
+            #         self.infoWidget.label_kontrast_text.setText(self.dock.tableWidget.item(index.row(), i).text())
+            #     if i == 29:
+            #         self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), i).text())]])
+            #         #newlayer.setSelectedFeatures([self.feature_id[f[self.infoWidget.label_kontrast_text.setText(self.dock.tableWidget.item(index.row(), i).text())]]])
+
+
+    def tilgjengelighet(self, selection, ogc_fid):
+        tilgjengelighet =  "NULL"
+        uri2 = self.uri
+        sql = "(select * from tilgjengelighet.t_inngangbygg where (rampe = 'Nei' AND (avstand_hc_park > 25 OR avstand_hc_park IS NULL) OR dorapner = 'Manuell'OR (dorapner = 'Halvautomatisk' AND man_knap_hoyde <= 130)OR (adko_stig_grad > 2.9 AND adko_stig_grad <= 4.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Vanskelig tilgjengelig')OR (avstand_hc_park > 25 OR avstand_hc_park IS NULL) OR dorapner = 'Manuell'OR (dorapner = 'Halvautomatisk' AND man_knap_hoyde <= 130) OR (adko_stig_grad > 2.9 AND adko_stig_grad <= 4.9)OR (rampe_stigning > 2.9 AND rampe_stigning <= 4.9)) and ogc_fid = " + str(ogc_fid) + ")"
+        uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
+        vlayer = QgsVectorLayer(uri2.uri(),"delvis_tilgjengelig","postgres")
+
+        if vlayer.isValid():
+            tilgjengelighet =  "delvis Tilgjengelig"
+            print tilgjengelighet
+
+        sql = "(select * from tilgjengelighet.t_inngangbygg WHERE rampe = 'Nei' AND (avstand_hc_park <= 25 AND (dorapner = 'Halvautomatisk' AND man_knap_hoyde BETWEEN 80 AND 110)AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9) OR rampe = 'Nei' AND (avstand_hc_park <= 25 AND dorapner = 'Automatisk'AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Tilgjengelig'AND avstand_hc_park <= 25 AND (dorapner = 'Halvautomatisk' AND man_knap_hoyde BETWEEN 80 AND 110)AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Tilgjengelig'AND avstand_hc_park <= 25 AND dorapner = 'Automatisk'AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9)) and ogc_fid = " + str(ogc_fid) + ")"
+        uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
+        vlayer = QgsVectorLayer(uri2.uri(),"tilgjengelig","postgres")
+
+        if vlayer.isValid():
+            tilgjengelighet =  "Tilgjengelig"
+            print tilgjengelighet
+
+        sql = "(select * from tilgjengelighet.t_inngangbygg WHERE (rampe IS NULLOR rampe = 'Nei'  AND (inngang_bredde IS NULL OR terskel_hoyde IS NULL OR adko_stig_grad IS NULL) OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Ikke vurdert' OR inngang_bredde IS NULLOR terskel_hoyde IS NULL OR adko_stig_grad IS NULL OR rampe_bredde IS NULL OR handlist IS NULL OR rampe_terskel IS NULL OR rampe_stigning IS NULL)) and ogc_fid = " + str(ogc_fid) + ")"
+        uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
+        vlayer = QgsVectorLayer(uri2.uri(),"tilgjengelig","postgres")
+
+        if vlayer.isValid():
+            tilgjengelighet =  "Ikke vurdert"
+            print tilgjengelighet
+
+        sql = "(select * from tilgjengelighet.t_inngangbygg WHERE rampe = 'Ja' AND (rampe_tilgjengelig = 'Ikke tilgjengelig'OR inngang_bredde < 90 OR terskel_hoyde > 2.5 OR adko_stig_grad > 4.9OR man_knap_hoyde > 130) OR rampe = 'Nei' AND (inngang_bredde < 90OR terskel_hoyde > 2.5 OR adko_stig_grad > 4.9OR man_knap_hoyde > 130) and ogc_fid = " + str(ogc_fid) + ")"
+        uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
+        vlayer = QgsVectorLayer(uri2.uri(),"tilgjengelig","postgres")
+
+        if vlayer.isValid():
+            tilgjengelighet =  "Ikke vurdert"
+            print tilgjengelighet
+
+        return tilgjengelighet
+
+        # uri = QgsDataSourceURI()
+        # uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
+        # sql = "(select * from tilgjengelighet.t_inngangbygg where (rampe = 'Nei' AND (avstand_hc_park > 25 OR avstand_hc_park IS NULL) OR dorapner = 'Manuell'OR (dorapner = 'Halvautomatisk' AND man_knap_hoyde <= 130)OR (adko_stig_grad > 2.9 AND adko_stig_grad <= 4.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Vanskelig tilgjengelig')OR (avstand_hc_park > 25 OR avstand_hc_park IS NULL) OR dorapner = 'Manuell'OR (dorapner = 'Halvautomatisk' AND man_knap_hoyde <= 130) OR (adko_stig_grad > 2.9 AND adko_stig_grad <= 4.9)OR (rampe_stigning > 2.9 AND rampe_stigning <= 4.9)) and ogc_fid = " + ogc_fid + ")"
+        # uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
+        # vlayer = QgsVectorLayer(uri2.uri(),"delvis_tilgjengelig","postgres")
+        # QgsMapLayerRegistry.instance().addMapLayer(vlayer)
 
 
     def fill_combobox(self, layer, feat_name, combobox):
@@ -477,7 +550,7 @@ class Master:
 
         if komune != self.uspesifisert:
             if komune[0:4] == "    ":
-                where = "where komm = " + self.komm_dict[komune][0][4:len(self.komm_dict[komune][0])] + ""
+                where = "where komm = " + self.komm_dict[komune[4:len(komune)]][0] + ""
             else:
                 where = "where komm = " + self.fylke_dict[komune][0]
                 for kommnr in range(1,len(self.fylke_dict)-1):
