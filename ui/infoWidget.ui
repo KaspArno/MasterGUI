@@ -54,7 +54,7 @@
         <item row="0" column="1">
          <widget class="QLabel" name="label_avstand_hc_text">
           <property name="text">
-           <string>Select Object</string>
+           <string>-</string>
           </property>
          </widget>
         </item>
@@ -68,7 +68,7 @@
         <item row="1" column="1">
          <widget class="QLabel" name="label_byggningstype_text">
           <property name="text">
-           <string>Select Object</string>
+           <string>-</string>
           </property>
          </widget>
         </item>
@@ -82,7 +82,7 @@
         <item row="2" column="1">
          <widget class="QLabel" name="label_ank_vei_stigning_text">
           <property name="text">
-           <string>Select Object</string>
+           <string>-</string>
           </property>
          </widget>
         </item>
@@ -96,7 +96,7 @@
         <item row="3" column="1">
          <widget class="QLabel" name="label_dortype_text">
           <property name="text">
-           <string>Select Object</string>
+           <string>-</string>
           </property>
          </widget>
         </item>
@@ -110,7 +110,7 @@
         <item row="4" column="1">
          <widget class="QLabel" name="label_dorapner_text">
           <property name="text">
-           <string>Select Object</string>
+           <string>-</string>
           </property>
          </widget>
         </item>
@@ -124,7 +124,7 @@
         <item row="5" column="1">
          <widget class="QLabel" name="label_ringeklokke_text">
           <property name="text">
-           <string>Select Object</string>
+           <string>-</string>
           </property>
          </widget>
         </item>
@@ -138,7 +138,7 @@
         <item row="6" column="1">
          <widget class="QLabel" name="label_ringeklokke_hoyde_text">
           <property name="text">
-           <string>Select Object</string>
+           <string>-</string>
           </property>
          </widget>
         </item>
@@ -152,7 +152,7 @@
         <item row="7" column="1">
          <widget class="QLabel" name="label_terskelhoyde_text">
           <property name="text">
-           <string>Select Object</string>
+           <string>-</string>
           </property>
          </widget>
         </item>
@@ -166,7 +166,7 @@
         <item row="8" column="1">
          <widget class="QLabel" name="label_inngang_bredde_text">
           <property name="text">
-           <string>Select Object</string>
+           <string>-</string>
           </property>
          </widget>
         </item>
@@ -180,7 +180,7 @@
         <item row="9" column="1">
          <widget class="QLabel" name="label_kontrast_text">
           <property name="text">
-           <string>Select Object</string>
+           <string>-</string>
           </property>
          </widget>
         </item>
@@ -194,7 +194,7 @@
         <item row="10" column="1">
          <widget class="QLabel" name="label_rampe_text">
           <property name="text">
-           <string>Select Object</string>
+           <string>-</string>
           </property>
          </widget>
         </item>

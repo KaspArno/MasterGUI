@@ -80,8 +80,10 @@ class Master:
 
         #Globale Variabler
         self.uspesifisert = ""
-        self.mer = "Mer enn" #for combobokser linket til mer eller mindre enn iteratsjoner
-        self.mindre = "Mindre enn"
+        self.mer = ">" #for combobokser linket til mer eller mindre enn iteratsjoner
+        self.mindre = "<"
+        self.mer_eller_lik = ">="
+        self.mindre_eller_lik = "<="
 
         #Attributter Inngangbygg
         self.att_bygg = "bygg_funksjon"
@@ -102,6 +104,7 @@ class Master:
         self.att_rmp_bredde = "rampe_bredde"
         self.att_hand1 = "hand_hoy_1"
         self.att_hand2 = "hand_hoy_2"
+        self.att_info_list = [self.att_avst_hc, self.att_bygg, self.att_ank_stig, self.att_dor, self.att_dorapner, self.att_ringeklokke, self.att_ringeklokke_hoyde, self.att_terslelhoyde, self.att_dorbredde, self.att_kontrast, self.att_rampe]
 
         #Attributter Tilgjengelighet
         self.att_rulle = "t_rulle_auto"
@@ -229,27 +232,51 @@ class Master:
         self.fill_combobox(inngangbygg, "t_rulle", self.dlg.comboBox_manuell_rullestol)
         self.fill_combobox(inngangbygg, "t_el_rulle_auto", self.dlg.comboBox_el_rullestol)
         self.fill_combobox(inngangbygg, "t_syn", self.dlg.comboBox_syn)
-        #self.dlg.comboBox_avstand_hc.clear()
-        #self.dlg.comboBox_avstand_hc.addItem(self.mer)
-        #self.dlg.comboBox_avstand_hc.addItem(self.mindre)
-        self.dlg.comboBox_ank_stigning.clear()
-        self.dlg.comboBox_ank_stigning.addItem(self.mer)
-        self.dlg.comboBox_ank_stigning.addItem(self.mindre)
-        self.dlg.comboBox_dorbredde.clear()
-        self.dlg.comboBox_dorbredde.addItem(self.mer)
-        self.dlg.comboBox_dorbredde.addItem(self.mindre)
-        self.dlg.comboBox_rmp_stigning.clear()
-        self.dlg.comboBox_rmp_stigning.addItem(self.mer)
-        self.dlg.comboBox_rmp_stigning.addItem(self.mindre)
-        self.dlg.comboBox_rmp_bredde.clear()
-        self.dlg.comboBox_rmp_bredde.addItem(self.mer)
-        self.dlg.comboBox_rmp_bredde.addItem(self.mindre)
-        self.dlg.comboBox_hand1.clear()
-        self.dlg.comboBox_hand1.addItem(self.mer)
-        self.dlg.comboBox_hand1.addItem(self.mindre)
-        self.dlg.comboBox_hand2.clear()
-        self.dlg.comboBox_hand2.addItem(self.mer)
-        self.dlg.comboBox_hand2.addItem(self.mindre)
+        self.fill_combobox(inngangbygg, "kontrast", self.dlg.comboBox_kontrast)
+        self.integer_valg_list = [self.dlg.comboBox_avstand_hc, self.dlg.comboBox_ank_stigning, self.dlg.comboBox_dorbredde, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_bredde, self.dlg.comboBox_hand1, self.dlg.comboBox_hand2, self.dlg.comboBox_terskel]
+        for cmbBox in self.integer_valg_list:
+            self.fill_combobox_mer_mindre(cmbBox)
+
+        # self.dlg.comboBox_avstand_hc.clear()
+        # self.dlg.comboBox_avstand_hc.addItem(self.mer)
+        # self.dlg.comboBox_avstand_hc.addItem(self.mindre)
+        # self.dlg.comboBox_avstand_hc.addItem(self.mer_eller_lik)
+        # self.dlg.comboBox_avstand_hc.addItem(self.mindre_eller_lik)
+        # self.dlg.comboBox_ank_stigning.clear()
+        # self.dlg.comboBox_ank_stigning.addItem(self.mer)
+        # self.dlg.comboBox_ank_stigning.addItem(self.mindre)
+        # self.dlg.comboBox_ank_stigning.addItem(self.mer_eller_lik)
+        # self.dlg.comboBox_ank_stigning.addItem(self.mindre_eller_lik)
+        # self.dlg.comboBox_dorbredde.clear()
+        # self.dlg.comboBox_dorbredde.addItem(self.mer)
+        # self.dlg.comboBox_dorbredde.addItem(self.mindre)
+        # self.dlg.comboBox_dorbredde.addItem(self.mer_eller_lik)
+        # self.dlg.comboBox_dorbredde.addItem(self.mindre_eller_lik)
+        # self.dlg.comboBox_rmp_stigning.clear()
+        # self.dlg.comboBox_rmp_stigning.addItem(self.mer)
+        # self.dlg.comboBox_rmp_stigning.addItem(self.mindre)
+        # self.dlg.comboBox_rmp_stigning.addItem(self.mer_eller_lik)
+        # self.dlg.comboBox_rmp_stigning.addItem(self.mindre_eller_lik)
+        # self.dlg.comboBox_rmp_bredde.clear()
+        # self.dlg.comboBox_rmp_bredde.addItem(self.mer)
+        # self.dlg.comboBox_rmp_bredde.addItem(self.mindre)
+        # self.dlg.comboBox_rmp_bredde.addItem(self.mer_eller_lik)
+        # self.dlg.comboBox_rmp_bredde.addItem(self.mindre_eller_lik)
+        # self.dlg.comboBox_hand1.clear()
+        # self.dlg.comboBox_hand1.addItem(self.mer)
+        # self.dlg.comboBox_hand1.addItem(self.mindre)
+        # self.dlg.comboBox_hand1.addItem(self.mer_eller_lik)
+        # self.dlg.comboBox_hand1.addItem(self.mindre_eller_lik)
+        # self.dlg.comboBox_hand2.clear()
+        # self.dlg.comboBox_hand2.addItem(self.mer)
+        # self.dlg.comboBox_hand2.addItem(self.mindre)
+        # self.dlg.comboBox_hand2.addItem(self.mer_eller_lik)
+        # self.dlg.comboBox_hand2.addItem(self.mindre_eller_lik)
+        # self.dlg.comboBox_terskel.clear()
+        # self.dlg.comboBox_terskel.addItem(self.mer)
+        # self.dlg.comboBox_terskel.addItem(self.mindre)
+        # self.dlg.comboBox_terskel.addItem(self.mer_eller_lik)
+        # self.dlg.comboBox_terskel.addItem(self.mindre_eller_lik)
 
         # remove source layer
         QgsMapLayerRegistry.instance().removeMapLayer( inngangbygg.id() )
@@ -326,25 +353,37 @@ class Master:
     def test(self):
         #print dir(self.dock.tableWidget.selectionModel().selectedRows().index())
         #self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), i).text())]])
+        infoWidget_label_list = [self.infoWidget.label_avstand_hc_text, self.infoWidget.label_byggningstype_text, self.infoWidget.label_ank_vei_stigning_text, self.infoWidget.label_dortype_text, self.infoWidget.label_dorapner_text, self.infoWidget.label_ringeklokke_text, self.infoWidget.label_ringeklokke_hoyde_text, self.infoWidget.label_terskelhoyde_text, self.infoWidget.label_inngang_bredde_text, self.infoWidget.label_kontrast_text, self.infoWidget.label_rampe_text]
         indexes = self.dock.tableWidget.selectionModel().selectedRows()
         for index in sorted(indexes):
             self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), 29).text())]])
             selection = self.newlayer.selectedFeatures()
 
             for feature in selection:
-                print feature[self.att_avst_hc]
-                self.infoWidget.label_avstand_hc_text.setText(str(feature[self.att_avst_hc]))
-                self.infoWidget.label_byggningstype_text.setText(feature[self.att_bygg])
-                self.infoWidget.label_ank_vei_stigning_text.setText(str(feature[self.att_ank_stig]))
-                self.infoWidget.label_dortype_text.setText(feature[self.att_dortype])
-                self.infoWidget.label_dorapner_text.setText(feature[self.att_dorapner])
-                self.infoWidget.label_ringeklokke_text.setText(feature[self.att_ringeklokke])
-                self.infoWidget.label_ringeklokke_hoyde_text.setText(str(feature[self.att_ringeklokke_hoyde]))
-                self.infoWidget.label_terskelhoyde_text.setText(str(feature[self.att_terslelhoyde]))
-                self.infoWidget.label_inngang_bredde_text.setText(str(feature[self.att_dorbredde]))
-                self.infoWidget.label_kontrast_text.setText(feature[self.att_kontrast])
-                self.infoWidget.label_rampe_text.setText(feature[self.att_rampe])
-                self.infoWidget.label_Inngang.setText(self.tilgjengelighet(selection, feature["ogc_fid"]))
+                for i in range(0, len(infoWidget_label_list)):
+                    try:
+                        if isinstance(feature[self.att_info_list[i]], (int, float)):
+                            infoWidget_label_list[i].setText((str(feature[self.att_info_list[i]])))
+                        else:
+                            infoWidget_label_list[i].setText((feature[self.att_info_list[i]]))
+                    except IndexError, e:
+                        print str(e)
+                    except Exception, e:
+                        infoWidget_label_list[i].setText("-")
+                        print str(e)
+
+                # self.infoWidget.label_avstand_hc_text.setText(str(feature[self.att_avst_hc]))
+                # self.infoWidget.label_byggningstype_text.setText(feature[self.att_bygg])
+                # self.infoWidget.label_ank_vei_stigning_text.setText(str(feature[self.att_ank_stig]))
+                # self.infoWidget.label_dortype_text.setText(feature[self.att_dortype])
+                # self.infoWidget.label_dorapner_text.setText(feature[self.att_dorapner])
+                # self.infoWidget.label_ringeklokke_text.setText(feature[self.att_ringeklokke])
+                # self.infoWidget.label_ringeklokke_hoyde_text.setText(str(feature[self.att_ringeklokke_hoyde]))
+                # self.infoWidget.label_terskelhoyde_text.setText(str(feature[self.att_terslelhoyde]))
+                # self.infoWidget.label_inngang_bredde_text.setText(str(feature[self.att_dorbredde]))
+                # self.infoWidget.label_kontrast_text.setText(feature[self.att_kontrast])
+                # self.infoWidget.label_rampe_text.setText(feature[self.att_rampe])
+                # self.infoWidget.label_Inngang.setText(self.tilgjengelighet(selection, feature["ogc_fid"]))
 
             # for i in range(0, self.nrColumn):
             #     if i == 2:
@@ -432,6 +471,15 @@ class Master:
 
             if not isinstance(name, QPyNullVariant) and combobox.findText(name) < 0:
                 combobox.addItem(name)
+
+    def fill_combobox_mer_mindre(self, combobox):
+        combobox.clear()
+        combobox.addItem(self.mer)
+        combobox.addItem(self.mindre)
+        combobox.addItem(self.mer_eller_lik)
+        combobox.addItem(self.mindre_eller_lik)
+        
+        
 
     def showResults(self, layer):
         prov = layer.dataProvider()
@@ -581,7 +629,7 @@ class Master:
         else:
             print "layer succeeded to load"
             self.showResults(self.newlayer)
-            self.iface.addDockWidget( Qt.RightDockWidgetArea , self.obj_info_dockwidget )
+            self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
 
 
         
