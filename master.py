@@ -25,7 +25,7 @@ import os.path
 import io
 
 from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry, QgsVectorLayer
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant, QDateTime, Qt
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant, QDateTime, QThread, pyqtSignal, Qt
 from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox, QApplication, QHBoxLayout, QVBoxLayout, QAbstractItemView, QListWidgetItem, QAbstractItemView
 # Initialize Qt resources from file resources.py
 import resources
@@ -39,6 +39,34 @@ from infoWidgetDialog import infoWidgetDialog
 from mytable import MyTable
 from test_table import Table
 
+
+class SelectThread(QThread):
+
+    data_downloaded = pyqtSignal(object)
+
+    def __init__(self, infoWidget_label_list, att_info_list):
+        QThread.__init__(self, )
+        #self.layer = layer
+        #self.info_widget = info_widget
+        self.infoWidget_label_list = infoWidget_label_list
+        self.att_info_list = att_info_list
+
+    def run(self):
+        while True:
+            layer = iface.activeLayer()
+            selection = self.layer.selectedFeatures()
+            for feature in selection:
+                        for i in range(0, len(infoWidget_label_list)):
+                            try:
+                                if isinstance(feature[self.att_info_list[i]], (int, float)):
+                                    infoWidget_label_list[i].setText((str(feature[self.att_info_list[i]])))
+                                else:
+                                    infoWidget_label_list[i].setText((feature[self.att_info_list[i]]))
+                            except IndexError, e:
+                                print str(e)
+                            except Exception, e:
+                                infoWidget_label_list[i].setText("-")
+                                print str(e)
 
 
 class Master:
@@ -114,6 +142,7 @@ class Master:
         #Annet
         self.feature_id = {}
         self.canvas = self.iface.mapCanvas()
+        self.newlayer = None
         
 
         
@@ -342,7 +371,9 @@ class Master:
     def connect_database(self):
         uri = QgsDataSourceURI()
         uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
+        #uri.setConnection("46.101.4.130","5432","webinar","webinar","webinar")
         sql = "(select * from tilgjengelighet.t_inngangbygg)"
+        #sql = "(select * from kasper_master.t_inngangbygg)"
         uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
         vlayer = QgsVectorLayer(uri.uri(),"inngangbygg","postgres")
         QgsMapLayerRegistry.instance().addMapLayer(vlayer)
@@ -355,22 +386,23 @@ class Master:
         #self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), i).text())]])
         infoWidget_label_list = [self.infoWidget.label_avstand_hc_text, self.infoWidget.label_byggningstype_text, self.infoWidget.label_ank_vei_stigning_text, self.infoWidget.label_dortype_text, self.infoWidget.label_dorapner_text, self.infoWidget.label_ringeklokke_text, self.infoWidget.label_ringeklokke_hoyde_text, self.infoWidget.label_terskelhoyde_text, self.infoWidget.label_inngang_bredde_text, self.infoWidget.label_kontrast_text, self.infoWidget.label_rampe_text]
         indexes = self.dock.tableWidget.selectionModel().selectedRows()
-        for index in sorted(indexes):
-            self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), 29).text())]])
-            selection = self.newlayer.selectedFeatures()
+        if self.newlayer is not None:
+            for index in sorted(indexes):
+                self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), 29).text())]])
+                selection = self.newlayer.selectedFeatures()
 
-            for feature in selection:
-                for i in range(0, len(infoWidget_label_list)):
-                    try:
-                        if isinstance(feature[self.att_info_list[i]], (int, float)):
-                            infoWidget_label_list[i].setText((str(feature[self.att_info_list[i]])))
-                        else:
-                            infoWidget_label_list[i].setText((feature[self.att_info_list[i]]))
-                    except IndexError, e:
-                        print str(e)
-                    except Exception, e:
-                        infoWidget_label_list[i].setText("-")
-                        print str(e)
+                for feature in selection:
+                    for i in range(0, len(infoWidget_label_list)):
+                        try:
+                            if isinstance(feature[self.att_info_list[i]], (int, float)):
+                                infoWidget_label_list[i].setText((str(feature[self.att_info_list[i]])))
+                            else:
+                                infoWidget_label_list[i].setText((feature[self.att_info_list[i]]))
+                        except IndexError, e:
+                            print str(e)
+                        except Exception, e:
+                            infoWidget_label_list[i].setText("-")
+                            print str(e)
 
                 # self.infoWidget.label_avstand_hc_text.setText(str(feature[self.att_avst_hc]))
                 # self.infoWidget.label_byggningstype_text.setText(feature[self.att_bygg])
@@ -413,42 +445,42 @@ class Master:
             #         #newlayer.setSelectedFeatures([self.feature_id[f[self.infoWidget.label_kontrast_text.setText(self.dock.tableWidget.item(index.row(), i).text())]]])
 
 
-    def tilgjengelighet(self, selection, ogc_fid):
-        tilgjengelighet =  "NULL"
-        uri2 = self.uri
-        sql = "(select * from tilgjengelighet.t_inngangbygg where (rampe = 'Nei' AND (avstand_hc_park > 25 OR avstand_hc_park IS NULL) OR dorapner = 'Manuell'OR (dorapner = 'Halvautomatisk' AND man_knap_hoyde <= 130)OR (adko_stig_grad > 2.9 AND adko_stig_grad <= 4.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Vanskelig tilgjengelig')OR (avstand_hc_park > 25 OR avstand_hc_park IS NULL) OR dorapner = 'Manuell'OR (dorapner = 'Halvautomatisk' AND man_knap_hoyde <= 130) OR (adko_stig_grad > 2.9 AND adko_stig_grad <= 4.9)OR (rampe_stigning > 2.9 AND rampe_stigning <= 4.9)) and ogc_fid = " + str(ogc_fid) + ")"
-        uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-        vlayer = QgsVectorLayer(uri2.uri(),"delvis_tilgjengelig","postgres")
+    # def tilgjengelighet(self, selection, ogc_fid):
+    #     tilgjengelighet =  "NULL"
+    #     uri2 = self.uri
+    #     sql = "(select * from tilgjengelighet.t_inngangbygg where (rampe = 'Nei' AND (avstand_hc_park > 25 OR avstand_hc_park IS NULL) OR dorapner = 'Manuell'OR (dorapner = 'Halvautomatisk' AND man_knap_hoyde <= 130)OR (adko_stig_grad > 2.9 AND adko_stig_grad <= 4.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Vanskelig tilgjengelig')OR (avstand_hc_park > 25 OR avstand_hc_park IS NULL) OR dorapner = 'Manuell'OR (dorapner = 'Halvautomatisk' AND man_knap_hoyde <= 130) OR (adko_stig_grad > 2.9 AND adko_stig_grad <= 4.9)OR (rampe_stigning > 2.9 AND rampe_stigning <= 4.9)) and ogc_fid = " + str(ogc_fid) + ")"
+    #     uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
+    #     vlayer = QgsVectorLayer(uri2.uri(),"delvis_tilgjengelig","postgres")
 
-        if vlayer.isValid():
-            tilgjengelighet =  "delvis Tilgjengelig"
-            print tilgjengelighet
+    #     if vlayer.isValid():
+    #         tilgjengelighet =  "delvis Tilgjengelig"
+    #         print tilgjengelighet
 
-        sql = "(select * from tilgjengelighet.t_inngangbygg WHERE rampe = 'Nei' AND (avstand_hc_park <= 25 AND (dorapner = 'Halvautomatisk' AND man_knap_hoyde BETWEEN 80 AND 110)AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9) OR rampe = 'Nei' AND (avstand_hc_park <= 25 AND dorapner = 'Automatisk'AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Tilgjengelig'AND avstand_hc_park <= 25 AND (dorapner = 'Halvautomatisk' AND man_knap_hoyde BETWEEN 80 AND 110)AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Tilgjengelig'AND avstand_hc_park <= 25 AND dorapner = 'Automatisk'AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9)) and ogc_fid = " + str(ogc_fid) + ")"
-        uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-        vlayer = QgsVectorLayer(uri2.uri(),"tilgjengelig","postgres")
+    #     sql = "(select * from tilgjengelighet.t_inngangbygg WHERE rampe = 'Nei' AND (avstand_hc_park <= 25 AND (dorapner = 'Halvautomatisk' AND man_knap_hoyde BETWEEN 80 AND 110)AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9) OR rampe = 'Nei' AND (avstand_hc_park <= 25 AND dorapner = 'Automatisk'AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Tilgjengelig'AND avstand_hc_park <= 25 AND (dorapner = 'Halvautomatisk' AND man_knap_hoyde BETWEEN 80 AND 110)AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Tilgjengelig'AND avstand_hc_park <= 25 AND dorapner = 'Automatisk'AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9)) and ogc_fid = " + str(ogc_fid) + ")"
+    #     uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
+    #     vlayer = QgsVectorLayer(uri2.uri(),"tilgjengelig","postgres")
 
-        if vlayer.isValid():
-            tilgjengelighet =  "Tilgjengelig"
-            print tilgjengelighet
+    #     if vlayer.isValid():
+    #         tilgjengelighet =  "Tilgjengelig"
+    #         print tilgjengelighet
 
-        sql = "(select * from tilgjengelighet.t_inngangbygg WHERE (rampe IS NULLOR rampe = 'Nei'  AND (inngang_bredde IS NULL OR terskel_hoyde IS NULL OR adko_stig_grad IS NULL) OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Ikke vurdert' OR inngang_bredde IS NULLOR terskel_hoyde IS NULL OR adko_stig_grad IS NULL OR rampe_bredde IS NULL OR handlist IS NULL OR rampe_terskel IS NULL OR rampe_stigning IS NULL)) and ogc_fid = " + str(ogc_fid) + ")"
-        uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-        vlayer = QgsVectorLayer(uri2.uri(),"tilgjengelig","postgres")
+    #     sql = "(select * from tilgjengelighet.t_inngangbygg WHERE (rampe IS NULLOR rampe = 'Nei'  AND (inngang_bredde IS NULL OR terskel_hoyde IS NULL OR adko_stig_grad IS NULL) OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Ikke vurdert' OR inngang_bredde IS NULLOR terskel_hoyde IS NULL OR adko_stig_grad IS NULL OR rampe_bredde IS NULL OR handlist IS NULL OR rampe_terskel IS NULL OR rampe_stigning IS NULL)) and ogc_fid = " + str(ogc_fid) + ")"
+    #     uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
+    #     vlayer = QgsVectorLayer(uri2.uri(),"tilgjengelig","postgres")
 
-        if vlayer.isValid():
-            tilgjengelighet =  "Ikke vurdert"
-            print tilgjengelighet
+    #     if vlayer.isValid():
+    #         tilgjengelighet =  "Ikke vurdert"
+    #         print tilgjengelighet
 
-        sql = "(select * from tilgjengelighet.t_inngangbygg WHERE rampe = 'Ja' AND (rampe_tilgjengelig = 'Ikke tilgjengelig'OR inngang_bredde < 90 OR terskel_hoyde > 2.5 OR adko_stig_grad > 4.9OR man_knap_hoyde > 130) OR rampe = 'Nei' AND (inngang_bredde < 90OR terskel_hoyde > 2.5 OR adko_stig_grad > 4.9OR man_knap_hoyde > 130) and ogc_fid = " + str(ogc_fid) + ")"
-        uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-        vlayer = QgsVectorLayer(uri2.uri(),"tilgjengelig","postgres")
+    #     sql = "(select * from tilgjengelighet.t_inngangbygg WHERE rampe = 'Ja' AND (rampe_tilgjengelig = 'Ikke tilgjengelig'OR inngang_bredde < 90 OR terskel_hoyde > 2.5 OR adko_stig_grad > 4.9OR man_knap_hoyde > 130) OR rampe = 'Nei' AND (inngang_bredde < 90OR terskel_hoyde > 2.5 OR adko_stig_grad > 4.9OR man_knap_hoyde > 130) and ogc_fid = " + str(ogc_fid) + ")"
+    #     uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
+    #     vlayer = QgsVectorLayer(uri2.uri(),"tilgjengelig","postgres")
 
-        if vlayer.isValid():
-            tilgjengelighet =  "Ikke vurdert"
-            print tilgjengelighet
+    #     if vlayer.isValid():
+    #         tilgjengelighet =  "Ikke vurdert"
+    #         print tilgjengelighet
 
-        return tilgjengelighet
+    #     return tilgjengelighet
 
         # uri = QgsDataSourceURI()
         # uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
@@ -593,15 +625,16 @@ class Master:
         ing_atr_lineedit = {self.att_avst_hc : [avstand_hc, self.dlg.comboBox_avstand_hc.currentText()], self.att_ank_stig : [ank_stigning, self.dlg.comboBox_ank_stigning.currentText()], self.att_dorbredde : [dorbredde, self.dlg.comboBox_dorbredde.currentText()], self.att_rmp_stigning : [rmp_stigning, self.dlg.comboBox_rmp_stigning.currentText()], self.att_rmp_bredde : [rmp_bredde, self.dlg.comboBox_rmp_bredde.currentText()], self.att_hand1 : [hand1, self.dlg.comboBox_hand1.currentText()], self.att_hand2 : [hand2, self.dlg.comboBox_hand2.currentText()]}
 
         sql = "select * from tilgjengelighet.t_inngangbygg"
+        #sql = "select * from kasper_master.t_inngangbygg"
         where = "".decode('utf-8')
 
 
         if komune != self.uspesifisert:
-            if komune[0:4] == "    ":
+            if komune[0:4] == "    ": #If a city is chosen, and not a county
                 where = "where komm = " + self.komm_dict[komune[4:len(komune)]][0] + ""
-            else:
+            else: #If a county is chosen
                 where = "where komm = " + self.fylke_dict[komune][0]
-                for kommnr in range(1,len(self.fylke_dict)-1):
+                for kommnr in range(1,len(self.fylke_dict[komune])-1): #iterate throu the rest of the cityes in the county
                     where = where + " or komm = " + self.fylke_dict[komune][kommnr]
 
         for atr, value in ing_atr_combobox.iteritems():
@@ -632,7 +665,10 @@ class Master:
             self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
 
 
-        
+        infoWidget_label_list = [self.infoWidget.label_avstand_hc_text, self.infoWidget.label_byggningstype_text, self.infoWidget.label_ank_vei_stigning_text, self.infoWidget.label_dortype_text, self.infoWidget.label_dorapner_text, self.infoWidget.label_ringeklokke_text, self.infoWidget.label_ringeklokke_hoyde_text, self.infoWidget.label_terskelhoyde_text, self.infoWidget.label_inngang_bredde_text, self.infoWidget.label_kontrast_text, self.infoWidget.label_rampe_text]
+
+        # thread = SelectThread(infoWidget_label_list, self.att_info_list)
+        # thread.start()
         print "Filtering End"
         
 
