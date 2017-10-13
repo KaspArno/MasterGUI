@@ -370,10 +370,10 @@ class Master:
 
     def connect_database(self):
         uri = QgsDataSourceURI()
-        uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
-        #uri.setConnection("46.101.4.130","5432","webinar","webinar","webinar")
-        sql = "(select * from tilgjengelighet.t_inngangbygg)"
-        #sql = "(select * from kasper_master.t_inngangbygg)"
+        #uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
+        uri.setConnection("46.101.4.130","5432","webinar","webinar","webinar")
+        #sql = "(select * from tilgjengelighet.t_inngangbygg)"
+        sql = "(select * from kasper_master.t_inngangbygg)"
         uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
         vlayer = QgsVectorLayer(uri.uri(),"inngangbygg","postgres")
         QgsMapLayerRegistry.instance().addMapLayer(vlayer)
@@ -624,8 +624,8 @@ class Master:
 
         ing_atr_lineedit = {self.att_avst_hc : [avstand_hc, self.dlg.comboBox_avstand_hc.currentText()], self.att_ank_stig : [ank_stigning, self.dlg.comboBox_ank_stigning.currentText()], self.att_dorbredde : [dorbredde, self.dlg.comboBox_dorbredde.currentText()], self.att_rmp_stigning : [rmp_stigning, self.dlg.comboBox_rmp_stigning.currentText()], self.att_rmp_bredde : [rmp_bredde, self.dlg.comboBox_rmp_bredde.currentText()], self.att_hand1 : [hand1, self.dlg.comboBox_hand1.currentText()], self.att_hand2 : [hand2, self.dlg.comboBox_hand2.currentText()]}
 
-        sql = "select * from tilgjengelighet.t_inngangbygg"
-        #sql = "select * from kasper_master.t_inngangbygg"
+        #sql = "select * from tilgjengelighet.t_inngangbygg"
+        sql = "select * from kasper_master.t_inngangbygg"
         where = "".decode('utf-8')
 
 
@@ -649,7 +649,7 @@ class Master:
 
         sql = "(" + sql + " " + where + ")"
 
-        print sql
+        #print sql
 
         self.uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
         self.newlayer = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
