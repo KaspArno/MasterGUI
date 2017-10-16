@@ -142,7 +142,7 @@ class Master:
         #Annet
         self.feature_id = {}
         self.canvas = self.iface.mapCanvas()
-        self.newlayer = None
+        self.layer_inngang = None
         
 
         
@@ -254,7 +254,7 @@ class Master:
         inngangbygg = self.add_layers()
 
         #fill comboboxes
-        self.fill_komuner()
+        self.fill_fylker()
         self.fill_combobox(inngangbygg, "bygg_funksjon", self.dlg.comboBox_byggningstype)
         self.fill_combobox(inngangbygg, "dortype", self.dlg.comboBox_dortype)
         self.fill_combobox(inngangbygg, "handlist", self.dlg.comboBox_handliste)
@@ -265,47 +265,6 @@ class Master:
         self.integer_valg_list = [self.dlg.comboBox_avstand_hc, self.dlg.comboBox_ank_stigning, self.dlg.comboBox_dorbredde, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_bredde, self.dlg.comboBox_hand1, self.dlg.comboBox_hand2, self.dlg.comboBox_terskel]
         for cmbBox in self.integer_valg_list:
             self.fill_combobox_mer_mindre(cmbBox)
-
-        # self.dlg.comboBox_avstand_hc.clear()
-        # self.dlg.comboBox_avstand_hc.addItem(self.mer)
-        # self.dlg.comboBox_avstand_hc.addItem(self.mindre)
-        # self.dlg.comboBox_avstand_hc.addItem(self.mer_eller_lik)
-        # self.dlg.comboBox_avstand_hc.addItem(self.mindre_eller_lik)
-        # self.dlg.comboBox_ank_stigning.clear()
-        # self.dlg.comboBox_ank_stigning.addItem(self.mer)
-        # self.dlg.comboBox_ank_stigning.addItem(self.mindre)
-        # self.dlg.comboBox_ank_stigning.addItem(self.mer_eller_lik)
-        # self.dlg.comboBox_ank_stigning.addItem(self.mindre_eller_lik)
-        # self.dlg.comboBox_dorbredde.clear()
-        # self.dlg.comboBox_dorbredde.addItem(self.mer)
-        # self.dlg.comboBox_dorbredde.addItem(self.mindre)
-        # self.dlg.comboBox_dorbredde.addItem(self.mer_eller_lik)
-        # self.dlg.comboBox_dorbredde.addItem(self.mindre_eller_lik)
-        # self.dlg.comboBox_rmp_stigning.clear()
-        # self.dlg.comboBox_rmp_stigning.addItem(self.mer)
-        # self.dlg.comboBox_rmp_stigning.addItem(self.mindre)
-        # self.dlg.comboBox_rmp_stigning.addItem(self.mer_eller_lik)
-        # self.dlg.comboBox_rmp_stigning.addItem(self.mindre_eller_lik)
-        # self.dlg.comboBox_rmp_bredde.clear()
-        # self.dlg.comboBox_rmp_bredde.addItem(self.mer)
-        # self.dlg.comboBox_rmp_bredde.addItem(self.mindre)
-        # self.dlg.comboBox_rmp_bredde.addItem(self.mer_eller_lik)
-        # self.dlg.comboBox_rmp_bredde.addItem(self.mindre_eller_lik)
-        # self.dlg.comboBox_hand1.clear()
-        # self.dlg.comboBox_hand1.addItem(self.mer)
-        # self.dlg.comboBox_hand1.addItem(self.mindre)
-        # self.dlg.comboBox_hand1.addItem(self.mer_eller_lik)
-        # self.dlg.comboBox_hand1.addItem(self.mindre_eller_lik)
-        # self.dlg.comboBox_hand2.clear()
-        # self.dlg.comboBox_hand2.addItem(self.mer)
-        # self.dlg.comboBox_hand2.addItem(self.mindre)
-        # self.dlg.comboBox_hand2.addItem(self.mer_eller_lik)
-        # self.dlg.comboBox_hand2.addItem(self.mindre_eller_lik)
-        # self.dlg.comboBox_terskel.clear()
-        # self.dlg.comboBox_terskel.addItem(self.mer)
-        # self.dlg.comboBox_terskel.addItem(self.mindre)
-        # self.dlg.comboBox_terskel.addItem(self.mer_eller_lik)
-        # self.dlg.comboBox_terskel.addItem(self.mindre_eller_lik)
 
         # remove source layer
         QgsMapLayerRegistry.instance().removeMapLayer( inngangbygg.id() )
@@ -334,6 +293,12 @@ class Master:
         filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
         filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
         self.dock.tableWidget.itemClicked.connect(self.test)
+        self.dlg.pushButton_reset.clicked.connect(self.reset)
+
+        #set combobox functions
+        fylker_cmb_changed = self.dlg.comboBox_fylker
+        fylker_cmb_changed.currentIndexChanged.connect(self.fylke_valgt) #Filling cityes from county
+        self.dlg.comboBox_komuner.currentIndexChanged.connect(lambda x: self.dlg.lineEdit_navn_paa_sok_inngang.setText(self.dlg.comboBox_komuner.currentText())) #seting name for search to city chosen
 
         
 
@@ -370,10 +335,10 @@ class Master:
 
     def connect_database(self):
         uri = QgsDataSourceURI()
-        #uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
-        uri.setConnection("46.101.4.130","5432","webinar","webinar","webinar")
-        #sql = "(select * from tilgjengelighet.t_inngangbygg)"
-        sql = "(select * from kasper_master.t_inngangbygg)"
+        uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
+        #uri.setConnection("46.101.4.130","5432","webinar","webinar","webinar")
+        sql = "(select * from tilgjengelighet.t_inngangbygg)"
+        #sql = "(select * from kasper_master.t_inngangbygg)"
         uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
         vlayer = QgsVectorLayer(uri.uri(),"inngangbygg","postgres")
         QgsMapLayerRegistry.instance().addMapLayer(vlayer)
@@ -383,13 +348,13 @@ class Master:
 
     def test(self):
         #print dir(self.dock.tableWidget.selectionModel().selectedRows().index())
-        #self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), i).text())]])
+        #self.layer_inngang.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), i).text())]])
         infoWidget_label_list = [self.infoWidget.label_avstand_hc_text, self.infoWidget.label_byggningstype_text, self.infoWidget.label_ank_vei_stigning_text, self.infoWidget.label_dortype_text, self.infoWidget.label_dorapner_text, self.infoWidget.label_ringeklokke_text, self.infoWidget.label_ringeklokke_hoyde_text, self.infoWidget.label_terskelhoyde_text, self.infoWidget.label_inngang_bredde_text, self.infoWidget.label_kontrast_text, self.infoWidget.label_rampe_text]
         indexes = self.dock.tableWidget.selectionModel().selectedRows()
-        if self.newlayer is not None:
+        if self.layer_inngang is not None:
             for index in sorted(indexes):
-                self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), 29).text())]])
-                selection = self.newlayer.selectedFeatures()
+                self.layer_inngang.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), 29).text())]])
+                selection = self.layer_inngang.selectedFeatures()
 
                 for feature in selection:
                     for i in range(0, len(infoWidget_label_list)):
@@ -403,91 +368,6 @@ class Master:
                         except Exception, e:
                             infoWidget_label_list[i].setText("-")
                             print str(e)
-
-                # self.infoWidget.label_avstand_hc_text.setText(str(feature[self.att_avst_hc]))
-                # self.infoWidget.label_byggningstype_text.setText(feature[self.att_bygg])
-                # self.infoWidget.label_ank_vei_stigning_text.setText(str(feature[self.att_ank_stig]))
-                # self.infoWidget.label_dortype_text.setText(feature[self.att_dortype])
-                # self.infoWidget.label_dorapner_text.setText(feature[self.att_dorapner])
-                # self.infoWidget.label_ringeklokke_text.setText(feature[self.att_ringeklokke])
-                # self.infoWidget.label_ringeklokke_hoyde_text.setText(str(feature[self.att_ringeklokke_hoyde]))
-                # self.infoWidget.label_terskelhoyde_text.setText(str(feature[self.att_terslelhoyde]))
-                # self.infoWidget.label_inngang_bredde_text.setText(str(feature[self.att_dorbredde]))
-                # self.infoWidget.label_kontrast_text.setText(feature[self.att_kontrast])
-                # self.infoWidget.label_rampe_text.setText(feature[self.att_rampe])
-                # self.infoWidget.label_Inngang.setText(self.tilgjengelighet(selection, feature["ogc_fid"]))
-
-            # for i in range(0, self.nrColumn):
-            #     if i == 2:
-            #         self.infoWidget.label_avstand_hc_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-            #     if i == 3:
-            #         self.infoWidget.label_dortype_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-            #     if i == 4:
-            #         self.infoWidget.label_rampe_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-            #     if i == 6:
-            #         self.infoWidget.label_ank_vei_stigning_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-            #     if i == 7:
-            #         self.infoWidget.label_terskelhoyde_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-            #     if i == 8:
-            #         self.infoWidget.label_ringeklokke_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-            #     if i == 9:
-            #         self.infoWidget.label_ringeklokke_hoyde_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-            #     if i == 11:
-            #         self.infoWidget.label_inngang_bredde_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-            #     if i == 16:
-            #         self.infoWidget.label_byggningstype_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-            #     if i == 18:
-            #         self.infoWidget.label_dorapner_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-            #     if i == 22:
-            #         self.infoWidget.label_kontrast_text.setText(self.dock.tableWidget.item(index.row(), i).text())
-            #     if i == 29:
-            #         self.newlayer.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), i).text())]])
-            #         #newlayer.setSelectedFeatures([self.feature_id[f[self.infoWidget.label_kontrast_text.setText(self.dock.tableWidget.item(index.row(), i).text())]]])
-
-
-    # def tilgjengelighet(self, selection, ogc_fid):
-    #     tilgjengelighet =  "NULL"
-    #     uri2 = self.uri
-    #     sql = "(select * from tilgjengelighet.t_inngangbygg where (rampe = 'Nei' AND (avstand_hc_park > 25 OR avstand_hc_park IS NULL) OR dorapner = 'Manuell'OR (dorapner = 'Halvautomatisk' AND man_knap_hoyde <= 130)OR (adko_stig_grad > 2.9 AND adko_stig_grad <= 4.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Vanskelig tilgjengelig')OR (avstand_hc_park > 25 OR avstand_hc_park IS NULL) OR dorapner = 'Manuell'OR (dorapner = 'Halvautomatisk' AND man_knap_hoyde <= 130) OR (adko_stig_grad > 2.9 AND adko_stig_grad <= 4.9)OR (rampe_stigning > 2.9 AND rampe_stigning <= 4.9)) and ogc_fid = " + str(ogc_fid) + ")"
-    #     uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-    #     vlayer = QgsVectorLayer(uri2.uri(),"delvis_tilgjengelig","postgres")
-
-    #     if vlayer.isValid():
-    #         tilgjengelighet =  "delvis Tilgjengelig"
-    #         print tilgjengelighet
-
-    #     sql = "(select * from tilgjengelighet.t_inngangbygg WHERE rampe = 'Nei' AND (avstand_hc_park <= 25 AND (dorapner = 'Halvautomatisk' AND man_knap_hoyde BETWEEN 80 AND 110)AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9) OR rampe = 'Nei' AND (avstand_hc_park <= 25 AND dorapner = 'Automatisk'AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Tilgjengelig'AND avstand_hc_park <= 25 AND (dorapner = 'Halvautomatisk' AND man_knap_hoyde BETWEEN 80 AND 110)AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Tilgjengelig'AND avstand_hc_park <= 25 AND dorapner = 'Automatisk'AND inngang_bredde >= 90 AND terskel_hoyde <= 2.5 AND adko_stig_grad <= 2.9)) and ogc_fid = " + str(ogc_fid) + ")"
-    #     uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-    #     vlayer = QgsVectorLayer(uri2.uri(),"tilgjengelig","postgres")
-
-    #     if vlayer.isValid():
-    #         tilgjengelighet =  "Tilgjengelig"
-    #         print tilgjengelighet
-
-    #     sql = "(select * from tilgjengelighet.t_inngangbygg WHERE (rampe IS NULLOR rampe = 'Nei'  AND (inngang_bredde IS NULL OR terskel_hoyde IS NULL OR adko_stig_grad IS NULL) OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Ikke vurdert' OR inngang_bredde IS NULLOR terskel_hoyde IS NULL OR adko_stig_grad IS NULL OR rampe_bredde IS NULL OR handlist IS NULL OR rampe_terskel IS NULL OR rampe_stigning IS NULL)) and ogc_fid = " + str(ogc_fid) + ")"
-    #     uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-    #     vlayer = QgsVectorLayer(uri2.uri(),"tilgjengelig","postgres")
-
-    #     if vlayer.isValid():
-    #         tilgjengelighet =  "Ikke vurdert"
-    #         print tilgjengelighet
-
-    #     sql = "(select * from tilgjengelighet.t_inngangbygg WHERE rampe = 'Ja' AND (rampe_tilgjengelig = 'Ikke tilgjengelig'OR inngang_bredde < 90 OR terskel_hoyde > 2.5 OR adko_stig_grad > 4.9OR man_knap_hoyde > 130) OR rampe = 'Nei' AND (inngang_bredde < 90OR terskel_hoyde > 2.5 OR adko_stig_grad > 4.9OR man_knap_hoyde > 130) and ogc_fid = " + str(ogc_fid) + ")"
-    #     uri2.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-    #     vlayer = QgsVectorLayer(uri2.uri(),"tilgjengelig","postgres")
-
-    #     if vlayer.isValid():
-    #         tilgjengelighet =  "Ikke vurdert"
-    #         print tilgjengelighet
-
-    #     return tilgjengelighet
-
-        # uri = QgsDataSourceURI()
-        # uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
-        # sql = "(select * from tilgjengelighet.t_inngangbygg where (rampe = 'Nei' AND (avstand_hc_park > 25 OR avstand_hc_park IS NULL) OR dorapner = 'Manuell'OR (dorapner = 'Halvautomatisk' AND man_knap_hoyde <= 130)OR (adko_stig_grad > 2.9 AND adko_stig_grad <= 4.9)OR rampe = 'Ja' AND (rampe_tilgjengelig = 'Vanskelig tilgjengelig')OR (avstand_hc_park > 25 OR avstand_hc_park IS NULL) OR dorapner = 'Manuell'OR (dorapner = 'Halvautomatisk' AND man_knap_hoyde <= 130) OR (adko_stig_grad > 2.9 AND adko_stig_grad <= 4.9)OR (rampe_stigning > 2.9 AND rampe_stigning <= 4.9)) and ogc_fid = " + ogc_fid + ")"
-        # uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-        # vlayer = QgsVectorLayer(uri2.uri(),"delvis_tilgjengelig","postgres")
-        # QgsMapLayerRegistry.instance().addMapLayer(vlayer)
 
 
     def fill_combobox(self, layer, feat_name, combobox):
@@ -554,32 +434,73 @@ class Master:
         self.iface.addDockWidget( Qt.BottomDockWidgetArea , self.obdockwidget ) #adding seartch result Widget
 
 
-    def fill_komuner(self):
-        self.dlg.comboBox_komuner.clear()
-        self.dlg.comboBox_komuner.addItem(self.uspesifisert)
+    def fill_fylker(self):
+        self.dlg.comboBox_fylker.clear()
+        self.dlg.comboBox_fylker.addItem("Norge")
 
-        #filename = 'C:\Users\kaspa_000\.qgis2\python\plugins\MasterGUI\komm.txt'
         filename = self.plugin_dir + "\komm.txt"
-
-        self.komm_dict = {}
+        self.komm_dict_nr = {}
+        self.komm_dict_nm = {}
         self.fylke_dict = {}
-        with io.open(filename,'r',encoding='utf-8') as f:
+
+        with io.open(filename, 'r', encoding='utf-8') as f:
             for line in f:
                 komm_nr, komune, fylke = line.rstrip('\n').split(("\t"))
                 komm_nr = self.to_unicode(komm_nr)
                 komune = self.to_unicode(komune)
                 fylke = self.to_unicode(fylke)
-                self.komm_dict[komune] = [komm_nr, fylke]
-                #self.dlg.comboBox_komuner.addItem(komune)
-                #print komune
+
+                self.komm_dict_nr[komm_nr] = komune
+                self.komm_dict_nm[komune] = komm_nr
                 if not fylke in self.fylke_dict:
                     self.fylke_dict[fylke] = []
-                    self.dlg.comboBox_komuner.addItem(fylke)
-                self.fylke_dict[fylke].append(komm_nr)
-                self.dlg.comboBox_komuner.addItem("    " + komune)
-        #print self.fylke_dict
+                    self.dlg.comboBox_fylker.addItem(fylke)
 
-        #print komm_nr
+                self.fylke_dict[fylke].append(komm_nr)
+
+
+    def fylke_valgt(self):
+        fylke = self.dlg.comboBox_fylker.currentText()
+        self.dlg.comboBox_komuner.clear()
+        self.dlg.comboBox_komuner.addItem(self.uspesifisert)
+        if fylke != "Norge":   
+            for komune_nr in self.fylke_dict[fylke]:
+                self.dlg.comboBox_komuner.addItem(self.komm_dict_nr[komune_nr])
+        self.dlg.lineEdit_navn_paa_sok_inngang.setText(fylke)
+
+    # def fill_komuner(self):
+    #     self.dlg.comboBox_komuner.clear()
+    #     self.dlg.comboBox_komuner.addItem(self.uspesifisert)
+
+    #     #filename = 'C:\Users\kaspa_000\.qgis2\python\plugins\MasterGUI\komm.txt'
+    #     filename = self.plugin_dir + "\komm.txt"
+
+    #     self.komm_dict = {}
+    #     self.fylke_dict = {}
+    #     with io.open(filename,'r',encoding='utf-8') as f:
+    #         for line in f:
+    #             komm_nr, komune, fylke = line.rstrip('\n').split(("\t"))
+    #             komm_nr = self.to_unicode(komm_nr)
+    #             komune = self.to_unicode(komune)
+    #             fylke = self.to_unicode(fylke)
+    #             self.komm_dict[komune] = [komm_nr, fylke]
+    #             #self.dlg.comboBox_komuner.addItem(komune)
+    #             #print komune
+    #             if not fylke in self.fylke_dict:
+    #                 self.fylke_dict[fylke] = []
+    #                 self.dlg.comboBox_komuner.addItem(fylke)
+    #             self.fylke_dict[fylke].append(komm_nr)
+    #             self.dlg.comboBox_komuner.addItem("    " + komune)
+    #     #print self.fylke_dict
+
+    #     #print komm_nr
+
+
+    # def fylke_valgt(self):
+    #     fylke = self.dlg.comboBox_byggningstype.currentText()
+    #     for komune in self.fylke_dict[fylke]:
+    #         self.dlg.comboBox_komuner.addItem()
+        # print "something"
 
 
     def create_where_statement(self, attribute, value, opperator, where):
@@ -595,6 +516,7 @@ class Master:
     def filtrer_inngang(self):
         print"Filtering Start"
 
+        fylke = self.dlg.comboBox_fylker.currentText()
         komune = self.dlg.comboBox_komuner.currentText()
 
         byggningstype = self.dlg.comboBox_byggningstype.currentText()
@@ -624,18 +546,25 @@ class Master:
 
         ing_atr_lineedit = {self.att_avst_hc : [avstand_hc, self.dlg.comboBox_avstand_hc.currentText()], self.att_ank_stig : [ank_stigning, self.dlg.comboBox_ank_stigning.currentText()], self.att_dorbredde : [dorbredde, self.dlg.comboBox_dorbredde.currentText()], self.att_rmp_stigning : [rmp_stigning, self.dlg.comboBox_rmp_stigning.currentText()], self.att_rmp_bredde : [rmp_bredde, self.dlg.comboBox_rmp_bredde.currentText()], self.att_hand1 : [hand1, self.dlg.comboBox_hand1.currentText()], self.att_hand2 : [hand2, self.dlg.comboBox_hand2.currentText()]}
 
-        #sql = "select * from tilgjengelighet.t_inngangbygg"
-        sql = "select * from kasper_master.t_inngangbygg"
+        sql = "select * from tilgjengelighet.t_inngangbygg"
+        #sql = "select * from kasper_master.t_inngangbygg"
         where = "".decode('utf-8')
 
+        if fylke != "Norge":
+            if komune == self.uspesifisert:
+                where = "where komm = " + self.fylke_dict[fylke][0]
+                for komune_nr in range(1, len(self.fylke_dict[fylke])-1):
+                    where = where + " or komm = " + self.fylke_dict[fylke][komune_nr]
+            else:
+                where = "where komm = " + self.komm_dict_nm[komune]
 
-        if komune != self.uspesifisert:
-            if komune[0:4] == "    ": #If a city is chosen, and not a county
-                where = "where komm = " + self.komm_dict[komune[4:len(komune)]][0] + ""
-            else: #If a county is chosen
-                where = "where komm = " + self.fylke_dict[komune][0]
-                for kommnr in range(1,len(self.fylke_dict[komune])-1): #iterate throu the rest of the cityes in the county
-                    where = where + " or komm = " + self.fylke_dict[komune][kommnr]
+        # if komune != self.uspesifisert:
+        #     if komune[0:4] == "    ": #If a city is chosen, and not a county
+        #         where = "where komm = " + self.komm_dict[komune[4:len(komune)]][0] + ""
+        #     else: #If a county is chosen
+        #         where = "where komm = " + self.fylke_dict[komune][0]
+        #         for kommnr in range(1,len(self.fylke_dict[komune])-1): #iterate throu the rest of the cityes in the county
+        #             where = where + " or komm = " + self.fylke_dict[komune][kommnr]
 
         for atr, value in ing_atr_combobox.iteritems():
             where = self.create_where_statement(atr, value, "like", where)
@@ -650,18 +579,30 @@ class Master:
         sql = "(" + sql + " " + where + ")"
 
         #print sql
-
+        
         self.uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-        self.newlayer = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
-        QgsMapLayerRegistry.instance().addMapLayer(self.newlayer)
+        try:
+            QgsMapLayerRegistry.instance().removeMapLayer(self.layer_inngang.id())
+        except Exception, e:
+            print str(e)
 
 
-        if not self.newlayer.isValid():
+        #self.layer_inngang = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
+        if len(self.dlg.lineEdit_navn_paa_sok_inngang.text()) > 0:
+            self.layer_inngang = QgsVectorLayer(self.uri.uri(),self.dlg.lineEdit_navn_paa_sok_inngang.text(),"postgres")
+        else:
+            self.layer_inngang = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
+        
+        #QgsMapLayerRegistry.instance().removeMapLayer( inngangbygg.id() )
+        QgsMapLayerRegistry.instance().addMapLayer(self.layer_inngang)
+
+
+        if not self.layer_inngang.isValid():
             print "layer failed to load"
             self.show_message("søket ga ingen teff", "Advarsel", msg_type=QMessageBox.Warning)
         else:
             print "layer succeeded to load"
-            self.showResults(self.newlayer)
+            self.showResults(self.layer_inngang)
             self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
 
 
@@ -695,6 +636,16 @@ class Master:
 
         retval = msg.exec_()
         print ("value of pressed message box button:", retval)
+
+
+    def reset(self): #unfinished
+        comboBoxes = [self.dlg.comboBox_fylker, self.dlg.comboBox_komuner, self.dlg.comboBox_avstand_hc, self.dlg.comboBox_ank_stigning, self.dlg.comboBox_byggningstype, self.dlg.comboBox_rampe, self.dlg.comboBox_dortype, self.dlg.comboBox_dorbredde, self.dlg.comboBox_terskel, self.dlg.comboBox_kontrast, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_bredde, self.dlg.comboBox_handliste, self.dlg.comboBox_hand1, self.dlg.comboBox_hand2, self.dlg.comboBox_manuell_rullestol, self.dlg.comboBox_el_rullestol, self.dlg.comboBox_syn]
+        for cmb in comboBoxes:
+            cmb.setCurrentIndex(0)
+
+        lineEdits = [self.dlg.lineEdit_avstand_hc, self.dlg.lineEdit_ank_stigning, self.dlg.lineEdit_dorbredde, self.dlg.lineEdit_terskel, self.dlg.lineEdit_rmp_stigning, self.dlg.lineEdit_rmp_bredde, self.dlg.lineEdit_hand1, self.dlg.lineEdit_hand2, self.dlg.lineEdit_navn_paa_sok_inngang]
+        for le in lineEdits:
+            le.setText("")
 
 
     def run(self):
