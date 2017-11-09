@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1740</width>
-    <height>953</height>
+    <width>1029</width>
+    <height>715</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -796,6 +796,20 @@ p, li { white-space: pre-wrap; }
                 <widget class="QLineEdit" name="lineEdit_navn_paa_sok_inngang"/>
                </item>
                <item>
+                <widget class="QComboBox" name="comboBox_sok_metode">
+                 <item>
+                  <property name="text">
+                   <string>visual</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>memory</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item>
                 <widget class="QPushButton" name="pushButton_filtrerInngang">
                  <property name="text">
                   <string>Filtrer</string>
@@ -809,39 +823,7 @@ p, li { white-space: pre-wrap; }
           </layout>
          </item>
         </layout>
-        <zorder>layoutWidget</zorder>
         <zorder></zorder>
-        <zorder>comboBox_rampe</zorder>
-        <zorder>label_21</zorder>
-        <zorder></zorder>
-        <zorder></zorder>
-        <zorder></zorder>
-        <zorder></zorder>
-        <zorder></zorder>
-        <zorder>line</zorder>
-        <zorder></zorder>
-        <zorder></zorder>
-        <zorder></zorder>
-        <zorder>line</zorder>
-        <zorder></zorder>
-        <zorder></zorder>
-        <zorder></zorder>
-        <zorder></zorder>
-        <zorder>line</zorder>
-        <zorder></zorder>
-        <zorder>label_14</zorder>
-        <zorder>label_15</zorder>
-        <zorder>label_16</zorder>
-        <zorder>label_22</zorder>
-        <zorder>label_23</zorder>
-        <zorder>label_24</zorder>
-        <zorder>line_2</zorder>
-        <zorder>line_3</zorder>
-        <zorder>line_4</zorder>
-        <zorder>line_8</zorder>
-        <zorder>verticalSpacer</zorder>
-        <zorder>verticalSpacer_2</zorder>
-        <zorder>verticalSpacer_6</zorder>
        </widget>
        <widget class="QWidget" name="tab_3">
         <attribute name="title">
@@ -1074,6 +1056,13 @@ p, li { white-space: pre-wrap; }
               </size>
              </property>
             </spacer>
+           </item>
+           <item>
+            <widget class="QProgressBar" name="progressBar">
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QDialogButtonBox" name="button_box_4">
@@ -1335,12 +1324,7 @@ p, li { white-space: pre-wrap; }
     </layout>
    </item>
   </layout>
-  <zorder>layoutWidget</zorder>
-  <zorder>button_box</zorder>
-  <zorder>tabWidget</zorder>
   <zorder></zorder>
-  <zorder>pushButton_reset</zorder>
-  <zorder>horizontalSpacer_5</zorder>
  </widget>
  <resources/>
  <connections>
