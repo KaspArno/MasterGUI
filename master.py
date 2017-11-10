@@ -53,6 +53,10 @@ from osgeo import gdal
 from osgeo import ogr
 import string
 
+#For selection
+from featureIdentifyTool import FeatureIdentifyTool
+from identifyGeometry import IdentifyGeometry
+
 import datetime
 import time
 
@@ -322,6 +326,9 @@ class Master:
         self.obj_info_dockwidget=QDockWidget("Info" , self.iface.mainWindow() )
         self.obj_info_dockwidget.setObjectName("Object Info")
         self.obj_info_dockwidget.setWidget(self.infoWidget)
+        self.infoWidget.pushButton_Bilde.setCheckable(True)
+        self.infoWidget.pushButton_Bilde.toggled.connect(self.toolButtonSelect)
+
         
         self.dlg.accepted.connect(self.filtrer_inngang) #OK fillterer foreløpig for inngang, burde endres
         #self.iface.addDockWidget( Qt.BottomDockWidgetArea , self.obdockwidget )
@@ -408,6 +415,9 @@ class Master:
 
         self.inngangSok = GuiAttribute("Navn På Søk")
         self.inngangSok.setLineEdit(self.dlg.lineEdit_navn_paa_sok_inngang)
+
+        #selection test
+        self.sourceMapTool = IdentifyGeometry(self.canvas, self.infoWidget, pickMode='selection')
 
 
     def unload(self):
@@ -671,6 +681,43 @@ class Master:
         return uri
 
 
+    # def mapToolInit(self):
+
+    #     if self.mapToolAction.isChecked() is False:
+    #         self.canvas.unsetMapTool(self.mapTool)
+    #         return
+    #     self.mapToolAction.setChecked( True )
+    #     self.mapTool = IdentifyGeometry(canvas)
+    #     QObject.connect(self.mapTool , SIGNAL("geomIdentified") , self.doSometing )
+    #     canvas.setMapTool(self.mapTool)
+    #     QObject.connect( canvas, SIGNAL( "mapToolSet(QgsMapTool *)" ), self.mapToolChanged)
+     
+    # def doSomething(self, layer, feature):
+    #     print "doSomething"
+    #   # do something
+
+    def toolButtonSelect(self, checked):
+        print "toolButtonSelect Activated"
+        # If the toolButton is checked
+        if checked:
+            print "checked"
+            self.oldMapTool = self.canvas.mapTool()
+            self.canvas.setMapTool(self.sourceMapTool)
+
+            #self.featIdentTool = FeatureIdentifyTool(self.iface)
+            #self.featIdentTool.geomIdentified.connect(self.toolButtonAction)
+            #self.canvas.setMapTool(self.featIdentTool)
+        else:
+            self.oldMapTool = self.canvas.mapTool()
+
+    # Method run when a feature in layer is identified by featIdentTool
+    def toolButtonAction(self, layer, feature):
+
+        # Do something with identified feature
+        if isinstance(layer, QgsVectorLayer) and isinstance(feature, QgsFeature):
+            self.featIdentTool.doWhatEver(feature)
+
+
     def hideNode( self, node, bHide=True ):
         if type( node ) in ( QgsLayerTreeLayer, QgsLayerTreeGroup ):
             index = self.model.node2index( node )
@@ -684,30 +731,44 @@ class Master:
 
 
     def test(self):
+        print "test called"
+        self.layer_inngang.setSelectedFeatures([])
         #print dir(self.dock.tableWidget.selectionModel().selectedRows().index())
         #self.layer_inngang.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), i).text())]])
         infoWidget_label_list = [self.infoWidget.label_avstand_hc_text, self.infoWidget.label_byggningstype_text, self.infoWidget.label_ank_vei_stigning_text, self.infoWidget.label_dortype_text, self.infoWidget.label_dorapner_text, self.infoWidget.label_ringeklokke_text, self.infoWidget.label_ringeklokke_hoyde_text, self.infoWidget.label_terskelhoyde_text, self.infoWidget.label_inngang_bredde_text, self.infoWidget.label_kontrast_text, self.infoWidget.label_rampe_text]
         indexes = self.dock.tableWidget.selectionModel().selectedRows()
         if self.layer_inngang is not None:
+            print "Layer is not None"
             for index in sorted(indexes):
+                print "index:", index
                 print self.dock.tableWidget.item(index.row(), 29)
                 #self.layer_inngang.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), 0).text())]])
                 self.layer_inngang.setSelectedFeatures([self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()]])
+                print "self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()]: ", self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()]
+                print "self.dock.tableWidget.item(index.row(), 0).text(): ", self.dock.tableWidget.item(index.row(), 0).text()
                 #self.layer_inngang.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), 0).text()[23:len(self.dock.tableWidget.item(index.row(), 0).text())])]])
                 selection = self.layer_inngang.selectedFeatures()
-
+                print "self.layer_inngang.selectedFeatures(): ", self.layer_inngang.selectedFeatures()
+                print "selection", selection
                 for feature in selection:
+                    print "feature", feature
                     for i in range(0, len(infoWidget_label_list)):
+                        print "i: ", i
                         try:
-                            if isinstance(feature[self.att_info_list[i]], (int, float)):
-                                infoWidget_label_list[i].setText((str(feature[self.att_info_list[i]])))
+                            if isinstance(feature[self.to_unicode(self.att_info_list[i])], (int, float, long)):
+                                print "int, float, ling", feature[self.to_unicode(self.att_info_list[i])]
+                                infoWidget_label_list[i].setText((str(feature[self.to_unicode(self.att_info_list[i])])))
+                            elif isinstance(feature[self.to_unicode(self.att_info_list[i])], (QPyNullVariant)):
+                                print "NULL", feature[self.to_unicode(self.att_info_list[i])]
+                                infoWidget_label_list[i].setText("-")
                             else:
-                                infoWidget_label_list[i].setText((feature[self.att_info_list[i]]))
-                        except IndexError, e:
-                            print str(e)
+                                print "else", feature[self.to_unicode(self.att_info_list[i])]
+                                infoWidget_label_list[i].setText(feature[self.to_unicode(self.att_info_list[i])])
                         except Exception, e:
+                            print "Exception", feature[self.to_unicode(self.att_info_list[i])]
                             infoWidget_label_list[i].setText("-")
                             print str(e)
+                            raise
 
 
     def fill_combobox(self, layer, feat_name, combobox):
@@ -1002,7 +1063,9 @@ class Master:
                 self.layer_inngang = vLayer
                 QgsMapLayerRegistry.instance().addMapLayer(self.layer_inngang)
                 self.canvas.setExtent(self.layer_inngang.extent())
-                #self.showResults(self.layer_inngang)
+                self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
+                self.showResults(self.layer_inngang)
+                self.sourceMapTool.setLayer(self.layer_inngang)
                 
             else:
                 self.show_message("Søket fullførte uten at noen objecter ble funnet", "ingen Objecter funnet", msg_info=None, msg_details=None, msg_type=None)
@@ -1053,6 +1116,7 @@ class Master:
                 self.canvas.setExtent(self.layer_inngang.extent())
                 self.canvas.refresh()
                 tempLayer.triggerRepaint()
+                self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
 
             else:
                 self.show_message("Søket fullførte uten at noen objecter ble funnet", "ingen Objecter funnet", msg_info=None, msg_details=None, msg_type=None)
