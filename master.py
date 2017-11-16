@@ -52,6 +52,7 @@ from PyQt4 import QtCore, QtGui
 from osgeo import gdal
 from osgeo import ogr
 import string
+from featuretype import FeatureType
 
 #For selection
 from featureIdentifyTool import FeatureIdentifyTool
@@ -60,36 +61,6 @@ from identifyGeometry import IdentifyGeometry
 import datetime
 import time
 
-
-class SelectThread(QThread):
-
-    data_downloaded = pyqtSignal(object)
-
-    
-
-    def __init__(self, infoWidget_label_list, att_info_list):
-        QThread.__init__(self, )
-        #self.layer = layer
-        #self.info_widget = info_widget
-        self.infoWidget_label_list = infoWidget_label_list
-        self.att_info_list = att_info_list
-
-    def run(self):
-        while True:
-            layer = iface.activeLayer()
-            selection = self.layer.selectedFeatures()
-            for feature in selection:
-                        for i in range(0, len(infoWidget_label_list)):
-                            try:
-                                if isinstance(feature[self.att_info_list[i]], (int, float)):
-                                    infoWidget_label_list[i].setText((str(feature[self.att_info_list[i]])))
-                                else:
-                                    infoWidget_label_list[i].setText((feature[self.att_info_list[i]]))
-                            except IndexError, e:
-                                print str(e)
-                            except Exception, e:
-                                infoWidget_label_list[i].setText("-")
-                                print str(e)
 
 
 class Master:
@@ -131,6 +102,7 @@ class Master:
         self.toolbar.setObjectName(u'Master')
 
         #Globale Variabler
+        #Combobox filling
         self.uspesifisert = ""
         self.mer = ">" #for combobokser linket til mer eller mindre enn iteratsjoner
         self.mindre = "<"
@@ -138,37 +110,37 @@ class Master:
         self.mindre_eller_lik = "<="
 
         #Attributter Inngangbygg
-        self.att_bygg = "funksjon" #"bygg_funksjon"
-        self.att_dor = "dørtype" #"dortype"
-        self.att_hand = "håndlist" #"handlist"
+        # self.att_bygg = "funksjon" #"bygg_funksjon"
+        # self.att_dor = "dørtype" #"dortype"
+        # self.att_hand = "håndlist" #"handlist"
 
-        self.att_avst_hc = "avstandHC" #"avstand_hc_park"
-        self.att_ank_stig = "stigningAdkomstvei" #"adko_stig_grad"
-        self.att_dortype = "dørtyoe" #"dortype"
-        self.att_dorbredde = "inngangBredde" #"inngang_bredde"
-        self.att_dorapner = "døråpner" #"dorapner"
-        self.att_ringeklokke = "ringeklokke"
-        self.att_ringeklokke_hoyde = "ringeklokkeHøyde" #"ringekl_hoyde"
-        self.att_terslelhoyde = "terskelHøyde" #"terskel_hoyde"
-        self.att_kontrast = "kontrast"
-        self.att_rampe = "rampe"
-        self.att_rmp_stigning = "rampeStigning" # "rampe_stigning"
-        self.att_rmp_bredde = "rampeBredde" #"rampe_bredde"
-        self.att_hand1 = "handlistHøyde1" #"hand_hoy_1"
-        self.att_hand2 = "handlistHøyde2" #"hand_hoy_2"
-        self.att_info_list = [self.att_avst_hc, self.att_bygg, self.att_ank_stig, self.att_dor, self.att_dorapner, self.att_ringeklokke, self.att_ringeklokke_hoyde, self.att_terslelhoyde, self.att_dorbredde, self.att_kontrast, self.att_rampe]
+        # self.att_avst_hc = "avstandHC" #"avstand_hc_park"
+        # self.att_ank_stig = "stigningAdkomstvei" #"adko_stig_grad"
+        # self.att_dortype = "dørtyoe" #"dortype"
+        # self.att_dorbredde = "inngangBredde" #"inngang_bredde"
+        # self.att_dorapner = "døråpner" #"dorapner"
+        # self.att_ringeklokke = "ringeklokke"
+        # self.att_ringeklokke_hoyde = "ringeklokkeHøyde" #"ringekl_hoyde"
+        # self.att_terslelhoyde = "terskelHøyde" #"terskel_hoyde"
+        # self.att_kontrast = "kontrast"
+        # self.att_rampe = "rampe"
+        # self.att_rmp_stigning = "rampeStigning" # "rampe_stigning"
+        # self.att_rmp_bredde = "rampeBredde" #"rampe_bredde"
+        # self.att_hand1 = "handlistHøyde1" #"hand_hoy_1"
+        # self.att_hand2 = "handlistHøyde2" #"hand_hoy_2"
+        # self.att_info_list = [self.att_avst_hc, self.att_bygg, self.att_ank_stig, self.att_dor, self.att_dorapner, self.att_ringeklokke, self.att_ringeklokke_hoyde, self.att_terslelhoyde, self.att_dorbredde, self.att_kontrast, self.att_rampe]
 
         #Attributter Tilgjengelighet
-        self.att_rulle = "t_rulle_auto"
-        self.att_el_rulle = "el_ruelle_auto"
-        self.att_syn = "t_syn"
+        # self.att_rulle = "t_rulle_auto"
+        # self.att_el_rulle = "el_ruelle_auto"
+        # self.att_syn = "t_syn"
 
         #Annet
-        self.feature_id = {}
-        self.canvas = self.iface.mapCanvas()
-        self.layers = []
-        self.layername = []
-        self.layer_inngang = None
+        self.feature_id = {} #gather feature id to set selected
+
+        self.layers = [] #gather all layers
+        self.layername = [] #gather all layer name (dict?)
+        self.layer_inngang = None #initiate layer inngang
 
         #to hide layers
         self.ltv = self.iface.layerTreeView()
@@ -322,24 +294,25 @@ class Master:
         self.dock.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows) #select entire row in table
         self.dock.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers) #Making table unediteble
 
+        #create widget for relevant information
         self.infoWidget = infoWidgetDialog()
         self.obj_info_dockwidget=QDockWidget("Info" , self.iface.mainWindow() )
         self.obj_info_dockwidget.setObjectName("Object Info")
         self.obj_info_dockwidget.setWidget(self.infoWidget)
-        self.infoWidget.pushButton_Bilde.setCheckable(True)
-        self.infoWidget.pushButton_Bilde.toggled.connect(self.toolButtonSelect)
+        self.infoWidget.pushButton_Select_Object.setCheckable(True)
+        self.infoWidget.pushButton_Select_Object.toggled.connect(self.toolButtonSelect)
 
         
         self.dlg.accepted.connect(self.filtrer_inngang) #OK fillterer foreløpig for inngang, burde endres
         #self.iface.addDockWidget( Qt.BottomDockWidgetArea , self.obdockwidget )
 
         #fill GUI
-        self.hent_wfs_layer()
+        self.get_wfs_layer()
 
         #Set push functions
         filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
         filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
-        self.dock.tableWidget.itemClicked.connect(self.test)
+        self.dock.tableWidget.itemClicked.connect(self.table_item_clicked)
         self.dlg.pushButton_reset.clicked.connect(self.reset)
         self.dlg.button_box_4.clicked.connect(self.wfs_test)
 
@@ -614,24 +587,30 @@ class Master:
                             # tempLayer.updateFields()
                             # temp_data.addFeatures(selectedFeatures)
 
+                            self.featuretype.next()
+                            if self.featuretype.getFeatureType():
+                                self.getFeatures()
+                            print "self.layers: ", len(self.layers)
                             print "doen"
 
 
-    def hent_wfs_layer(self):
+    def get_wfs_layer(self):
         print "hent_wfs_layer kalt"
         online_resource = "https://wfs.geonorge.no/skwms1/wfs.tilgjengelighettettsted"
 
-        feature_type = ['app:TettstedHCparkering', 'app:TettstedInngangBygg', u'app:TettstedParkeringsomr\xe5de', u'app:TettstedParkeringsomr\xe5deGr', 'app:TettstedVei']
+        #feature_type = ['app:TettstedHCparkering', 'app:TettstedInngangBygg', u'app:TettstedParkeringsomr\xe5de', u'app:TettstedParkeringsomr\xe5deGr', 'app:TettstedVei']
+        self.featuretype = FeatureType()
         nsmap = {'gml': 'http://www.opengis.net/gml', 'app': 'http://skjema.geonorge.no/SOSI/produktspesifikasjon/TilgjengelighetTettsted/4.5', 'xlink': 'http://www.w3.org/1999/xlink', 'ows': 'http://www.opengis.net/ows/1.1', 'xsd': 'http://www.w3.org/2001/XMLSchema', 'wfs': 'http://www.opengis.net/wfs/2.0', 'xsi': 'http://www.w3.org/2001/XMLSchema-instance', 'gml32': 'http://www.opengis.net/gml/3.2', 'ogc': 'http://www.opengis.net/ogc', 'fes': 'http://www.opengis.net/fes/2.0'}
         namespace = "http://skjema.geonorge.no/SOSI/produktspesifikasjon/TilgjengelighetTettsted/4.5"
         namespace_prefix = "app"
         titlelist = ['app:TettstedHCparkering', 'app:TettstedInngangBygg', u'app:TettstedParkeringsomr\xe5de', u'app:TettstedParkeringsomr\xe5deGr', 'app:TettstedVei']
 
-        lowercorner_east = 0
-        lowercorner_south = 0
-        uppercorner_west = 0
-        uppercorner_north = 0
+        # lowercorner_east = 0
+        # lowercorner_south = 0
+        # uppercorner_west = 0
+        # uppercorner_north = 0
 
+        #Do I use these?
         request = "{0}{1}{2}".format(online_resource, "?", "{0}service=WFS&acceptversions=2.0.0&request=GetCapabilities".format("&"))
         response = urllib2.urlopen(request, None, 10)
 
@@ -641,22 +620,32 @@ class Master:
         nswfs = "{http://www.opengis.net/wfs/2.0}"
         nsows = "{http://www.opengis.net/ows/1.1}"
 
-        for target in root.findall("{0}FeatureTypeList/{0}FeatureType".format(nswfs)):
-            for name in target.findall("{0}Name".format(nswfs)):
-                for bbox in target.findall("{0}WGS84BoundingBox".format(nsows)):
-                            for lowercorner in bbox.findall("{0}LowerCorner".format(nsows)):
-                                if float(lowercorner.text.split(' ')[0]) < lowercorner_east:
-                                    lowercorner_east = lowercorner.text.split(' ')[0]
-                                if float(lowercorner.text.split(' ')[1]) > lowercorner_south:
-                                    uppercorner_north = lowercorner.text.split(' ')[1]
-                            for uppercorner in bbox.findall("{0}UpperCorner".format(nsows)):
-                                if float(uppercorner.text.split(' ')[0]) < uppercorner_west:
-                                    uppercorner_west = uppercorner.text.split(' ')[0]
-                                if float(lowercorner.text.split(' ')[1]) > uppercorner_north:
-                                    uppercorner_north = uppercorner.text.split(' ')[1]
+        # for target in root.findall("{0}FeatureTypeList/{0}FeatureType".format(nswfs)):
+        #     for name in target.findall("{0}Name".format(nswfs)):
+        #         for bbox in target.findall("{0}WGS84BoundingBox".format(nsows)):
+        #                     for lowercorner in bbox.findall("{0}LowerCorner".format(nsows)):
+        #                         if float(lowercorner.text.split(' ')[0]) < lowercorner_east:
+        #                             lowercorner_east = lowercorner.text.split(' ')[0]
+        #                         if float(lowercorner.text.split(' ')[1]) > lowercorner_south:
+        #                             uppercorner_north = lowercorner.text.split(' ')[1]
+        #                     for uppercorner in bbox.findall("{0}UpperCorner".format(nsows)):
+        #                         if float(uppercorner.text.split(' ')[0]) < uppercorner_west:
+        #                             uppercorner_west = uppercorner.text.split(' ')[0]
+        #                         if float(lowercorner.text.split(' ')[1]) > uppercorner_north:
+        #                             uppercorner_north = uppercorner.text.split(' ')[1]
 
         #Get Features
-        typeNames= urllib.quote(feature_type[1].encode('utf8'))
+        #for feature in feature_type:
+        #    self.getFeatures(feature, namespace, namespace_prefix, online_resource)
+        self.getFeatures()
+
+    def getFeatures(self):
+        namespace = "http://skjema.geonorge.no/SOSI/produktspesifikasjon/TilgjengelighetTettsted/4.5"
+        namespace_prefix = "app"
+        online_resource = "https://wfs.geonorge.no/skwms1/wfs.tilgjengelighettettsted"
+
+        #typeNames= urllib.quote(feature_type[1].encode('utf8'))
+        typeNames= urllib.quote(self.featuretype.getFeatureType().encode('utf8'))
         #print "typeNames", typeNames
         query_string = "?service=WFS&request=GetFeature&version=2.0.0&srsName={0}&typeNames={1}".format( "urn:ogc:def:crs:EPSG::{0}".format(str(self.iface.mapCanvas().mapRenderer().destinationCrs().postgisSrid())).strip(), typeNames)
         query_string += "&namespaces=xmlns({0},{1})".format(namespace_prefix, urllib.quote(namespace,""))
@@ -665,7 +654,7 @@ class Master:
         #print "query_string: ", query_string
 
         self.httpGetId = 0
-        print "httpGatId", self.httpGetId
+        #print "httpGatId", self.httpGetId
         self.http = QHttp()
 
         self.http.requestStarted.connect(self.httpRequestStartet)
@@ -695,17 +684,17 @@ class Master:
         #print "httpGetId", self.httpGetId
         
 
-    def connect_database(self):
-        uri = QgsDataSourceURI()
-        uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
-        #uri.setConnection("46.101.4.130","5432","webinar","webinar","webinar")
-        sql = "(select * from tilgjengelighet.t_inngangbygg)"
-        #sql = "(select * from kasper_master.t_inngangbygg)"
-        uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-        self.vlayer = QgsVectorLayer(uri.uri(),"inngangbygg","postgres")
-        QgsMapLayerRegistry.instance().addMapLayer(self.vlayer)
+    # def connect_database(self):
+    #     uri = QgsDataSourceURI()
+    #     uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
+    #     #uri.setConnection("46.101.4.130","5432","webinar","webinar","webinar")
+    #     sql = "(select * from tilgjengelighet.t_inngangbygg)"
+    #     #sql = "(select * from kasper_master.t_inngangbygg)"
+    #     uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
+    #     self.vlayer = QgsVectorLayer(uri.uri(),"inngangbygg","postgres")
+    #     QgsMapLayerRegistry.instance().addMapLayer(self.vlayer)
 
-        return uri
+    #     return uri
 
 
     # def mapToolInit(self):
@@ -808,7 +797,7 @@ class Master:
             self.dlg.line.setVisible(False)
 
 
-    def test(self):
+    def table_item_clicked(self):
         print "test called"
         self.layer_inngang.setSelectedFeatures([])
         #print dir(self.dock.tableWidget.selectionModel().selectedRows().index())
@@ -818,34 +807,35 @@ class Master:
         if self.layer_inngang is not None:
             print "Layer is not None"
             for index in sorted(indexes):
-                print "index:", index
-                print self.dock.tableWidget.item(index.row(), 29)
+                #print "index:", index
+                #print self.dock.tableWidget.item(index.row(), 29)
                 #self.layer_inngang.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), 0).text())]])
                 self.layer_inngang.setSelectedFeatures([self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()]])
-                print "self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()]: ", self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()]
-                print "self.dock.tableWidget.item(index.row(), 0).text(): ", self.dock.tableWidget.item(index.row(), 0).text()
+                #print "self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()]: ", self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()]
+                #print "self.dock.tableWidget.item(index.row(), 0).text(): ", self.dock.tableWidget.item(index.row(), 0).text()
                 #self.layer_inngang.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), 0).text()[23:len(self.dock.tableWidget.item(index.row(), 0).text())])]])
                 selection = self.layer_inngang.selectedFeatures()
-                print "self.layer_inngang.selectedFeatures(): ", self.layer_inngang.selectedFeatures()
-                print "selection", selection
+                #print "self.layer_inngang.selectedFeatures(): ", self.layer_inngang.selectedFeatures()
+                #print "selection", selection
                 for feature in selection:
-                    print "feature", feature
+                    #print "feature", feature
                     for i in range(0, len(infoWidget_label_list)):
-                        print "i: ", i
+                        #print "i: ", i
                         try:
-                            if isinstance(feature[self.to_unicode(self.att_info_list[i])], (int, float, long)):
-                                print "int, float, ling", feature[self.to_unicode(self.att_info_list[i])]
-                                infoWidget_label_list[i].setText((str(feature[self.to_unicode(self.att_info_list[i])])))
-                            elif isinstance(feature[self.to_unicode(self.att_info_list[i])], (QPyNullVariant)):
-                                print "NULL", feature[self.to_unicode(self.att_info_list[i])]
+                            if isinstance(feature[self.to_unicode(self.attributes_inngang[i].getAttribute())], (int, float, long)): #isinstance(feature[self.to_unicode(self.att_info_list[i])], (int, float, long)):
+                                self.attributes_inngang
+                                #print "int, float, ling", feature[self.to_unicode(self.att_info_list[i])]
+                                infoWidget_label_list[i].setText((str(feature[self.to_unicode(self.attributes_inngang[i].getAttribute())])))
+                            elif isinstance(feature[self.to_unicode(self.attributes_inngang[i].getAttribute())], (QPyNullVariant)):
+                                #print "NULL", feature[self.to_unicode(self.att_info_list[i])]
                                 infoWidget_label_list[i].setText("-")
                             else:
-                                print "else", feature[self.to_unicode(self.att_info_list[i])]
-                                infoWidget_label_list[i].setText(feature[self.to_unicode(self.att_info_list[i])])
+                                #print "else", feature[self.to_unicode(self.att_info_list[i])]
+                                infoWidget_label_list[i].setText(feature[self.to_unicode(self.attributes_inngang[i].getAttribute())])
                         except Exception, e:
-                            print "Exception", feature[self.to_unicode(self.att_info_list[i])]
+                            #print "Exception", feature[self.to_unicode(self.att_info_list[i])]
                             infoWidget_label_list[i].setText("-")
-                            print str(e)
+                            #print str(e)
                             raise
 
 
@@ -903,7 +893,7 @@ class Master:
                         self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem(f[i].toString('dd.MM.yy')))
                 elif hasattr(f[i], 'toString'):
                     self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem(f[i].toString()))
-                elif isinstance(f[i], (int, float)):
+                elif isinstance(f[i], (int, float, long)):
                     self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem(str(f[i])))
                 elif isinstance(f[i], QPyNullVariant):
                     self.dock.tableWidget.setItem(current_object,i,QTableWidgetItem("NULL"))
@@ -1047,34 +1037,34 @@ class Master:
         fylke = self.dlg.comboBox_fylker.currentText()
         komune = self.dlg.comboBox_komuner.currentText()
 
-        byggningstype = self.dlg.comboBox_byggningstype.currentText()
-        dortype = self.dlg.comboBox_dortype.currentText()
-        handliste = self.dlg.comboBox_handliste.currentText()
-        m_rullestol = self.dlg.comboBox_manuell_rullestol.currentText()
-        el_rullestol = self.dlg.comboBox_el_rullestol.currentText()
-        syn = self.dlg.comboBox_syn.currentText()
-        kontrast = self.dlg.comboBox_kontrast.currentText()
+        # byggningstype = self.dlg.comboBox_byggningstype.currentText()
+        # dortype = self.dlg.comboBox_dortype.currentText()
+        # handliste = self.dlg.comboBox_handliste.currentText()
+        # m_rullestol = self.dlg.comboBox_manuell_rullestol.currentText()
+        # el_rullestol = self.dlg.comboBox_el_rullestol.currentText()
+        # syn = self.dlg.comboBox_syn.currentText()
+        # kontrast = self.dlg.comboBox_kontrast.currentText()
 
-        byggningstype = self.to_unicode(byggningstype)
-        #byggningstype = byggningstype.decode('iso-8859-1')
-        dortype = self.to_unicode(dortype)
-        handliste = self.to_unicode(handliste)
-        m_rullestol = self.to_unicode(m_rullestol)
-        el_rullestol = self.to_unicode(el_rullestol)
-        syn = self.to_unicode(syn)
-        kontrast = self.to_unicode(kontrast)
+        # byggningstype = self.to_unicode(byggningstype)
+        # #byggningstype = byggningstype.decode('iso-8859-1')
+        # dortype = self.to_unicode(dortype)
+        # handliste = self.to_unicode(handliste)
+        # m_rullestol = self.to_unicode(m_rullestol)
+        # el_rullestol = self.to_unicode(el_rullestol)
+        # syn = self.to_unicode(syn)
+        # kontrast = self.to_unicode(kontrast)
 
-        ing_atr_combobox = {self.att_bygg : byggningstype, self.att_dor :  dortype, self.att_hand :  handliste, self.att_rulle : m_rullestol, self.att_el_rulle : el_rullestol, self.att_syn : syn, self.att_kontrast : kontrast}
+        # ing_atr_combobox = {self.att_bygg : byggningstype, self.att_dor :  dortype, self.att_hand :  handliste, self.att_rulle : m_rullestol, self.att_el_rulle : el_rullestol, self.att_syn : syn, self.att_kontrast : kontrast}
 
-        avstand_hc = self.dlg.lineEdit_avstand_hc.text()
-        ank_stigning = self.dlg.lineEdit_ank_stigning.text()
-        dorbredde = self.dlg.lineEdit_dorbredde.text()
-        rmp_stigning = self.dlg.lineEdit_rmp_stigning.text()
-        rmp_bredde = self.dlg.lineEdit_rmp_bredde.text()
-        hand1 = self.dlg.lineEdit_hand1.text()
-        hand2 = self.dlg.lineEdit_hand2.text()
-        ing_atr_lineedit_list = {self.dlg.lineEdit_avstand_hc : self.dlg.comboBox_avstand_hc, self.dlg.lineEdit_ank_stigning : self.dlg.comboBox_ank_stigning, self.dlg.lineEdit_dorbredde : self.dlg.comboBox_dorbredde, self.dlg.lineEdit_rmp_stigning : self.dlg.comboBox_rmp_stigning, self.dlg.lineEdit_rmp_bredde : self.dlg.comboBox_rmp_bredde, self.dlg.lineEdit_hand1 : self.dlg.comboBox_hand1, self.dlg.lineEdit_hand2 : self.dlg.comboBox_hand2}
-        ing_atr_lineedit = {self.att_avst_hc : [avstand_hc, self.dlg.comboBox_avstand_hc.currentText()], self.att_ank_stig : [ank_stigning, self.dlg.comboBox_ank_stigning.currentText()], self.att_dorbredde : [dorbredde, self.dlg.comboBox_dorbredde.currentText()], self.att_rmp_stigning : [rmp_stigning, self.dlg.comboBox_rmp_stigning.currentText()], self.att_rmp_bredde : [rmp_bredde, self.dlg.comboBox_rmp_bredde.currentText()], self.att_hand1 : [hand1, self.dlg.comboBox_hand1.currentText()], self.att_hand2 : [hand2, self.dlg.comboBox_hand2.currentText()]}
+        # avstand_hc = self.dlg.lineEdit_avstand_hc.text()
+        # ank_stigning = self.dlg.lineEdit_ank_stigning.text()
+        # dorbredde = self.dlg.lineEdit_dorbredde.text()
+        # rmp_stigning = self.dlg.lineEdit_rmp_stigning.text()
+        # rmp_bredde = self.dlg.lineEdit_rmp_bredde.text()
+        # hand1 = self.dlg.lineEdit_hand1.text()
+        # hand2 = self.dlg.lineEdit_hand2.text()
+        # ing_atr_lineedit_list = {self.dlg.lineEdit_avstand_hc : self.dlg.comboBox_avstand_hc, self.dlg.lineEdit_ank_stigning : self.dlg.comboBox_ank_stigning, self.dlg.lineEdit_dorbredde : self.dlg.comboBox_dorbredde, self.dlg.lineEdit_rmp_stigning : self.dlg.comboBox_rmp_stigning, self.dlg.lineEdit_rmp_bredde : self.dlg.comboBox_rmp_bredde, self.dlg.lineEdit_hand1 : self.dlg.comboBox_hand1, self.dlg.lineEdit_hand2 : self.dlg.comboBox_hand2}
+        # ing_atr_lineedit = {self.att_avst_hc : [avstand_hc, self.dlg.comboBox_avstand_hc.currentText()], self.att_ank_stig : [ank_stigning, self.dlg.comboBox_ank_stigning.currentText()], self.att_dorbredde : [dorbredde, self.dlg.comboBox_dorbredde.currentText()], self.att_rmp_stigning : [rmp_stigning, self.dlg.comboBox_rmp_stigning.currentText()], self.att_rmp_bredde : [rmp_bredde, self.dlg.comboBox_rmp_bredde.currentText()], self.att_hand1 : [hand1, self.dlg.comboBox_hand1.currentText()], self.att_hand2 : [hand2, self.dlg.comboBox_hand2.currentText()]}
 
 
         #Ny metode med WFS
@@ -1151,6 +1141,10 @@ class Master:
         #QgsMapLayerRegistry.instance().removeMapLayer( self.layers[-1].id() )
         
         if self.dlg.comboBox_sok_metode.currentText() == "memory":
+            try:
+                QgsMapLayerRegistry.instance().removeMapLayer( tempLayer )
+            except (RuntimeError, AttributeError, UnboundLocalError):
+                pass
             print datetime.datetime.now().time()
             expr = QgsExpression(expr_string)
             print datetime.datetime.now().time()
@@ -1196,6 +1190,7 @@ class Master:
                 tempLayer.triggerRepaint()
                 self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
                 self.sourceMapTool.setLayer(self.layer_inngang)
+                self.showResults(self.layer_inngang) #rampeverdi ikke med i tabell
 
             else:
                 self.show_message("Søket fullførte uten at noen objecter ble funnet", "ingen Objecter funnet", msg_info=None, msg_details=None, msg_type=None)
@@ -1313,8 +1308,9 @@ class Master:
         # wfs = wfs_test(self.iface)
         # wfs.getCapabilities()
         # wfs.getFeature()
+        for layer in self.layers:
+            QgsMapLayerRegistry.instance().addMapLayer(layer)
 
-        self.hent_wfs_layer()
 
 
     def run(self):
