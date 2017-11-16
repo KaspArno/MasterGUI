@@ -1,6 +1,6 @@
 from qgis.PyQt.QtCore import pyqtSignal, QPyNullVariant
 from qgis.PyQt.QtGui import QPixmap, QCursor
-from qgis.core import QgsVectorLayer, QgsFeature
+from qgis.core import QgsVectorLayer, QgsFeature, QgsExpression, QgsFeatureRequest
 from qgis.gui import QgsMapToolIdentify
 
 from infoWidgetDialog import infoWidgetDialog
@@ -50,7 +50,11 @@ class IdentifyGeometry(QgsMapToolIdentify):
             self.feature_id[f['gml_id']] = f.id()
 
     def fillInfoWidget(self, results):
-        self.layer.setSelectedFeatures([self.feature_id[results[0].mFeature.attributes()[0]]])
+        expr = QgsExpression( "\"gml_id\"=\'{0}\'".format(results[0].mFeature.attributes()[0]) )
+        it = self.layer.getFeatures( QgsFeatureRequest( expr ) )
+        ids = [i.id() for i in it]
+        self.layer.setSelectedFeatures(ids)
+        #self.layer.setSelectedFeatures([self.feature_id[results[0].mFeature.attributes()[0]]])
         print "feature_id; ", "Key: ", results[0].mFeature.attributes()[0], " Value: ", self.feature_id[results[0].mFeature.attributes()[0]]
         infoWidget_label_list = [self.infoWidget.label_avstand_hc_text, self.infoWidget.label_byggningstype_text, self.infoWidget.label_ank_vei_stigning_text, self.infoWidget.label_dortype_text, self.infoWidget.label_dorapner_text, self.infoWidget.label_ringeklokke_text, self.infoWidget.label_ringeklokke_hoyde_text, self.infoWidget.label_terskelhoyde_text, self.infoWidget.label_inngang_bredde_text, self.infoWidget.label_kontrast_text, self.infoWidget.label_rampe_text]
         values = [results[0].mFeature.attributes()[17], results[0].mFeature.attributes()[10], results[0].mFeature.attributes()[25], results[0].mFeature.attributes()[19], results[0].mFeature.attributes()[20], results[0].mFeature.attributes()[24], results[0].mFeature.attributes()[32], results[0].mFeature.attributes()[21], results[0].mFeature.attributes()[26], results[0].mFeature.attributes()[18]]

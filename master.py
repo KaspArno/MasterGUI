@@ -361,7 +361,7 @@ class Master:
         self.byggningstype = GuiAttribute("funksjon")
         self.byggningstype.setComboBox(self.dlg.comboBox_byggningstype)
 
-        self.rampe = GuiAttribute("rampe")
+        self.rampe = GuiAttribute("rampe", {"" : "", "Ja" : "1", "Nei" : "1"})
         self.rampe.setComboBox(self.dlg.comboBox_rampe)
 
         #self.dortype = GuiAttribute("dørtype")
@@ -418,6 +418,33 @@ class Master:
 
         #selection test
         self.sourceMapTool = IdentifyGeometry(self.canvas, self.infoWidget, pickMode='selection')
+
+        #hide gui options test
+        self.dlg.label_rampe_boxs.setVisible(False)
+
+        self.dlg.lineEdit_rmp_stigning.setVisible(False)
+        self.dlg.comboBox_rmp_stigning.setVisible(False)
+        self.dlg.label_rmp_stigning.setVisible(False)
+
+        self.dlg.lineEdit_rmp_bredde.setVisible(False)
+        self.dlg.comboBox_rmp_bredde.setVisible(False)
+        self.dlg.label_rmp_bredde.setVisible(False)
+
+        self.dlg.comboBox_handliste.setVisible(False)
+        self.dlg.label_handliste.setVisible(False)
+
+        self.dlg.lineEdit_hand1.setVisible(False)
+        self.dlg.comboBox_hand1.setVisible(False)
+        self.dlg.label_hand1.setVisible(False)
+
+        self.dlg.lineEdit_hand2.setVisible(False)
+        self.dlg.comboBox_hand2.setVisible(False)
+        self.dlg.label_hand2.setVisible(False)
+
+        self.dlg.line_4.setVisible(False)
+        self.dlg.line.setVisible(False)
+
+        self.dlg.comboBox_rampe.currentIndexChanged.connect(self.hide_show_rampe)
 
 
     def unload(self):
@@ -728,6 +755,57 @@ class Master:
     def hideLayer( self, mapLayer ):
         if isinstance( mapLayer, QgsMapLayer ):
             self.hideNode( self.root.findLayer( mapLayer.id() ) )
+
+
+    def hide_show_rampe(self):
+        if self.dlg.comboBox_rampe.currentText() == "Ja":
+            self.dlg.label_rampe_boxs.setVisible(True)
+
+            self.dlg.lineEdit_rmp_stigning.setVisible(True)
+            self.dlg.comboBox_rmp_stigning.setVisible(True)
+            self.dlg.label_rmp_stigning.setVisible(True)
+
+            self.dlg.lineEdit_rmp_bredde.setVisible(True)
+            self.dlg.comboBox_rmp_bredde.setVisible(True)
+            self.dlg.label_rmp_bredde.setVisible(True)
+
+            self.dlg.comboBox_handliste.setVisible(True)
+            self.dlg.label_handliste.setVisible(True)
+
+            self.dlg.lineEdit_hand1.setVisible(True)
+            self.dlg.comboBox_hand1.setVisible(True)
+            self.dlg.label_hand1.setVisible(True)
+
+            self.dlg.lineEdit_hand2.setVisible(True)
+            self.dlg.comboBox_hand2.setVisible(True)
+            self.dlg.label_hand2.setVisible(True)
+
+            self.dlg.line_4.setVisible(True)
+            self.dlg.line.setVisible(True)
+        else:
+            self.dlg.label_rampe_boxs.setVisible(False)
+
+            self.dlg.lineEdit_rmp_stigning.setVisible(False)
+            self.dlg.comboBox_rmp_stigning.setVisible(False)
+            self.dlg.label_rmp_stigning.setVisible(False)
+
+            self.dlg.lineEdit_rmp_bredde.setVisible(False)
+            self.dlg.comboBox_rmp_bredde.setVisible(False)
+            self.dlg.label_rmp_bredde.setVisible(False)
+
+            self.dlg.comboBox_handliste.setVisible(False)
+            self.dlg.label_handliste.setVisible(False)
+
+            self.dlg.lineEdit_hand1.setVisible(False)
+            self.dlg.comboBox_hand1.setVisible(False)
+            self.dlg.label_hand1.setVisible(False)
+
+            self.dlg.lineEdit_hand2.setVisible(False)
+            self.dlg.comboBox_hand2.setVisible(False)
+            self.dlg.label_hand2.setVisible(False)
+
+            self.dlg.line_4.setVisible(False)
+            self.dlg.line.setVisible(False)
 
 
     def test(self):
@@ -1064,7 +1142,7 @@ class Master:
                 QgsMapLayerRegistry.instance().addMapLayer(self.layer_inngang)
                 self.canvas.setExtent(self.layer_inngang.extent())
                 self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
-                self.showResults(self.layer_inngang)
+                self.showResults(self.layer_inngang) #rampeverdi ikke med i tabell
                 self.sourceMapTool.setLayer(self.layer_inngang)
                 
             else:
@@ -1117,6 +1195,7 @@ class Master:
                 self.canvas.refresh()
                 tempLayer.triggerRepaint()
                 self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
+                self.sourceMapTool.setLayer(self.layer_inngang)
 
             else:
                 self.show_message("Søket fullførte uten at noen objecter ble funnet", "ingen Objecter funnet", msg_info=None, msg_details=None, msg_type=None)

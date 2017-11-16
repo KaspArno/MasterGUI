@@ -504,7 +504,7 @@
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_9">
                  <item>
-                  <widget class="QLabel" name="label_23">
+                  <widget class="QLabel" name="label_rampe_boxs">
                    <property name="text">
                     <string>Rampe</string>
                    </property>
@@ -523,7 +523,7 @@
                     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                    </property>
                    <item row="0" column="0">
-                    <widget class="QLabel" name="label_9">
+                    <widget class="QLabel" name="label_rmp_stigning">
                      <property name="text">
                       <string>Rampe Stigning</string>
                      </property>
@@ -540,7 +540,7 @@
                     </layout>
                    </item>
                    <item row="1" column="0">
-                    <widget class="QLabel" name="label_10">
+                    <widget class="QLabel" name="label_rmp_bredde">
                      <property name="text">
                       <string>Rampe Bredde</string>
                      </property>
@@ -557,7 +557,7 @@
                     </layout>
                    </item>
                    <item row="2" column="0">
-                    <widget class="QLabel" name="label_6">
+                    <widget class="QLabel" name="label_handliste">
                      <property name="text">
                       <string>Håndliste</string>
                      </property>
@@ -571,7 +571,7 @@
                     </layout>
                    </item>
                    <item row="3" column="0">
-                    <widget class="QLabel" name="label_7">
+                    <widget class="QLabel" name="label_hand1">
                      <property name="text">
                       <string>Håndliste Høyde 1</string>
                      </property>
@@ -588,7 +588,7 @@
                     </layout>
                    </item>
                    <item row="4" column="0">
-                    <widget class="QLabel" name="label_8">
+                    <widget class="QLabel" name="label_hand2">
                      <property name="text">
                       <string>Håndliste Høyde 2</string>
                      </property>

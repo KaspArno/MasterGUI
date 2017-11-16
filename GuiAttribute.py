@@ -1,9 +1,10 @@
 class GuiAttribute(object):
 
-	def __init__(self, attribute):
+	def __init__(self, attribute, comboBoxText=None):
 		self.attribute = attribute
 		self.comboBox = None
 		self.lineEdit = None
+		self.alt_comboboxText = comboBoxText
 
 	def setComboBox(self, comboBox):
 		self.comboBox = comboBox
@@ -22,6 +23,8 @@ class GuiAttribute(object):
 
 	def getComboBoxCurrentText(self):
 		if self.comboBox is not None:
+			if self.alt_comboboxText:
+				return self.alt_comboboxText[self.comboBox.currentText()]
 			return self.comboBox.currentText()
 		return None
 
