@@ -38,7 +38,7 @@ from tabledialog import TableDialog
 from infoWidgetDialog import infoWidgetDialog
 from mytable import MyTable
 from test_table import Table
-from wfs_test import wfs_test
+#from wfs_test import wfs_test
 from GuiAttribute import GuiAttribute
 
 import urllib2
@@ -314,7 +314,7 @@ class Master:
         filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
         self.dock.tableWidget.itemClicked.connect(self.table_item_clicked)
         self.dlg.pushButton_reset.clicked.connect(self.reset)
-        self.dlg.button_box_4.clicked.connect(self.wfs_test)
+        #self.dlg.button_box_4.clicked.connect(self.wfs_test)
 
         #set combobox functions
         fylker_cmb_changed = self.dlg.comboBox_fylker
@@ -431,20 +431,20 @@ class Master:
         del self.toolbar
 
 
-    def wfs_test(self):
-        nfs = wfs_test(self.iface)
-        nfs.getCapabilities()
-        nfs.getFeature()
+    # def wfs_test(self):
+    #     nfs = wfs_test(self.iface)
+    #     nfs.getCapabilities()
+    #     nfs.getFeature()
 
 
-    def add_layers(self):
-        layerList = QgsMapLayerRegistry.instance().mapLayersByName("inngangbygg")
+    # def add_layers(self):
+    #     layerList = QgsMapLayerRegistry.instance().mapLayersByName("inngangbygg")
 
-        try:
-            inngangbygg = layerList[0]
-            return inngangbygg
-        except IndexError:
-            print "inngangbygg not a layer"
+    #     try:
+    #         inngangbygg = layerList[0]
+    #         return inngangbygg
+    #     except IndexError:
+    #         print "inngangbygg not a layer"
 
     def to_unicode(self, in_string):
         if isinstance(in_string,str):
@@ -463,8 +463,21 @@ class Master:
         tmpfile= os.path.join(tmpdir, filename)
         return tmpfile
 
+
+    def updateDataReadProgress(self, bytesRead, totalBytes):
+        
+        #value = bytesRead/totalBytes*100
+        #print totalBytes
+        #self.dlg.progressBar.setMaximum(totalBytes)
+        #self.dlg.progressBar.setValue(bytesRead)
+        #self.dlg.progressBar.setValue(value)
+        #print totalBytes
+        #self.dlg.lblMessage.setText("Please wait while downloading - {0} Bytes downloaded!".format(str(bytesRead)))
+        self.dlg.label_Progress.setText("Vent mens data laster ned, data nedlastet: " + str(bytesRead))
+
     def httpRequestStartet(self):
         print "The Request has started!"
+
 
     def httpRequestFinished(self, requestId, error):
         print "The Request is finished!"
@@ -547,21 +560,24 @@ class Master:
                                     #print prov.fields().field(i).name(), ": ", f[i]
                                     #pass
                                 #break
-
+                            #Flytt denne bolken til ege metode    
                             inngangbygg = self.layers[0]
-
+                            #print self.layers[-1].name()
                             #fill comboboxes
-                            self.fill_fylker()
-                            self.fill_combobox(inngangbygg, "funksjon", self.dlg.comboBox_byggningstype)
-                            self.fill_combobox(inngangbygg, "dørtype", self.dlg.comboBox_dortype)
-                            self.fill_combobox(inngangbygg, "håndlist", self.dlg.comboBox_handliste)
-                            self.fill_combobox(inngangbygg, "tilgjengvurderingRullestol", self.dlg.comboBox_manuell_rullestol)
-                            self.fill_combobox(inngangbygg, "tilgjengvurderingElRull", self.dlg.comboBox_el_rullestol)
-                            self.fill_combobox(inngangbygg, "tilgjengvurderingSyn", self.dlg.comboBox_syn)
-                            self.fill_combobox(inngangbygg, "kontrast", self.dlg.comboBox_kontrast)
-                            self.integer_valg_list = [self.dlg.comboBox_avstand_hc, self.dlg.comboBox_ank_stigning, self.dlg.comboBox_dorbredde, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_bredde, self.dlg.comboBox_hand1, self.dlg.comboBox_hand2, self.dlg.comboBox_terskel]
-                            for cmbBox in self.integer_valg_list:
-                                self.fill_combobox_mer_mindre(cmbBox)
+                            if self.layers[-1].name() == "TettstedInngangBygg":
+                                print "if statement enterd"
+                                inngangbygg = self.layers[-1]
+                                self.fill_fylker()
+                                self.fill_combobox(inngangbygg, "funksjon", self.dlg.comboBox_byggningstype)
+                                self.fill_combobox(inngangbygg, "dørtype", self.dlg.comboBox_dortype)
+                                self.fill_combobox(inngangbygg, "håndlist", self.dlg.comboBox_handliste)
+                                self.fill_combobox(inngangbygg, "tilgjengvurderingRullestol", self.dlg.comboBox_manuell_rullestol)
+                                self.fill_combobox(inngangbygg, "tilgjengvurderingElRull", self.dlg.comboBox_el_rullestol)
+                                self.fill_combobox(inngangbygg, "tilgjengvurderingSyn", self.dlg.comboBox_syn)
+                                self.fill_combobox(inngangbygg, "kontrast", self.dlg.comboBox_kontrast)
+                                self.integer_valg_list = [self.dlg.comboBox_avstand_hc, self.dlg.comboBox_ank_stigning, self.dlg.comboBox_dorbredde, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_bredde, self.dlg.comboBox_hand1, self.dlg.comboBox_hand2, self.dlg.comboBox_terskel]
+                                for cmbBox in self.integer_valg_list:
+                                    self.fill_combobox_mer_mindre(cmbBox)
 
                             # vlayer = self.layers[-1]
                             # expr = QgsExpression( "\"kommune\"=104 AND \"avstandHC\"<=25" )
@@ -590,35 +606,40 @@ class Master:
                             self.featuretype.next()
                             if self.featuretype.getFeatureType():
                                 self.getFeatures()
-                            print "self.layers: ", len(self.layers)
-                            print "doen"
+                            else:
+                                #print "self.layers: ", len(self.layers)
+                                #print dir(self.dlg.label_Progress)
+                                self.dlg.label_Progress_Inngang.setVisible(False)
+                                self.dlg.label_Progress_Vei.setVisible(False)
+                                #print self.dlg.progressBar.value()
+                                print "doen"
 
 
     def get_wfs_layer(self):
         print "hent_wfs_layer kalt"
-        online_resource = "https://wfs.geonorge.no/skwms1/wfs.tilgjengelighettettsted"
+        # online_resource = "https://wfs.geonorge.no/skwms1/wfs.tilgjengelighettettsted"
 
         #feature_type = ['app:TettstedHCparkering', 'app:TettstedInngangBygg', u'app:TettstedParkeringsomr\xe5de', u'app:TettstedParkeringsomr\xe5deGr', 'app:TettstedVei']
         self.featuretype = FeatureType()
-        nsmap = {'gml': 'http://www.opengis.net/gml', 'app': 'http://skjema.geonorge.no/SOSI/produktspesifikasjon/TilgjengelighetTettsted/4.5', 'xlink': 'http://www.w3.org/1999/xlink', 'ows': 'http://www.opengis.net/ows/1.1', 'xsd': 'http://www.w3.org/2001/XMLSchema', 'wfs': 'http://www.opengis.net/wfs/2.0', 'xsi': 'http://www.w3.org/2001/XMLSchema-instance', 'gml32': 'http://www.opengis.net/gml/3.2', 'ogc': 'http://www.opengis.net/ogc', 'fes': 'http://www.opengis.net/fes/2.0'}
-        namespace = "http://skjema.geonorge.no/SOSI/produktspesifikasjon/TilgjengelighetTettsted/4.5"
-        namespace_prefix = "app"
-        titlelist = ['app:TettstedHCparkering', 'app:TettstedInngangBygg', u'app:TettstedParkeringsomr\xe5de', u'app:TettstedParkeringsomr\xe5deGr', 'app:TettstedVei']
+        # nsmap = {'gml': 'http://www.opengis.net/gml', 'app': 'http://skjema.geonorge.no/SOSI/produktspesifikasjon/TilgjengelighetTettsted/4.5', 'xlink': 'http://www.w3.org/1999/xlink', 'ows': 'http://www.opengis.net/ows/1.1', 'xsd': 'http://www.w3.org/2001/XMLSchema', 'wfs': 'http://www.opengis.net/wfs/2.0', 'xsi': 'http://www.w3.org/2001/XMLSchema-instance', 'gml32': 'http://www.opengis.net/gml/3.2', 'ogc': 'http://www.opengis.net/ogc', 'fes': 'http://www.opengis.net/fes/2.0'}
+        # namespace = "http://skjema.geonorge.no/SOSI/produktspesifikasjon/TilgjengelighetTettsted/4.5"
+        # namespace_prefix = "app"
+        # titlelist = ['app:TettstedHCparkering', 'app:TettstedInngangBygg', u'app:TettstedParkeringsomr\xe5de', u'app:TettstedParkeringsomr\xe5deGr', 'app:TettstedVei']
 
-        # lowercorner_east = 0
-        # lowercorner_south = 0
-        # uppercorner_west = 0
-        # uppercorner_north = 0
+        # # lowercorner_east = 0
+        # # lowercorner_south = 0
+        # # uppercorner_west = 0
+        # # uppercorner_north = 0
 
-        #Do I use these?
-        request = "{0}{1}{2}".format(online_resource, "?", "{0}service=WFS&acceptversions=2.0.0&request=GetCapabilities".format("&"))
-        response = urllib2.urlopen(request, None, 10)
+        # #Do I use these?
+        # request = "{0}{1}{2}".format(online_resource, "?", "{0}service=WFS&acceptversions=2.0.0&request=GetCapabilities".format("&"))
+        # response = urllib2.urlopen(request, None, 10)
 
-        buf = response.read()
-        root = ElementTree.fromstring(buf)
+        # buf = response.read()
+        # root = ElementTree.fromstring(buf)
 
-        nswfs = "{http://www.opengis.net/wfs/2.0}"
-        nsows = "{http://www.opengis.net/ows/1.1}"
+        # nswfs = "{http://www.opengis.net/wfs/2.0}"
+        # nsows = "{http://www.opengis.net/ows/1.1}"
 
         # for target in root.findall("{0}FeatureTypeList/{0}FeatureType".format(nswfs)):
         #     for name in target.findall("{0}Name".format(nswfs)):
@@ -659,6 +680,7 @@ class Master:
 
         self.http.requestStarted.connect(self.httpRequestStartet)
         self.http.requestFinished.connect(self.httpRequestFinished)
+        #self.http.dataReadProgress.connect(self.updateDataReadProgress)
 
 
         layername="wfs{0}".format(''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(6)))
@@ -1029,11 +1051,32 @@ class Master:
         #print "where: " + where
         return where
 
+    def create_where_statement2(self,attribute, where):
+        onde_atributter = ["dørtype", "terskelHøyde", "håndlist", "håndlistHøyde1", "håndlistHøyde2"]
+        one_att_dict = {"dørtype" : "d_rtype", "terskelHøyde" : "terskelH_yde", "håndlist" : "h_ndlist", "håndlistHøyde1" : "h_ndlistH_yde1", "håndlistHøyde2" : "h_ndlistH_yde2"}
+        if attribute.getLineEdit() is None:
+            if attribute.getComboBoxCurrentText() != self.uspesifisert:
+                if len(where) == 0:
+                    #print attribute.getAttribute()
+                    where = "\"%s\" = '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText())
+                    #where = "WHERE " + attribute.getAttribute() + " = " + "'" + attribute.getComboBoxCurrentText() + "'"
+                else:
+                    where =  where + " AND " + "\"%s\" = '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText())
+        else:
+            if attribute.getLineEditText() != self.uspesifisert:
+                if len(where) == 0:
+                    where = "\"%s\" %s '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText(), attribute.getLineEditText())
+                else:
+                    where = where + " AND " +  "\"%s\" %s '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText(), attribute.getLineEditText())
+
+        #print "where: " + where
+        return where
+
 
 
     def filtrer_inngang(self):
         print"Filtering Start"
-
+        layer = self.layers[1]
         fylke = self.dlg.comboBox_fylker.currentText()
         komune = self.dlg.comboBox_komuner.currentText()
 
@@ -1073,21 +1116,23 @@ class Master:
         expr_string = ""
         if fylke != "Norge":
             if komune == self.uspesifisert:
-                expr_string = expr_string + "\"kommune\"={0}".format(self.fylke_dict[fylke][0])
+                expr_string = expr_string + " (\"kommune\"={0}".format(self.fylke_dict[fylke][0])
                 for komune_nr in range(1, len(self.fylke_dict[fylke])-1):
                     expr_string = expr_string + " OR \"kommune\"={0}".format(self.fylke_dict[fylke][komune_nr])
                     #where = where + " or komm = " + self.fylke_dict[fylke][komune_nr]
+                expr_string = expr_string + ")"
             else:
-                expr_string = expr_string + "\"kommune\"={0}".format(self.komm_dict_nm[komune])
+                expr_string = expr_string + " \"kommune\"={0}".format(self.komm_dict_nm[komune])
                     #where = "where komm = " + self.komm_dict_nm[komune]
         where = "WHERE lokalId > 0"
         if fylke != "Norge":
             if komune == self.uspesifisert:
                 #where = "WHERE " + "kommune = '{0}'".format(self.fylke_dict[fylke][0])
-                where = where + " AND " + "kommune = '{0}'".format(self.fylke_dict[fylke][0])
+                where = where + " AND " + "(kommune = '{0}'".format(self.fylke_dict[fylke][0])
                 for komune_nr in range(1, len(self.fylke_dict[fylke])-1):
                     where = where + " OR kommune = '{0}'".format(self.fylke_dict[fylke][komune_nr])
                     #where = where + " or komm = " + self.fylke_dict[fylke][komune_nr]
+                where = where + ")"
             else:
                 #where = "WHERE " + "kommune = '{0}'".format(self.komm_dict_nm[komune])
                 where = where + " AND " + "kommune = '{0}'".format(self.komm_dict_nm[komune])
@@ -1096,9 +1141,9 @@ class Master:
         for attribute in self.attributes_inngang:
             #print "attribute: ", attribute.getAttribute()
             where = self.create_where_statement(attribute, where)
-            expr_string = self.create_where_statement(attribute, expr_string)
-        #print "where: " + where
-        #print "espr: " + expr_string
+            expr_string = self.create_where_statement2(attribute, expr_string)
+        print "where: " + where
+        print "espr: " + expr_string
         # for atr, value in ing_atr_combobox.iteritems():
         #     expr_string = self.create_expr_statement(atr, value, "=", expr_string)
 
@@ -1109,18 +1154,18 @@ class Master:
         #     where = self.create_expr_statement(atr, value[0], opperator, where)
         
         if self.dlg.comboBox_sok_metode.currentText() == "visual":
-            QgsMapLayerRegistry.instance().addMapLayer(self.layers[-1])
-            self.hideLayer(self.layers[-1])
-            self.iface.legendInterface().setLayerVisible(self.layers[-1], False)
+            QgsMapLayerRegistry.instance().addMapLayer(layer)
+            self.hideLayer(layer)
+            self.iface.legendInterface().setLayerVisible(layer, False)
             #tempLayer = QgsVectorLayer("Point?crs=epsg:4326", "Norge" + "Memory", "memory")
             #temp_data = tempLayer.dataProvider()
-            layer_name = self.layers[-1].name()
+            layer_name = layer.name()
             #attr = self.layers[-1].dataProvider().fields().toList()
             #temp_data.addAttributes(attr)
             #vLayer = QgsVectorLayer("?query=SELECT * FROM " + layer_name, self.dlg.lineEdit_navn_paa_sok_inngang.text() + "Virtual", "virtual" )
             print layer_name
             query = "SELECT * FROM " + layer_name + " " + where
-            #print query
+            print query
             vLayer = QgsVectorLayer("?query=%s" % (query), self.dlg.lineEdit_navn_paa_sok_inngang.text() + "Virtual", "virtual" )
             print vLayer.isValid()
             if vLayer.featureCount() > 0:
@@ -1134,6 +1179,9 @@ class Master:
                 self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
                 self.showResults(self.layer_inngang) #rampeverdi ikke med i tabell
                 self.sourceMapTool.setLayer(self.layer_inngang)
+                self.dock.tabWidget_main.setCurrentIndex(1) #for tettsted
+                self.dock.tabWidget_tettsted.setCurrentIndex(1) #for inngangbygg
+                self.infoWidget.tabWidget.setCurrentIndex(1)
                 
             else:
                 self.show_message("Søket fullførte uten at noen objecter ble funnet", "ingen Objecter funnet", msg_info=None, msg_details=None, msg_type=None)
@@ -1145,38 +1193,41 @@ class Master:
                 QgsMapLayerRegistry.instance().removeMapLayer( tempLayer )
             except (RuntimeError, AttributeError, UnboundLocalError):
                 pass
-            print datetime.datetime.now().time()
-            expr = QgsExpression(expr_string)
-            print datetime.datetime.now().time()
-            it = self.layers[-1].getFeatures( QgsFeatureRequest( expr ) )
-            ids = [i.id() for i in it]
-            self.layers[-1].setSelectedFeatures( ids )
-            print datetime.datetime.now().time()
-            selectedFeatures = self.layers[-1].selectedFeatures()
-            print datetime.datetime.now().time()
-            #selectedFeatures = []
-            #WFSlayer = QgsVectorLayer(uri, "layerName", "WFS")
-            #features1 = self.layers[-1].selectedFeatures() # this layer is the layer the user or code selects in the map
-            print datetime.datetime.now().time()
-            #for WFSfeature in WFSlayer.getFeatures():
-            #  for f in features1:
-            #    if WFSfeature.geometry().intersects(f.geometry()):
-            #      selectedFeatures.append(WFSfeature)
-            # create temp layer, eg use LineString geometry
-            tempLayer = QgsVectorLayer("Point?crs=epsg:4326", self.dlg.lineEdit_navn_paa_sok_inngang.text() + "Memory", "memory")
-            print datetime.datetime.now().time()
-            #QgsMapLayerRegistry.instance().addMapLayer(tempLayer)
-            print datetime.datetime.now().time()
-            temp_data = tempLayer.dataProvider()
-            print datetime.datetime.now().time()
-            attr = self.layers[-1].dataProvider().fields().toList()
-            print datetime.datetime.now().time()
-            temp_data.addAttributes(attr)
-            print datetime.datetime.now().time()
-            tempLayer.updateFields()
-            print datetime.datetime.now().time()
-            temp_data.addFeatures(selectedFeatures)
-            print datetime.datetime.now().time()
+            if len(expr_string) == 0:
+                tempLayer = layer
+            else:
+                print datetime.datetime.now().time()
+                expr = QgsExpression(expr_string)
+                print datetime.datetime.now().time()
+                it = layer.getFeatures( QgsFeatureRequest( expr ) )
+                ids = [i.id() for i in it]
+                layer.setSelectedFeatures( ids )
+                print datetime.datetime.now().time()
+                selectedFeatures = layer.selectedFeatures()
+                print datetime.datetime.now().time()
+                #selectedFeatures = []
+                #WFSlayer = QgsVectorLayer(uri, "layerName", "WFS")
+                #features1 = self.layers[-1].selectedFeatures() # this layer is the layer the user or code selects in the map
+                print datetime.datetime.now().time()
+                #for WFSfeature in WFSlayer.getFeatures():
+                #  for f in features1:
+                #    if WFSfeature.geometry().intersects(f.geometry()):
+                #      selectedFeatures.append(WFSfeature)
+                # create temp layer, eg use LineString geometry
+                tempLayer = QgsVectorLayer("Point?crs=epsg:4326", self.dlg.lineEdit_navn_paa_sok_inngang.text() + "Memory", "memory")
+                print datetime.datetime.now().time()
+                #QgsMapLayerRegistry.instance().addMapLayer(tempLayer)
+                print datetime.datetime.now().time()
+                temp_data = tempLayer.dataProvider()
+                print datetime.datetime.now().time()
+                attr = layer.dataProvider().fields().toList()
+                print datetime.datetime.now().time()
+                temp_data.addAttributes(attr)
+                print datetime.datetime.now().time()
+                tempLayer.updateFields()
+                print datetime.datetime.now().time()
+                temp_data.addFeatures(selectedFeatures)
+                print datetime.datetime.now().time()
             if tempLayer.featureCount() > 0:
                 # try:
                 #     QgsMapLayerRegistry.instance().removeMapLayer( self.layer_inngang )
@@ -1191,6 +1242,9 @@ class Master:
                 self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
                 self.sourceMapTool.setLayer(self.layer_inngang)
                 self.showResults(self.layer_inngang) #rampeverdi ikke med i tabell
+                self.dock.tabWidget_main.setCurrentIndex(1) #for tettsted
+                self.dock.tabWidget_tettsted.setCurrentIndex(1) #for inngangbygg
+                self.infoWidget.tabWidget.setCurrentIndex(1)
 
             else:
                 self.show_message("Søket fullførte uten at noen objecter ble funnet", "ingen Objecter funnet", msg_info=None, msg_details=None, msg_type=None)

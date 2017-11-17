@@ -93,7 +93,7 @@
             <item>
              <widget class="QTabWidget" name="tabWidget">
               <property name="currentIndex">
-               <number>1</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="tab">
                <attribute name="title">
@@ -387,82 +387,41 @@
                    </spacer>
                   </item>
                   <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_23">
+                   <layout class="QHBoxLayout" name="horizontalLayout_30">
                     <item>
-                     <widget class="QPushButton" name="pushButton_LastVei">
+                     <widget class="QLabel" name="label_40">
                       <property name="text">
-                       <string>Last inn Lag</string>
+                       <string>Navn på Søk</string>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <spacer name="horizontalSpacer_4">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
+                     <widget class="QLineEdit" name="lineEdit_navn_paa_sok_inngang_2"/>
                     </item>
                     <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_8">
+                     <widget class="QComboBox" name="comboBox_sok_metode_2">
                       <item>
-                       <widget class="QLabel" name="label_40">
-                        <property name="text">
-                         <string>Navn på Søk</string>
-                        </property>
-                       </widget>
+                       <property name="text">
+                        <string>visual</string>
+                       </property>
                       </item>
                       <item>
-                       <widget class="QLineEdit" name="lineEdit_navn_paa_sok_inngang_2"/>
+                       <property name="text">
+                        <string>memory</string>
+                       </property>
                       </item>
-                      <item>
-                       <widget class="QComboBox" name="comboBox_sok_metode_2">
-                        <item>
-                         <property name="text">
-                          <string>visual</string>
-                         </property>
-                        </item>
-                        <item>
-                         <property name="text">
-                          <string>memory</string>
-                         </property>
-                        </item>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="pushButton_filtrerInngang_2">
-                        <property name="text">
-                         <string>Filtrer</string>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="pushButton_filtrerInngang_2">
+                      <property name="text">
+                       <string>Filtrer</string>
+                      </property>
+                     </widget>
                     </item>
                    </layout>
                   </item>
                  </layout>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_Progress_Vei">
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>TextLabel</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                 </widget>
                 </item>
                </layout>
                <zorder></zorder>
@@ -472,10 +431,8 @@
                <zorder>line_5</zorder>
                <zorder>line_6</zorder>
                <zorder>verticalSpacer_3</zorder>
+               <zorder>verticalSpacer_7</zorder>
                <zorder>layoutWidget</zorder>
-               <zorder>pushButton_LastVei</zorder>
-               <zorder>horizontalSpacer_4</zorder>
-               <zorder>label_Progress_Vei</zorder>
               </widget>
               <widget class="QWidget" name="tab_2">
                <attribute name="title">
@@ -924,13 +881,6 @@ p, li { white-space: pre-wrap; }
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_26">
                     <item>
-                     <widget class="QPushButton" name="pushButton_LastInngang">
-                      <property name="text">
-                       <string>Last inn Lag</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
                      <spacer name="horizontalSpacer_3">
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
@@ -982,26 +932,8 @@ p, li { white-space: pre-wrap; }
                   </item>
                  </layout>
                 </item>
-                <item>
-                 <widget class="QLabel" name="label_Progress_Inngang">
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>TextLabel</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                 </widget>
-                </item>
                </layout>
                <zorder></zorder>
-               <zorder>label_Progress_Inngang</zorder>
               </widget>
               <widget class="QWidget" name="tab_3">
                <attribute name="title">
@@ -1234,6 +1166,23 @@ p, li { white-space: pre-wrap; }
                      </size>
                     </property>
                    </spacer>
+                  </item>
+                  <item>
+                   <widget class="QProgressBar" name="progressBar">
+                    <property name="value">
+                     <number>0</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDialogButtonBox" name="button_box_4">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="standardButtons">
+                     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </item>
