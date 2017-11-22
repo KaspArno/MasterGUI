@@ -26,7 +26,8 @@ import io
 
 from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsVectorFileWriter, QgsLayerTreeLayer, QgsLayerTreeGroup, QgsMapLayer, QgsProject
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant, QDateTime, QThread, pyqtSignal, Qt
-from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox, QApplication, QHBoxLayout, QVBoxLayout, QAbstractItemView, QListWidgetItem, QAbstractItemView
+from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox, QApplication, QHBoxLayout, QVBoxLayout, QAbstractItemView, QListWidgetItem, QAbstractItemView, QFileDialog
+
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
@@ -38,6 +39,7 @@ from tabledialog import TableDialog
 from infoWidgetDialog import infoWidgetDialog
 from mytable import MyTable
 from test_table import Table
+from exportlayerdialog import exportLayerDialog
 #from wfs_test import wfs_test
 from GuiAttribute import GuiAttribute
 
@@ -262,7 +264,7 @@ class Master:
         icon_path = ':/plugins/Master/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u''),
+            text=self.tr(u'UU Tilgjengelighet'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
@@ -291,6 +293,12 @@ class Master:
         #Set push functions
         # filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
         # filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
+        self.export_layer = exportLayerDialog()
+        self.export_layer.pushButton_bla.clicked.connect(self.OpenBrowse)
+        self.export_layer.pushButton_lagre.clicked.connect(self.lagre_lag)
+        self.export_layer.pushButton_lagre.clicked.connect(lambda x: self.export_layer.close())
+        self.export_layer.pushButton_avbryt.clicked.connect(lambda x: self.export_layer.close())
+
 
         #Creating dock view of second window
         self.dock = TableDialog()
@@ -307,6 +315,10 @@ class Master:
         self.obj_info_dockwidget.setWidget(self.infoWidget)
         self.infoWidget.pushButton_Select_Object.setCheckable(True)
         self.infoWidget.pushButton_Select_Object.toggled.connect(self.toolButtonSelect)
+        self.infoWidget.pushButton_exporter.clicked.connect(self.open_export_layer_dialog)
+        self.infoWidget.pushButton_filtrer.clicked.connect(lambda x: self.dlg.show())
+
+        
 
         
         #self.dlg.accepted.connect(self.filtrer_inngang) #OK fillterer foreløpig for inngang, burde endres
@@ -1375,8 +1387,8 @@ class Master:
             #print "attribute: ", attribute.getAttribute()
             where = self.create_where_statement(attribute, where)
             expr_string = self.create_where_statement2(attribute, expr_string)
-        print "where: " + where
-        print "espr: " + expr_string
+        #print "where: " + where
+        #print "espr: " + expr_string
         # for atr, value in ing_atr_combobox.iteritems():
         #     expr_string = self.create_expr_statement(atr, value, "=", expr_string)
 
@@ -1386,7 +1398,7 @@ class Master:
         #         opperator = "<"
         #     where = self.create_expr_statement(atr, value[0], opperator, where)
         
-        if sok_metode == "visual": #if self.dlg.comboBox_sok_metode.currentText() == "visual":
+        if sok_metode == "virtual": #if self.dlg.comboBox_sok_metode.currentText() == "visual":
             QgsMapLayerRegistry.instance().addMapLayer(baselayer)
             self.hideLayer(baselayer)
             self.iface.legendInterface().setLayerVisible(baselayer, False)
@@ -1396,7 +1408,7 @@ class Master:
             #attr = self.layers[-1].dataProvider().fields().toList()
             #temp_data.addAttributes(attr)
             #vLayer = QgsVectorLayer("?query=SELECT * FROM " + layer_name, self.dlg.lineEdit_navn_paa_sok_inngang.text() + "Virtual", "virtual" )
-            print base_layer_name
+            #print base_layer_name
             query = "SELECT * FROM " + base_layer_name + " " + where
             print query
             vLayer = QgsVectorLayer("?query=%s" % (query), layer_name + "Virtual", "virtual" )
@@ -1588,6 +1600,19 @@ class Master:
 
         retval = msg.exec_()
         print ("value of pressed message box button:", retval)
+
+
+    def open_export_layer_dialog(self):
+        self.export_layer.show()
+
+    def OpenBrowse(self):        
+        filename1 = QFileDialog.getSaveFileName()
+        #QFileDialog.setFileMode(QFileDialog.Directory())
+        #filename1 = QFileDialog.directory()
+        self.export_layer.lineEdit.setText(filename1)
+
+    def lagre_lag(self):
+        QgsVectorFileWriter.writeAsVectorFormat(self.iface.activeLayer(), self.export_layer.lineEdit.text(), "utf-8", None, self.export_layer.comboBox.currentText())
 
 
     def reset(self): #unfinished

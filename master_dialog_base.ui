@@ -86,7 +86,7 @@
              <item>
               <widget class="QTabWidget" name="tabWidget">
                <property name="currentIndex">
-                <number>0</number>
+                <number>3</number>
                </property>
                <widget class="QWidget" name="tab">
                 <attribute name="title">
@@ -383,7 +383,7 @@
                         <widget class="QComboBox" name="comboBox_sok_metode_vei">
                          <item>
                           <property name="text">
-                           <string>visual</string>
+                           <string>virtual</string>
                           </property>
                          </item>
                          <item>
@@ -909,7 +909,7 @@ p, li { white-space: pre-wrap; }
                         <widget class="QComboBox" name="comboBox_sok_metode">
                          <item>
                           <property name="text">
-                           <string>visual</string>
+                           <string>virtual</string>
                           </property>
                          </item>
                          <item>
@@ -1244,7 +1244,7 @@ p, li { white-space: pre-wrap; }
                         <widget class="QComboBox" name="comboBox_sok_metode_hcpark">
                          <item>
                           <property name="text">
-                           <string>visual</string>
+                           <string>virtual</string>
                           </property>
                          </item>
                          <item>
@@ -1502,7 +1502,7 @@ p, li { white-space: pre-wrap; }
                         <widget class="QComboBox" name="comboBox_sok_metode_pomrade">
                          <item>
                           <property name="text">
-                           <string>visual</string>
+                           <string>virtual</string>
                           </property>
                          </item>
                          <item>
