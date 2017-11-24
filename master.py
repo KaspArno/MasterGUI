@@ -1410,7 +1410,7 @@ class Master:
             #vLayer = QgsVectorLayer("?query=SELECT * FROM " + layer_name, self.dlg.lineEdit_navn_paa_sok_inngang.text() + "Virtual", "virtual" )
             #print base_layer_name
             query = "SELECT * FROM " + base_layer_name + " " + where
-            print query
+            #print query
             vLayer = QgsVectorLayer("?query=%s" % (query), layer_name + "Virtual", "virtual" )
             print vLayer.isValid()
             if vLayer.featureCount() > 0:
