@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/plugins/ObjectWindow" >
-        <file>icon.png</file>
-    </qresource>
-</RCC>

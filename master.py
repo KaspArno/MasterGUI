@@ -34,13 +34,12 @@ import resources
 from master_dialog import MasterDialog
 
 #from ObjectWindow.ObjectWindow import ObjectWindow
-from AllObjectWidget import AllObjectWidget
+
 from tabledialog import TableDialog
 from infoWidgetDialog import infoWidgetDialog
-from mytable import MyTable
-from test_table import Table
+
+
 from exportlayerdialog import exportLayerDialog
-#from wfs_test import wfs_test
 from GuiAttribute import GuiAttribute
 
 import urllib2
@@ -57,7 +56,6 @@ import string
 from featuretype import FeatureType
 
 #For selection
-from featureIdentifyTool import FeatureIdentifyTool
 from identifyGeometry import IdentifyGeometry
 
 import datetime
@@ -159,10 +157,6 @@ class Master:
 
         #self.layer_inngang = None
 
-        # nfs = wfs_test(self.iface)
-        # nfs.getCapabilities()
-        # nfs.getFeature()
-        
 
         
 
@@ -330,7 +324,6 @@ class Master:
         
         self.dock.tableWidget.itemClicked.connect(self.table_item_clicked)
         self.dlg.pushButton_reset.clicked.connect(self.reset)
-        #self.dlg.button_box_4.clicked.connect(self.wfs_test)
 
         #set combobox functions
         fylker_cmb_changed = self.dlg.comboBox_fylker
@@ -592,11 +585,6 @@ class Master:
         del self.toolbar
 
 
-    # def wfs_test(self):
-    #     nfs = wfs_test(self.iface)
-    #     nfs.getCapabilities()
-    #     nfs.getFeature()
-
 
     # def add_layers(self):
     #     layerList = QgsMapLayerRegistry.instance().mapLayersByName("inngangbygg")
@@ -605,7 +593,7 @@ class Master:
     #         inngangbygg = layerList[0]
     #         return inngangbygg
     #     except IndexError:
-    #         print "inngangbygg not a layer"
+    #         print("inngangbygg not a layer")
 
     def to_unicode(self, in_string):
         if isinstance(in_string,str):
@@ -628,34 +616,34 @@ class Master:
     def updateDataReadProgress(self, bytesRead, totalBytes):
         
         #value = bytesRead/totalBytes*100
-        #print totalBytes
+        #print(totalBytes)
         #self.dlg.progressBar.setMaximum(totalBytes)
         #self.dlg.progressBar.setValue(bytesRead)
         #self.dlg.progressBar.setValue(value)
-        #print totalBytes
+        #print(totalBytes)
         #self.dlg.lblMessage.setText("Please wait while downloading - {0} Bytes downloaded!".format(str(bytesRead)))
         self.dlg.label_Progress.setText("Vent mens data laster ned, data nedlastet: " + str(bytesRead))
 
     def httpRequestStartet(self):
-        print "The Request has started!"
+        print("The Request has started!")
 
 
     def httpRequestFinished(self, requestId, error):
-        print "The Request is finished!"
-        #print requestId, self.httpGetId
+        print("The Request is finished!")
+        #print(requestId, self.httpGetId)
         if requestId != self.httpGetId:
-            print "requesrtd Id != httpGetId"
+            print("requesrtd Id != httpGetId")
             return
         
         self.outFile.close()
         
         if error:
-            print "error in requestFinished"
-            print self.http.errorString()
-            print type(error)
+            print("error in requestFinished")
+            print(self.http.errorString())
+            print(type(error))
             self.outFile.remove()
         else:
-            print "here i am"
+            print("here i am")
             gdaltimeout = "5"
             gdal.SetConfigOption("GDAL_HTTP_TIMEOUT", gdaltimeout)
             gdal.SetConfigOption('GML_SKIP_RESOLVE_ELEMS', 'ALL')
@@ -667,9 +655,9 @@ class Master:
             ogrdatasource = ogrdriver.Open(self.outFile.fileName())
             
             if ogrdatasource is None:
-                print "ogrdatasource is None"
+                print("ogrdatasource is None")
             else: # Determine the LayerCount
-                #print "ogrdatasource is some"
+                #print("ogrdatasource is some")
                 ogrlayercount = ogrdatasource.GetLayerCount()
                 for i in range(0, ogrlayercount):
                     j = ogrlayercount -1 - i
@@ -679,15 +667,15 @@ class Master:
                     geomtypeids = []
                     
                     if ogrgeometrytype==0:
-                        #print "is it ever abstract geometry?"
+                        #print("is it ever abstract geometry?")
                         geomtypeids = ["1", "2", "3", "100"]
                     else:
                         geomtypeids = [str(ogrgeometrytype)]
-                        #print geomtypeids
+                        #print(geomtypeids)
                     
                     for geomtypeid in geomtypeids:
                         qgislayername = ogrlayername
-                        #print "qgislayername: ", qgislayername
+                        #print("qgislayername: ", qgislayername)
                         uri = self.outFile.fileName() + "|layerid=" + str(j)
                         if len(geomtypeids) > 1:
                             uri += "|subset=" + self.getsubset(geomtypeid)
@@ -702,7 +690,7 @@ class Master:
                         
                         #if not self.vlayer.isValid():
                         if not self.layers[-1].isValid():
-                            print "self.vlayer not valid"
+                            print("self.vlayer not valid")
                         else:
                             #featurecount = self.vlayer.featureCount()
                             featurecount = self.layers[-1].featureCount()
@@ -716,16 +704,16 @@ class Master:
                             #for f in self.vlayer.getFeatures():
                             #for f in self.layers[qgislayername].getFeatures():
                             #for f in self.layers[-1].getFeatures():
-                                #print ""
+                                #print("")
                                 #for i in range(0, len(prov.fields())):
-                                    #print prov.fields().field(i).name(), ": ", f[i]
+                                    #print(prov.fields().field(i).name(), ": ", f[i])
                                     #pass
                                 #break
                             #Flytt denne bolken til ege metode    
                             #inngangbygg = self.layers[0]
-                            #print self.layers[-1].name()
+                            #print(self.layers[-1].name())
                             #fill comboboxes
-                            #print self.layers[-1].name()
+                            #print(self.layers[-1].name())
                             if self.layers[-1].name() == "TettstedInngangBygg":
                                 self.fill_fylker()
                                 for att in self.attributes_inngang_gui:
@@ -747,7 +735,7 @@ class Master:
                                     self.fill_combobox(self.layers[-1], att.getAttribute(), att.getComboBox())
                                 for att in self.attributes_pomrade_mer_mindre:
                                     self.fill_combobox_mer_mindre(att.getComboBox())
-                                # print "if statement enterd"
+                                # print("if statement enterd")
                                 # inngangbygg = self.layers[-1]
                                 # self.fill_fylker()
                                 # self.fill_combobox(inngangbygg, "funksjon", self.dlg.comboBox_byggningstype)
@@ -767,7 +755,7 @@ class Master:
                             # ids = [i.id() for i in it]
                             # vlayer.setSelectedFeatures( ids )
                             # selectedFeatures = vlayer.selectedFeatures()
-                            # print "selectedFeatures: ", type(selectedFeatures)
+                            # print("selectedFeatures: ", type(selectedFeatures))
                             # #selectedFeatures = []
                             # #WFSlayer = QgsVectorLayer(uri, "layerName", "WFS")
                             # features1 = self.layers[-1].selectedFeatures() # this layer is the layer the user or code selects in the map
@@ -789,16 +777,16 @@ class Master:
                             if self.featuretype.getFeatureType():
                                 self.getFeatures()
                             else:
-                                #print "self.layers: ", len(self.layers)
-                                #print dir(self.dlg.label_Progress)
+                                #print("self.layers: ", len(self.layers))
+                                #print(dir(self.dlg.label_Progress))
                                 self.dlg.label_Progress_Inngang.setVisible(False)
                                 self.dlg.label_Progress_Vei.setVisible(False)
-                                #print self.dlg.progressBar.value()
-                                print "doen"
+                                #print(self.dlg.progressBar.value())
+                                print("doen")
 
 
     def get_wfs_layer(self):
-        print "hent_wfs_layer kalt"
+        print("hent_wfs_layer kalt")
         # online_resource = "https://wfs.geonorge.no/skwms1/wfs.tilgjengelighettettsted"
 
         #feature_type = ['app:TettstedHCparkering', 'app:TettstedInngangBygg', u'app:TettstedParkeringsomr\xe5de', u'app:TettstedParkeringsomr\xe5deGr', 'app:TettstedVei']
@@ -849,15 +837,15 @@ class Master:
 
         #typeNames= urllib.quote(feature_type[1].encode('utf8'))
         typeNames= urllib.quote(self.featuretype.getFeatureType().encode('utf8'))
-        #print "typeNames", typeNames
+        #print("typeNames", typeNames)
         query_string = "?service=WFS&request=GetFeature&version=2.0.0&srsName={0}&typeNames={1}".format( "urn:ogc:def:crs:EPSG::{0}".format(str(self.iface.mapCanvas().mapRenderer().destinationCrs().postgisSrid())).strip(), typeNames)
         query_string += "&namespaces=xmlns({0},{1})".format(namespace_prefix, urllib.quote(namespace,""))
         #query_string+= "&count={0}".format("1000")
         query_string+= "&"
-        #print "query_string: ", query_string
+        #print("query_string: ", query_string)
 
         self.httpGetId = 0
-        #print "httpGatId", self.httpGetId
+        #print("httpGatId", self.httpGetId)
         self.http = QHttp()
 
         self.http.requestStarted.connect(self.httpRequestStartet)
@@ -871,9 +859,9 @@ class Master:
         #downloadFile
 
         url = QtCore.QUrl(online_resource)
-        print "online_resource: ", online_resource
+        print("online_resource: ", online_resource)
         if QtCore.QFile.exists(fileName):
-                    print "File  Exists"
+                    print("File  Exists")
                     QtCore.QFile.remove(fileName)
 
         self.outFile = QtCore.QFile(fileName)
@@ -883,9 +871,9 @@ class Master:
             port = 0
         
         self.http.setHost(url.host(), QHttp.ConnectionModeHttps, port) #starting request
-        #print "url.path: ", url.path()
+        #print("url.path: ", url.path())
         self.httpGetId = self.http.get(url.path() + query_string, self.outFile)
-        #print "httpGetId", self.httpGetId
+        #print("httpGetId", self.httpGetId)
         
 
     # def connect_database(self):
@@ -913,20 +901,17 @@ class Master:
     #     QObject.connect( canvas, SIGNAL( "mapToolSet(QgsMapTool *)" ), self.mapToolChanged)
      
     # def doSomething(self, layer, feature):
-    #     print "doSomething"
+    #     print("doSomething")
     #   # do something
 
     def toolButtonSelect(self, checked):
-        print "toolButtonSelect Activated"
+        print("toolButtonSelect Activated")
         # If the toolButton is checked
         if checked:
-            print "checked"
+            print("checked")
             self.oldMapTool = self.canvas.mapTool()
             self.canvas.setMapTool(self.sourceMapTool)
 
-            #self.featIdentTool = FeatureIdentifyTool(self.iface)
-            #self.featIdentTool.geomIdentified.connect(self.toolButtonAction)
-            #self.canvas.setMapTool(self.featIdentTool)
         else:
             self.oldMapTool = self.canvas.mapTool()
 
@@ -1035,44 +1020,44 @@ class Master:
 
 
     def table_item_clicked(self):
-        print "test called"
+        print("test called")
         self.current_seartch_layer.setSelectedFeatures([])
-        #print dir(self.dock.tableWidget.selectionModel().selectedRows().index())
+        #print(dir(self.dock.tableWidget.selectionModel().selectedRows().index()))
         #self.layer_inngang.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), i).text())]])
         #infoWidget_label_list = [self.infoWidget.label_avstand_hc_text, self.infoWidget.label_byggningstype_text, self.infoWidget.label_ank_vei_stigning_text, self.infoWidget.label_dortype_text, self.infoWidget.label_dorapner_text, self.infoWidget.label_ringeklokke_text, self.infoWidget.label_ringeklokke_hoyde_text, self.infoWidget.label_terskelhoyde_text, self.infoWidget.label_inngang_bredde_text, self.infoWidget.label_kontrast_text, self.infoWidget.label_rampe_text]
         indexes = self.dock.tableWidget.selectionModel().selectedRows()
         if self.current_seartch_layer is not None:
-            print "Layer is not None"
+            print("Layer is not None")
             for index in sorted(indexes):
-                #print "index:", index
-                #print self.dock.tableWidget.item(index.row(), 29)
+                #print("index:", index)
+                #print(self.dock.tableWidget.item(index.row(), 29))
                 #self.layer_inngang.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), 0).text())]])
                 self.current_seartch_layer.setSelectedFeatures([self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()]])
-                #print "self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()]: ", self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()]
-                #print "self.dock.tableWidget.item(index.row(), 0).text(): ", self.dock.tableWidget.item(index.row(), 0).text()
+                #print("self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()]: ", self.feature_id[self.dock.tableWidget.item(index.row(), 0).text()])
+                #print("self.dock.tableWidget.item(index.row(), 0).text(): ", self.dock.tableWidget.item(index.row(), 0).text())
                 #self.layer_inngang.setSelectedFeatures([self.feature_id[int(self.dock.tableWidget.item(index.row(), 0).text()[23:len(self.dock.tableWidget.item(index.row(), 0).text())])]])
                 selection = self.current_seartch_layer.selectedFeatures()
-                #print "self.layer_inngang.selectedFeatures(): ", self.layer_inngang.selectedFeatures()
-                #print "selection", selection
+                #print("self.layer_inngang.selectedFeatures(): ", self.layer_inngang.selectedFeatures())
+                #print("selection", selection)
                 # for feature in selection:
-                #     #print "feature", feature
+                #     #print("feature", feature)
                 #     for i in range(0, len(infoWidget_label_list)):
-                #         #print "i: ", i
+                #         #print("i: ", i)
                 #         try:
                 #             if isinstance(feature[self.to_unicode(self.attributes_inngang[i].getAttribute())], (int, float, long)): #isinstance(feature[self.to_unicode(self.att_info_list[i])], (int, float, long)):
                 #                 self.attributes_inngang
-                #                 #print "int, float, ling", feature[self.to_unicode(self.att_info_list[i])]
+                #                 #print("int, float, ling", feature[self.to_unicode(self.att_info_list[i])])
                 #                 infoWidget_label_list[i].setText((str(feature[self.to_unicode(self.attributes_inngang[i].getAttribute())])))
                 #             elif isinstance(feature[self.to_unicode(self.attributes_inngang[i].getAttribute())], (QPyNullVariant)):
-                #                 #print "NULL", feature[self.to_unicode(self.att_info_list[i])]
+                #                 #print("NULL", feature[self.to_unicode(self.att_info_list[i])])
                 #                 infoWidget_label_list[i].setText("-")
                 #             else:
-                #                 #print "else", feature[self.to_unicode(self.att_info_list[i])]
+                #                 #print("else", feature[self.to_unicode(self.att_info_list[i])])
                 #                 infoWidget_label_list[i].setText(feature[self.to_unicode(self.attributes_inngang[i].getAttribute())])
                 #         except Exception, e:
-                #             #print "Exception", feature[self.to_unicode(self.att_info_list[i])]
+                #             #print("Exception", feature[self.to_unicode(self.att_info_list[i])])
                 #             infoWidget_label_list[i].setText("-")
-                #             #print str(e)
+                #             #print(str(e))
                 #             raise
 
 
@@ -1081,13 +1066,13 @@ class Master:
         combobox.addItem(self.uspesifisert)
         
         feat_name = self.to_unicode(feat_name)
-        #print "feat_name: ", feat_name
+        #print("feat_name: ", feat_name)
         for feature in layer.getFeatures(): #Sett inn error catchment her
             try:
                 name = feature[feat_name]
-                #print feat_name, ": ", name
+                #print(feat_name, ": ", name)
             except KeyError:
-                print "Layer does not contain given key"
+                print("Layer does not contain given key")
                 return
             if isinstance(name, int):
                 name = str(name)
@@ -1177,8 +1162,8 @@ class Master:
             try:
                 for komune_nr in self.fylke_dict[fylke]:
                     self.dlg.comboBox_komuner.addItem(self.komm_dict_nr[komune_nr])
-            except Exception, e:
-                print str(e)
+            except Exception as e:
+                print(str(e))
         self.dlg.lineEdit_navn_paa_sok_inngang.setText("Inngangbygg: " + fylke)
         self.dlg.lineEdit_navn_paa_sok_vei_tettsted.setText("Vei: " + fylke)
         self.dlg.lineEdit_navn_paa_sok_hcpark.setText("HC-Park: " + fylke)
@@ -1207,22 +1192,22 @@ class Master:
     #             fylke = self.to_unicode(fylke)
     #             self.komm_dict[komune] = [komm_nr, fylke]
     #             #self.dlg.comboBox_komuner.addItem(komune)
-    #             #print komune
+    #             #print(komune)
     #             if not fylke in self.fylke_dict:
     #                 self.fylke_dict[fylke] = []
     #                 self.dlg.comboBox_komuner.addItem(fylke)
     #             self.fylke_dict[fylke].append(komm_nr)
     #             self.dlg.comboBox_komuner.addItem("    " + komune)
-    #     #print self.fylke_dict
+    #     #print(self.fylke_dict)
 
-    #     #print komm_nr
+    #     #print(komm_nr)
 
 
     # def fylke_valgt(self):
     #     fylke = self.dlg.comboBox_byggningstype.currentText()
     #     for komune in self.fylke_dict[fylke]:
     #         self.dlg.comboBox_komuner.addItem()
-        # print "something"
+        # print("something")
 
 
     # def create_where_statement(self, attribute, value, opperator, where):
@@ -1253,7 +1238,7 @@ class Master:
         #     else:
         #         #expr_string = expr_string + " AND \"{0}\"=\'{1}\'".format(attribute, value)
         #         expr_string = expr_string + " AND " + "\"%s\"=\'%s\' " % (self.to_unicode(attribute), value)
-        #print "expr: " + expr_string
+        #print("expr: " + expr_string)
         return expr_string
 
     def create_where_statement(self,attribute, where):
@@ -1262,7 +1247,7 @@ class Master:
         if attribute.getLineEdit() is None:
             if attribute.getComboBoxCurrentText() != self.uspesifisert:
                 if len(where) == 0:
-                    #print attribute.getAttribute()
+                    #print(attribute.getAttribute())
                     where = "WHERE %s = '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText())
                     #where = "WHERE " + attribute.getAttribute() + " = " + "'" + attribute.getComboBoxCurrentText() + "'"
                 else:
@@ -1274,7 +1259,7 @@ class Master:
                 else:
                     where = where + " AND " +  "%s %s '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText(), attribute.getLineEditText())
 
-        #print "where: " + where
+        #print("where: " + where)
         return where
 
     def create_where_statement2(self,attribute, where):
@@ -1283,7 +1268,7 @@ class Master:
         if attribute.getLineEdit() is None:
             if attribute.getComboBoxCurrentText() != self.uspesifisert:
                 if len(where) == 0:
-                    #print attribute.getAttribute()
+                    #print(attribute.getAttribute())
                     where = "\"%s\" = '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText())
                     #where = "WHERE " + attribute.getAttribute() + " = " + "'" + attribute.getComboBoxCurrentText() + "'"
                 else:
@@ -1295,13 +1280,13 @@ class Master:
                 else:
                     where = where + " AND " +  "\"%s\" %s '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText(), attribute.getLineEditText())
 
-        #print "where: " + where
+        #print("where: " + where)
         return where
 
 
 
     def filtrer_inngang(self, attributes, filtering_layer, search_type):
-        print"Filtering Start"
+        print("Filtering Start")
         #layer = self.layers[1]
         sok_metode = ""
         #self.tempLayer
@@ -1384,11 +1369,11 @@ class Master:
                     #where = "where komm = " + self.komm_dict_nm[komune]
 
         for attribute in attributes:
-            #print "attribute: ", attribute.getAttribute()
+            #print("attribute: ", attribute.getAttribute())
             where = self.create_where_statement(attribute, where)
             expr_string = self.create_where_statement2(attribute, expr_string)
-        #print "where: " + where
-        #print "espr: " + expr_string
+        #print("where: " + where)
+        #print("espr: " + expr_string)
         # for atr, value in ing_atr_combobox.iteritems():
         #     expr_string = self.create_expr_statement(atr, value, "=", expr_string)
 
@@ -1408,11 +1393,11 @@ class Master:
             #attr = self.layers[-1].dataProvider().fields().toList()
             #temp_data.addAttributes(attr)
             #vLayer = QgsVectorLayer("?query=SELECT * FROM " + layer_name, self.dlg.lineEdit_navn_paa_sok_inngang.text() + "Virtual", "virtual" )
-            #print base_layer_name
+            #print(base_layer_name)
             query = "SELECT * FROM " + base_layer_name + " " + where
-            #print query
+            #print(query)
             vLayer = QgsVectorLayer("?query=%s" % (query), layer_name + "Virtual", "virtual" )
-            print vLayer.isValid()
+            print(vLayer.isValid())
             if vLayer.featureCount() > 0:
                 try:
                     QgsMapLayerRegistry.instance().removeMapLayer( self.filtering_layer )
@@ -1442,19 +1427,19 @@ class Master:
             if len(expr_string) == 0:
                 tempLayer = baselayer
             else:
-                print datetime.datetime.now().time()
+                print(datetime.datetime.now().time())
                 expr = QgsExpression(expr_string)
-                print datetime.datetime.now().time()
+                print(datetime.datetime.now().time())
                 it = baselayer.getFeatures( QgsFeatureRequest( expr ) )
                 ids = [i.id() for i in it]
                 baselayer.setSelectedFeatures( ids )
-                print datetime.datetime.now().time()
+                print(datetime.datetime.now().time())
                 selectedFeatures = baselayer.selectedFeatures()
-                print datetime.datetime.now().time()
+                print(datetime.datetime.now().time())
                 #selectedFeatures = []
                 #WFSlayer = QgsVectorLayer(uri, "layerName", "WFS")
                 #features1 = self.layers[-1].selectedFeatures() # this layer is the layer the user or code selects in the map
-                print datetime.datetime.now().time()
+                print(datetime.datetime.now().time())
                 #for WFSfeature in WFSlayer.getFeatures():
                 #  for f in features1:
                 #    if WFSfeature.geometry().intersects(f.geometry()):
@@ -1466,19 +1451,19 @@ class Master:
                     tempLayer = QgsVectorLayer("Polygon?crs=epsg:4326", layer_name + "Memory", "memory")
                 else:
                     tempLayer = QgsVectorLayer("Point?crs=epsg:4326", layer_name + "Memory", "memory")
-                print datetime.datetime.now().time()
+                print(datetime.datetime.now().time())
                 #QgsMapLayerRegistry.instance().addMapLayer(tempLayer)
-                print datetime.datetime.now().time()
+                print(datetime.datetime.now().time())
                 temp_data = tempLayer.dataProvider()
-                print datetime.datetime.now().time()
+                print(datetime.datetime.now().time())
                 attr = baselayer.dataProvider().fields().toList()
-                print datetime.datetime.now().time()
+                print(datetime.datetime.now().time())
                 temp_data.addAttributes(attr)
-                print datetime.datetime.now().time()
+                print(datetime.datetime.now().time())
                 tempLayer.updateFields()
-                print datetime.datetime.now().time()
+                print(datetime.datetime.now().time())
                 temp_data.addFeatures(selectedFeatures)
-                print datetime.datetime.now().time()
+                print(datetime.datetime.now().time())
             if tempLayer.featureCount() > 0:
                 # try:
                 #     QgsMapLayerRegistry.instance().removeMapLayer( self.layer_inngang )
@@ -1532,7 +1517,7 @@ class Master:
 
         # for atr, value in ing_atr_combobox.iteritems():
         #     where = self.create_where_statement(atr, value, "like", where)
-        #     #print where
+        #     #print(where)
 
         # for atr, value in ing_atr_lineedit.iteritems():
         #     opperator = ">"
@@ -1542,13 +1527,13 @@ class Master:
 
         # sql = "(" + sql + " " + where + ")"
 
-        # #print sql
+        # #print(sql)
         
         # self.uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
         # try:
         #     QgsMapLayerRegistry.instance().removeMapLayer(self.layer_inngang.id())
         # except Exception, e:
-        #     print str(e)
+        #     print(str(e))
 
 
         # #self.layer_inngang = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
@@ -1562,10 +1547,10 @@ class Master:
 
 
         # if not self.layer_inngang.isValid():
-        #     print "layer failed to load"
+        #     print("layer failed to load")
         #     self.show_message("søket ga ingen teff", "Advarsel", msg_type=QMessageBox.Warning)
         # else:
-        #     print "layer succeeded to load"
+        #     print("layer succeeded to load")
         #     self.showResults(self.layer_inngang)
         #     self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
 
@@ -1574,7 +1559,7 @@ class Master:
 
         # thread = SelectThread(infoWidget_label_list, self.att_info_list)
         # thread.start()
-        print "Filtering End"
+        print("Filtering End")
         
 
     def show_message(self, msg_text, msg_title=None, msg_info=None, msg_details=None, msg_type=None):
@@ -1599,7 +1584,7 @@ class Master:
         #msg.buttonClicked.connect()
 
         retval = msg.exec_()
-        print ("value of pressed message box button:", retval)
+        print(("value of pressed message box button:", retval))
 
 
     def open_export_layer_dialog(self):
@@ -1624,9 +1609,6 @@ class Master:
         for le in lineEdits:
             le.setText("")
 
-        # wfs = wfs_test(self.iface)
-        # wfs.getCapabilities()
-        # wfs.getFeature()
         for layer in self.layers:
             QgsMapLayerRegistry.instance().addMapLayer(layer)
 
@@ -1641,14 +1623,11 @@ class Master:
         
         # indexes = self.dock.tableWidget.selectionModel().selectedRows()
         # for index in sorted(indexes):
-        #     print('Row %d is selected' % index.row())
+        #     print('Row %d is selected' % index.row()))
 
         #byggningstyper = self.add_byggningstyper(inngangbygg = inngangbygg)
         #fyll ut combobosker
         
-        #ow = self.testDock()
-        #td = testDock(self.iface)
-        #td.show()
         
 
 

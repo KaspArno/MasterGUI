@@ -8,5 +8,5 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 class infoWidgetDialog(QtGui.QDockWidget, FORM_CLASS):
     def __init__(self, parent=None):
-    	super(infoWidgetDialog, self).__init__(parent)
+        super(infoWidgetDialog, self).__init__(parent)
         self.setupUi(self)

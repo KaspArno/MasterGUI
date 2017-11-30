@@ -8,5 +8,5 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 class exportLayerDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, parent=None):
-    	super(exportLayerDialog, self).__init__(parent)
+        super(exportLayerDialog, self).__init__(parent)
         self.setupUi(self)
