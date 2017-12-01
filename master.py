@@ -147,6 +147,8 @@ class Master:
         self.layer_hcparkering = None
         self.layer_pomrade = None
         self.current_seartch_layer = None
+        self.search_history = {}
+        self.previus_search_method = None
 
         #to hide layers
         self.ltv = self.iface.layerTreeView()
@@ -1285,23 +1287,34 @@ class Master:
 
 
 
-    def filtrer_inngang(self, attributes, filtering_layer, search_type):
+    def filtrer_inngang(self, attributes, filtering_layer, search_type, newLayer = False):
         print("Filtering Start")
         #layer = self.layers[1]
         sok_metode = ""
+        print(self.iface.activeLayer().id())
+        print(self.iface.activeLayer().id() in self.search_history)
+        self.current_seartch_layer = filtering_layer
+        if not newLayer and self.previus_search_method == search_type and self.iface.activeLayer().id() in self.search_history:
+            try:
+                QgsMapLayerRegistry.instance().removeMapLayer( self.iface.activeLayer() )
+            except (RuntimeError, AttributeError):
+                pass
         #self.tempLayer
+        self.previus_search_method = search_type
         if search_type == "vei_tettsted":
-            baselayer = self.layers[4]
+            baselayer = self.layers[3]
             sok_metode = self.dlg.comboBox_sok_metode_vei.currentText()
             layer_name = self.dlg.lineEdit_navn_paa_sok_vei_tettsted.text()
         elif search_type == "inngangbygg":
             baselayer = self.layers[1]
             sok_metode = self.dlg.comboBox_sok_metode.currentText()
             layer_name = self.dlg.lineEdit_navn_paa_sok_inngang.text()
+
         elif search_type == "hcparkering":
             baselayer = self.layers[0]
             sok_metode = self.dlg.comboBox_sok_metode_hcpark.currentText()
             layer_name = self.dlg.lineEdit_navn_paa_sok_hcpark.text()
+
         elif search_type == "parkeringsomrade":
             baselayer = self.layers[2]
             sok_metode = self.dlg.comboBox_sok_metode_pomrade.currentText()
@@ -1309,6 +1322,18 @@ class Master:
 
         fylke = self.dlg.comboBox_fylker.currentText()
         komune = self.dlg.comboBox_komuner.currentText()
+        searchdata = []
+
+        if len(self.iface.legendInterface().layers()) > 0:
+            #print("legendInterface length: ", self.iface.legendInterface().layers())
+            try:
+                activeLayer_id = self.iface.activeLayer().id()
+            except Exception as e:
+                activeLayer_id = None
+                print(str(e))
+        else:
+            activeLayer_id = None
+
 
         # byggningstype = self.dlg.comboBox_byggningstype.currentText()
         # dortype = self.dlg.comboBox_dortype.currentText()
@@ -1368,10 +1393,12 @@ class Master:
                 where = where + " AND " + "kommune = '{0}'".format(self.komm_dict_nm[komune])
                     #where = "where komm = " + self.komm_dict_nm[komune]
 
+
         for attribute in attributes:
             #print("attribute: ", attribute.getAttribute())
             where = self.create_where_statement(attribute, where)
             expr_string = self.create_where_statement2(attribute, expr_string)
+            searchdata.append(attribute)
         #print("where: " + where)
         #print("espr: " + expr_string)
         # for atr, value in ing_atr_combobox.iteritems():
@@ -1382,7 +1409,7 @@ class Master:
         #     if value[1] == self.mindre:
         #         opperator = "<"
         #     where = self.create_expr_statement(atr, value[0], opperator, where)
-        
+        #print("sok_metode: ", sok_metode)
         if sok_metode == "virtual": #if self.dlg.comboBox_sok_metode.currentText() == "visual":
             QgsMapLayerRegistry.instance().addMapLayer(baselayer)
             self.hideLayer(baselayer)
@@ -1396,23 +1423,23 @@ class Master:
             #print(base_layer_name)
             query = "SELECT * FROM " + base_layer_name + " " + where
             #print(query)
-            vLayer = QgsVectorLayer("?query=%s" % (query), layer_name + "Virtual", "virtual" )
-            print(vLayer.isValid())
-            if vLayer.featureCount() > 0:
-                try:
-                    QgsMapLayerRegistry.instance().removeMapLayer( self.filtering_layer )
-                except (RuntimeError, AttributeError):
-                    pass
-                self.filtering_layer = vLayer
-                QgsMapLayerRegistry.instance().addMapLayer(self.filtering_layer)
-                self.canvas.setExtent(self.filtering_layer.extent())
+            self.current_seartch_layer = QgsVectorLayer("?query=%s" % (query), layer_name + "Virtual", "virtual" )
+            print(self.current_seartch_layer.isValid())
+            if self.current_seartch_layer.featureCount() > 0:
+                # try:
+                #     QgsMapLayerRegistry.instance().removeMapLayer( self.iface.activeLayer() )
+                # except (RuntimeError, AttributeError):
+                #     pass
+                #self.current_seartch_layer = vLayer
+                QgsMapLayerRegistry.instance().addMapLayer(self.current_seartch_layer)
+                self.canvas.setExtent(self.current_seartch_layer.extent())
                 self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
-                self.showResults(self.filtering_layer) #rampeverdi ikke med i tabell
-                self.sourceMapTool.setLayer(self.filtering_layer)
+                self.showResults(self.current_seartch_layer) #rampeverdi ikke med i tabell
+                self.sourceMapTool.setLayer(self.current_seartch_layer)
                 self.dock.tabWidget_main.setCurrentIndex(1) #for tettsted
                 self.dock.tabWidget_tettsted.setCurrentIndex(1) #for inngangbygg
                 self.infoWidget.tabWidget.setCurrentIndex(1)
-                self.current_seartch_layer = self.filtering_layer
+                self.current_seartch_layer = self.current_seartch_layer
                 
             else:
                 self.show_message("Søket fullførte uten at noen objecter ble funnet", "ingen Objecter funnet", msg_info=None, msg_details=None, msg_type=None)
@@ -1559,6 +1586,11 @@ class Master:
 
         # thread = SelectThread(infoWidget_label_list, self.att_info_list)
         # thread.start()
+        if not newLayer:
+            self.search_history.pop(activeLayer_id, None)
+        self.search_history[activeLayer_id] = searchdata
+        for id in self.search_history:
+            print id
         print("Filtering End")
         
 

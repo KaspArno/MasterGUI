@@ -1,6 +1,6 @@
 class FeatureType(object):
 
-	feature_type = ['app:TettstedHCparkering', 'app:TettstedInngangBygg', u'app:TettstedParkeringsomr\xe5de', u'app:TettstedParkeringsomr\xe5deGr', 'app:TettstedVei']
+	feature_type = ['app:TettstedHCparkering', 'app:TettstedInngangBygg', u'app:TettstedParkeringsomr\xe5de', 'app:TettstedVei']
 	index = 0
 
 	def next(self):
