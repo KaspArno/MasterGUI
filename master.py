@@ -54,6 +54,7 @@ from osgeo import gdal
 from osgeo import ogr
 import string
 from featuretype import FeatureType
+from SavedSearch import SavedSearch
 
 #For selection
 from identifyGeometry import IdentifyGeometry
@@ -784,6 +785,11 @@ class Master:
                                 self.dlg.label_Progress_Inngang.setVisible(False)
                                 self.dlg.label_Progress_Vei.setVisible(False)
                                 #print(self.dlg.progressBar.value())
+                                for baselayer in self.layers:
+                                    QgsMapLayerRegistry.instance().addMapLayer(baselayer)
+                                    self.hideLayer(baselayer)
+                                    self.iface.legendInterface().setLayerVisible(baselayer, False)
+
                                 print("doen")
 
 
@@ -1291,34 +1297,59 @@ class Master:
         print("Filtering Start")
         #layer = self.layers[1]
         sok_metode = ""
-        print(self.iface.activeLayer().id())
-        print(self.iface.activeLayer().id() in self.search_history)
-        self.current_seartch_layer = filtering_layer
-        if not newLayer and self.previus_search_method == search_type and self.iface.activeLayer().id() in self.search_history:
+        if len(QgsMapLayerRegistry.instance().mapLayers()) > 0:
             try:
-                QgsMapLayerRegistry.instance().removeMapLayer( self.iface.activeLayer() )
-            except (RuntimeError, AttributeError):
-                pass
+                print(self.iface.activeLayer().id())
+                #print(self.iface.activeLayer().id() in self.search_history)
+            except (RuntimeError, AttributeError) as e:
+                print(str(e))
+
+        self.current_seartch_layer = filtering_layer
+        
+        layers = QgsMapLayerRegistry.instance().mapLayers()
+        for name, layer in layers.iteritems():
+             print("MapRegistry", layer.id(), layer.name())
+
+
         #self.tempLayer
         self.previus_search_method = search_type
+
         if search_type == "vei_tettsted":
-            baselayer = self.layers[3]
+            #baselayer = self.layers[3]
+            baselayer = QgsMapLayerRegistry.instance().mapLayersByName('TettstedVei')[0]
             sok_metode = self.dlg.comboBox_sok_metode_vei.currentText()
             layer_name = self.dlg.lineEdit_navn_paa_sok_vei_tettsted.text()
         elif search_type == "inngangbygg":
-            baselayer = self.layers[1]
+            #baselayer = self.layers[1]
+            baselayer = QgsMapLayerRegistry.instance().mapLayersByName('TettstedInngangBygg')[0]
             sok_metode = self.dlg.comboBox_sok_metode.currentText()
             layer_name = self.dlg.lineEdit_navn_paa_sok_inngang.text()
 
         elif search_type == "hcparkering":
-            baselayer = self.layers[0]
+            #baselayer = self.layers[0]
+            baselayer = QgsMapLayerRegistry.instance().mapLayersByName('TettstedHCparkering')[0]
             sok_metode = self.dlg.comboBox_sok_metode_hcpark.currentText()
             layer_name = self.dlg.lineEdit_navn_paa_sok_hcpark.text()
 
         elif search_type == "parkeringsomrade":
-            baselayer = self.layers[2]
+            #baselayer = self.layers[2]
+            baselayer = QgsMapLayerRegistry.instance().mapLayersByName('TettstedParkeringsomr\xc3\xa5de')[0]
             sok_metode = self.dlg.comboBox_sok_metode_pomrade.currentText()
             layer_name = self.dlg.lineEdit_navn_paa_sok_pomrade.text()
+
+        #if not newLayer and self.previus_search_method == search_type:
+        print(layer_name)
+
+        
+
+        # layers = (QgsMapLayerRegistry.instance().mapLayersByName(self.to_unicode(layer_name)))
+        # for layer in layers:
+        #     print("laryers like layername", layer.name())
+        # if len(QgsMapLayerRegistry.instance().mapLayersByName(self.to_unicode(layer_name))) > 0:
+        #     try:
+        #         QgsMapLayerRegistry.instance().removeMapLayer( QgsMapLayerRegistry.instance().mapLayersByName(self.to_unicode(layer_name)[0].id()) )
+        #     except (RuntimeError, AttributeError) as e:
+        #         print(str(e))
 
         fylke = self.dlg.comboBox_fylker.currentText()
         komune = self.dlg.comboBox_komuner.currentText()
@@ -1411,9 +1442,11 @@ class Master:
         #     where = self.create_expr_statement(atr, value[0], opperator, where)
         #print("sok_metode: ", sok_metode)
         if sok_metode == "virtual": #if self.dlg.comboBox_sok_metode.currentText() == "visual":
-            QgsMapLayerRegistry.instance().addMapLayer(baselayer)
-            self.hideLayer(baselayer)
-            self.iface.legendInterface().setLayerVisible(baselayer, False)
+            layer_name = layer_name + "Virtual"
+            
+            #QgsMapLayerRegistry.instance().addMapLayer(baselayer)
+            #self.hideLayer(baselayer)
+            #self.iface.legendInterface().setLayerVisible(baselayer, False)
             #tempLayer = QgsVectorLayer("Point?crs=epsg:4326", "Norge" + "Memory", "memory")
             #temp_data = tempLayer.dataProvider()
             base_layer_name = baselayer.name()
@@ -1423,9 +1456,15 @@ class Master:
             #print(base_layer_name)
             query = "SELECT * FROM " + base_layer_name + " " + where
             #print(query)
-            self.current_seartch_layer = QgsVectorLayer("?query=%s" % (query), layer_name + "Virtual", "virtual" )
+            self.current_seartch_layer = QgsVectorLayer("?query=%s" % (query), layer_name, "virtual" )
             print(self.current_seartch_layer.isValid())
             if self.current_seartch_layer.featureCount() > 0:
+                if len(QgsMapLayerRegistry.instance().mapLayersByName(layer_name)) > 0:
+                    try:
+                        QgsMapLayerRegistry.instance().removeMapLayer( QgsMapLayerRegistry.instance().mapLayersByName(layer_name)[0].id() )
+                    except (RuntimeError, AttributeError) as e:
+                        print(str(e))
+
                 # try:
                 #     QgsMapLayerRegistry.instance().removeMapLayer( self.iface.activeLayer() )
                 # except (RuntimeError, AttributeError):
@@ -1436,10 +1475,15 @@ class Master:
                 self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
                 self.showResults(self.current_seartch_layer) #rampeverdi ikke med i tabell
                 self.sourceMapTool.setLayer(self.current_seartch_layer)
-                self.dock.tabWidget_main.setCurrentIndex(1) #for tettsted
-                self.dock.tabWidget_tettsted.setCurrentIndex(1) #for inngangbygg
-                self.infoWidget.tabWidget.setCurrentIndex(1)
-                self.current_seartch_layer = self.current_seartch_layer
+                #self.dock.tabWidget_main.setCurrentIndex(1) #for tettsted
+                #self.dock.tabWidget_tettsted.setCurrentIndex(1) #for inngangbygg
+                #self.infoWidget.tabWidget.setCurrentIndex(1)
+                #self.current_seartch_layer = self.activeLayer()
+                self.search_history[layer_name] = SavedSearch()
+                for attribute in searchdata:
+                    self.search_history[layer_name].add_attribute(attribute, attribute.getComboBox().currentIndex())
+
+
                 
             else:
                 self.show_message("Søket fullførte uten at noen objecter ble funnet", "ingen Objecter funnet", msg_info=None, msg_details=None, msg_type=None)
@@ -1586,11 +1630,15 @@ class Master:
 
         # thread = SelectThread(infoWidget_label_list, self.att_info_list)
         # thread.start()
-        if not newLayer:
-            self.search_history.pop(activeLayer_id, None)
-        self.search_history[activeLayer_id] = searchdata
-        for id in self.search_history:
-            print id
+        #if not newLayer:
+        #    self.search_history.pop(activeLayer_id, None)
+        #self.search_history[activeLayer_id] = searchdata
+        #for id in self.search_history:
+        #    print id
+
+        for i in self.search_history:
+            print(self.search_history[i].get_attributes())
+
         print("Filtering End")
         
 

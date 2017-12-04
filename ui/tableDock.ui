@@ -14,74 +14,13 @@
    <string>DockWidget</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
-   <layout class="QVBoxLayout" name="verticalLayout_6">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QTabWidget" name="tabWidget_main">
-      <property name="currentIndex">
-       <number>1</number>
-      </property>
-      <widget class="QWidget" name="tab_7">
-       <attribute name="title">
-        <string>Friluft</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_8">
-       <attribute name="title">
-        <string>Tettsted</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <item>
-         <widget class="QTabWidget" name="tabWidget_tettsted">
-          <property name="currentIndex">
-           <number>1</number>
-          </property>
-          <widget class="QWidget" name="tab_6">
-           <attribute name="title">
-            <string>Vei</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <item>
-             <widget class="QTableWidget" name="tableWidget_4"/>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab">
-           <attribute name="title">
-            <string>Inngangbygg</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-             <widget class="QTableWidget" name="tableWidget"/>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_2">
-           <attribute name="title">
-            <string>HC-Parkering</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <item>
-             <widget class="QTableWidget" name="tableWidget_2"/>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_5">
-           <attribute name="title">
-            <string>Parkeringsområde</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <item>
-             <widget class="QTableWidget" name="tableWidget_3"/>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </widget>
+     <widget class="QTableWidget" name="tableWidget"/>
     </item>
    </layout>
+   <zorder>tableWidget_4</zorder>
+   <zorder>tableWidget</zorder>
   </widget>
  </widget>
  <resources/>
