@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>469</width>
+    <width>291</width>
     <height>656</height>
    </rect>
   </property>
@@ -220,6 +220,33 @@
          <widget class="QPushButton" name="pushButton_exporter">
           <property name="text">
            <string>Eksporter</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Filterer tidligere lag:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_search_history">
+          <item>
+           <property name="text">
+            <string/>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_filtre_tidligere">
+          <property name="text">
+           <string>Filtrer</string>
           </property>
          </widget>
         </item>

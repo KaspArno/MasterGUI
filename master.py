@@ -302,6 +302,7 @@ class Master:
         self.obdockwidget=QDockWidget("Seartch Results" , self.iface.mainWindow() )
         self.obdockwidget.setObjectName("Results")
         self.obdockwidget.setWidget(self.dock)
+        self.obdockwidget.hide()
         self.dock.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows) #select entire row in table
         self.dock.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers) #Making table unediteble
 
@@ -310,10 +311,12 @@ class Master:
         self.obj_info_dockwidget=QDockWidget("Info" , self.iface.mainWindow() )
         self.obj_info_dockwidget.setObjectName("Object Info")
         self.obj_info_dockwidget.setWidget(self.infoWidget)
+        self.obj_info_dockwidget.hide()
         self.infoWidget.pushButton_Select_Object.setCheckable(True)
         self.infoWidget.pushButton_Select_Object.toggled.connect(self.toolButtonSelect)
         self.infoWidget.pushButton_exporter.clicked.connect(self.open_export_layer_dialog)
         self.infoWidget.pushButton_filtrer.clicked.connect(lambda x: self.dlg.show())
+        self.infoWidget.pushButton_filtre_tidligere.clicked.connect(self.get_previus_search)
 
         
 
@@ -1026,6 +1029,37 @@ class Master:
             self.dlg.lineEdit_lengde_vei.setVisible(False)
 
 
+    def get_previus_search(self):
+        # for key, value in self.search_history.items():
+        #     print(key)
+        #     print(value)
+        #     for att, item in value.attributes.items():
+        #         print(att)
+        #         print("att current index; ", att.getComboBox().currentIndex())
+        #         print("Value: ", item[0])
+        layer_name = self.infoWidget.comboBox_search_history.currentText()
+        if layer_name != "":
+            try:
+                print("search_history len: ", len(self.search_history))
+                pre_search = self.search_history[layer_name]
+                for key, value in pre_search.attributes.iteritems():
+                    print(key.getComboBox())
+                    print(value[0])
+                    key.getComboBox().setCurrentIndex(int(value[0]))
+                    if value[1]:
+                        key.getLineEdit().setText(value[1])
+                self.dlg.tabWidget_main.setCurrentIndex(pre_search.tabIndex_main)
+                self.dlg.tabWidget_friluft.setCurrentIndex(pre_search.tabIndex_friluft)
+                self.dlg.tabWidget_tettsted.setCurrentIndex(pre_search.tabIndex_tettsted)
+                pre_search.lineEdit_seach.setText(pre_search.search_name)
+                self.dlg.show()
+
+            except KeyError:
+                raise
+        else:
+            self.dlg.show()
+
+
 
     def table_item_clicked(self):
         print("test called")
@@ -1318,27 +1352,27 @@ class Master:
             #baselayer = self.layers[3]
             baselayer = QgsMapLayerRegistry.instance().mapLayersByName('TettstedVei')[0]
             sok_metode = self.dlg.comboBox_sok_metode_vei.currentText()
-            layer_name = self.dlg.lineEdit_navn_paa_sok_vei_tettsted.text()
+            layer_name = self.dlg.lineEdit_navn_paa_sok_vei_tettsted
         elif search_type == "inngangbygg":
             #baselayer = self.layers[1]
             baselayer = QgsMapLayerRegistry.instance().mapLayersByName('TettstedInngangBygg')[0]
             sok_metode = self.dlg.comboBox_sok_metode.currentText()
-            layer_name = self.dlg.lineEdit_navn_paa_sok_inngang.text()
+            layer_name = self.dlg.lineEdit_navn_paa_sok_inngang
 
         elif search_type == "hcparkering":
             #baselayer = self.layers[0]
             baselayer = QgsMapLayerRegistry.instance().mapLayersByName('TettstedHCparkering')[0]
             sok_metode = self.dlg.comboBox_sok_metode_hcpark.currentText()
-            layer_name = self.dlg.lineEdit_navn_paa_sok_hcpark.text()
+            layer_name = self.dlg.lineEdit_navn_paa_sok_hcpark
 
         elif search_type == "parkeringsomrade":
             #baselayer = self.layers[2]
             baselayer = QgsMapLayerRegistry.instance().mapLayersByName('TettstedParkeringsomr\xc3\xa5de')[0]
             sok_metode = self.dlg.comboBox_sok_metode_pomrade.currentText()
-            layer_name = self.dlg.lineEdit_navn_paa_sok_pomrade.text()
+            layer_name = self.dlg.lineEdit_navn_paa_sok_pomrade
 
         #if not newLayer and self.previus_search_method == search_type:
-        print(layer_name)
+        #print(layer_name)
 
         
 
@@ -1442,7 +1476,7 @@ class Master:
         #     where = self.create_expr_statement(atr, value[0], opperator, where)
         #print("sok_metode: ", sok_metode)
         if sok_metode == "virtual": #if self.dlg.comboBox_sok_metode.currentText() == "visual":
-            layer_name = layer_name + "Virtual"
+            layer_name_text = layer_name.text() + "Virtual"
             
             #QgsMapLayerRegistry.instance().addMapLayer(baselayer)
             #self.hideLayer(baselayer)
@@ -1456,12 +1490,13 @@ class Master:
             #print(base_layer_name)
             query = "SELECT * FROM " + base_layer_name + " " + where
             #print(query)
-            self.current_seartch_layer = QgsVectorLayer("?query=%s" % (query), layer_name, "virtual" )
+            self.current_seartch_layer = QgsVectorLayer("?query=%s" % (query), layer_name_text, "virtual" )
             print(self.current_seartch_layer.isValid())
             if self.current_seartch_layer.featureCount() > 0:
-                if len(QgsMapLayerRegistry.instance().mapLayersByName(layer_name)) > 0:
+                if len(QgsMapLayerRegistry.instance().mapLayersByName(layer_name_text)) > 0:
+                    #self.search_history.pop(layer_name_text, None)
                     try:
-                        QgsMapLayerRegistry.instance().removeMapLayer( QgsMapLayerRegistry.instance().mapLayersByName(layer_name)[0].id() )
+                        QgsMapLayerRegistry.instance().removeMapLayer( QgsMapLayerRegistry.instance().mapLayersByName(layer_name_text)[0].id() )
                     except (RuntimeError, AttributeError) as e:
                         print(str(e))
 
@@ -1479,11 +1514,15 @@ class Master:
                 #self.dock.tabWidget_tettsted.setCurrentIndex(1) #for inngangbygg
                 #self.infoWidget.tabWidget.setCurrentIndex(1)
                 #self.current_seartch_layer = self.activeLayer()
-                self.search_history[layer_name] = SavedSearch()
-                for attribute in searchdata:
-                    self.search_history[layer_name].add_attribute(attribute, attribute.getComboBox().currentIndex())
 
-
+                self.search_history[layer_name_text] = SavedSearch(layer_name_text, self.current_seartch_layer, layer_name, self.dlg.tabWidget_main.currentIndex(), self.dlg.tabWidget_friluft.currentIndex(), self.dlg.tabWidget_tettsted.currentIndex())
+                for attribute in attributes:
+                    self.search_history[layer_name_text].add_attribute(attribute, int(attribute.getComboBox().currentIndex()), attribute.getLineEditText())
+                    print(layer_name_text)
+                    print(attribute.getComboBox().currentIndex())
+                    print(type(attribute.getComboBox().currentIndex()))
+                if self.infoWidget.comboBox_search_history.findText(layer_name_text) == -1:
+                	self.infoWidget.comboBox_search_history.addItem(layer_name_text)
                 
             else:
                 self.show_message("Søket fullførte uten at noen objecter ble funnet", "ingen Objecter funnet", msg_info=None, msg_details=None, msg_type=None)
@@ -1637,6 +1676,7 @@ class Master:
         #    print id
 
         for i in self.search_history:
+            print(i)
             print(self.search_history[i].get_attributes())
 
         print("Filtering End")

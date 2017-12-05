@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1399</width>
-    <height>944</height>
+    <width>1079</width>
+    <height>587</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,9 +69,9 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_14">
          <item>
-          <widget class="QTabWidget" name="tabWidget_2">
+          <widget class="QTabWidget" name="tabWidget_main">
            <property name="currentIndex">
-            <number>1</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="tab_5">
             <attribute name="title">
@@ -79,9 +79,9 @@
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_40">
              <item>
-              <widget class="QTabWidget" name="tabWidget_3">
+              <widget class="QTabWidget" name="tabWidget_friluft">
                <property name="currentIndex">
-                <number>9</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="tab_7">
                 <attribute name="title">
@@ -3295,7 +3295,7 @@
             </attribute>
             <layout class="QHBoxLayout" name="horizontalLayout_18">
              <item>
-              <widget class="QTabWidget" name="tabWidget">
+              <widget class="QTabWidget" name="tabWidget_tettsted">
                <property name="currentIndex">
                 <number>1</number>
                </property>
@@ -4797,134 +4797,7 @@ p, li { white-space: pre-wrap; }
     </layout>
    </item>
   </layout>
-  <zorder>layoutWidget</zorder>
-  <zorder>layoutWidget_2</zorder>
-  <zorder>label_95</zorder>
-  <zorder>comboBox_31</zorder>
-  <zorder>label_96</zorder>
-  <zorder>comboBox_32</zorder>
-  <zorder>lineEdit_7</zorder>
-  <zorder>layoutWidget_3</zorder>
-  <zorder>label_97</zorder>
-  <zorder>layoutWidget_4</zorder>
-  <zorder>label_98</zorder>
-  <zorder>label_99</zorder>
-  <zorder>comboBox_38</zorder>
-  <zorder>layoutWidget_5</zorder>
-  <zorder>label_100</zorder>
-  <zorder>layoutWidget_6</zorder>
-  <zorder>label_101</zorder>
-  <zorder>layoutWidget_7</zorder>
-  <zorder>label_116</zorder>
-  <zorder>label_118</zorder>
-  <zorder>line_33</zorder>
-  <zorder>verticalSpacer_30</zorder>
-  <zorder>line_34</zorder>
-  <zorder>layoutWidget_8</zorder>
-  <zorder>line_36</zorder>
-  <zorder>layoutWidget_9</zorder>
-  <zorder>verticalSpacer_32</zorder>
-  <zorder>label_124</zorder>
-  <zorder>comboBox_42</zorder>
-  <zorder>label_125</zorder>
-  <zorder>comboBox_43</zorder>
-  <zorder>label_126</zorder>
-  <zorder>comboBox_44</zorder>
-  <zorder>label_127</zorder>
-  <zorder>comboBox_45</zorder>
-  <zorder>lineEdit_17</zorder>
-  <zorder>label_128</zorder>
-  <zorder>comboBox_46</zorder>
-  <zorder>label_129</zorder>
-  <zorder>label_130</zorder>
-  <zorder>line_37</zorder>
-  <zorder>line_38</zorder>
-  <zorder>line_39</zorder>
-  <zorder>verticalSpacer_33</zorder>
-  <zorder>verticalSpacer_34</zorder>
-  <zorder>layoutWidget_10</zorder>
-  <zorder>verticalSpacer_35</zorder>
-  <zorder>label_132</zorder>
-  <zorder>comboBox_47</zorder>
-  <zorder>label_133</zorder>
-  <zorder>comboBox_48</zorder>
-  <zorder>label_134</zorder>
-  <zorder>comboBox_49</zorder>
-  <zorder>lineEdit_18</zorder>
-  <zorder>label_135</zorder>
-  <zorder>layoutWidget_11</zorder>
-  <zorder>label_136</zorder>
-  <zorder>layoutWidget_12</zorder>
-  <zorder>label_137</zorder>
-  <zorder>layoutWidget_13</zorder>
-  <zorder>label_137</zorder>
-  <zorder>comboBox_52</zorder>
-  <zorder>label_138</zorder>
-  <zorder>label_139</zorder>
-  <zorder>line_40</zorder>
-  <zorder>line_41</zorder>
-  <zorder>verticalSpacer_36</zorder>
-  <zorder>verticalSpacer_37</zorder>
-  <zorder>line_42</zorder>
-  <zorder>horizontalSpacer_5</zorder>
-  <zorder>layoutWidget_11</zorder>
-  <zorder>verticalSpacer_38</zorder>
-  <zorder>label_141</zorder>
-  <zorder>comboBox_53</zorder>
-  <zorder>label_142</zorder>
-  <zorder>comboBox_54</zorder>
-  <zorder>label_143</zorder>
-  <zorder>comboBox_55</zorder>
-  <zorder>label_144</zorder>
-  <zorder>comboBox_56</zorder>
-  <zorder>label_145</zorder>
-  <zorder>comboBox_57</zorder>
-  <zorder>label_146</zorder>
-  <zorder>comboBox_58</zorder>
-  <zorder>label_147</zorder>
-  <zorder>comboBox_59</zorder>
-  <zorder>label_148</zorder>
-  <zorder>comboBox_60</zorder>
-  <zorder>label_149</zorder>
-  <zorder>comboBox_61</zorder>
-  <zorder>lineEdit_21</zorder>
-  <zorder>lineEdit_22</zorder>
-  <zorder>lineEdit_23</zorder>
-  <zorder>label_150</zorder>
-  <zorder>comboBox_62</zorder>
-  <zorder>label_148</zorder>
-  <zorder>comboBox_60</zorder>
-  <zorder>comboBox_63</zorder>
-  <zorder>label_151</zorder>
-  <zorder>comboBox_64</zorder>
-  <zorder>label_152</zorder>
-  <zorder>comboBox_65</zorder>
-  <zorder>label_153</zorder>
-  <zorder>comboBox_66</zorder>
-  <zorder>label_154</zorder>
-  <zorder>comboBox_67</zorder>
-  <zorder>label_155</zorder>
-  <zorder>label_156</zorder>
-  <zorder>label_157</zorder>
-  <zorder>line_43</zorder>
-  <zorder>line_44</zorder>
-  <zorder>line_45</zorder>
-  <zorder>line_46</zorder>
-  <zorder>verticalSpacer_39</zorder>
-  <zorder>verticalSpacer_40</zorder>
-  <zorder>layoutWidget_12</zorder>
   <zorder></zorder>
-  <zorder>layoutWidget_13</zorder>
-  <zorder>verticalSpacer_42</zorder>
-  <zorder>label_160</zorder>
-  <zorder>lineEdit_24</zorder>
-  <zorder>label_161</zorder>
-  <zorder>lineEdit_25</zorder>
-  <zorder>label_162</zorder>
-  <zorder>line_48</zorder>
-  <zorder>verticalSpacer_43</zorder>
-  <zorder>layoutWidget_14</zorder>
-  <zorder>verticalSpacer_44</zorder>
  </widget>
  <resources/>
  <connections>
