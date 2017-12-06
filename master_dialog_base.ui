@@ -6,14 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1079</width>
-    <height>587</height>
+    <width>1200</width>
+    <height>813</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1200</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Master</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_72">
+  <layout class="QVBoxLayout" name="verticalLayout_16">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_19">
      <item>
@@ -71,7 +77,7 @@
          <item>
           <widget class="QTabWidget" name="tabWidget_main">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="tab_5">
             <attribute name="title">
@@ -3654,9 +3660,9 @@
                 <attribute name="title">
                  <string>Inngang</string>
                 </attribute>
-                <layout class="QVBoxLayout" name="verticalLayout_16">
+                <layout class="QVBoxLayout" name="verticalLayout_15">
                  <item>
-                  <layout class="QVBoxLayout" name="verticalLayout_15">
+                  <layout class="QVBoxLayout" name="verticalLayout_11">
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_25">
                      <item>
@@ -3677,8 +3683,17 @@
                        </item>
                        <item>
                         <layout class="QFormLayout" name="formLayout_2">
+                         <property name="fieldGrowthPolicy">
+                          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                         </property>
                          <item row="0" column="0">
                           <widget class="QLabel" name="label">
+                           <property name="minimumSize">
+                            <size>
+                             <width>10</width>
+                             <height>10</height>
+                            </size>
+                           </property>
                            <property name="text">
                             <string>Avstand HC parkering</string>
                            </property>
@@ -3687,7 +3702,14 @@
                          <item row="0" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_12">
                            <item>
-                            <widget class="QComboBox" name="comboBox_avstand_hc"/>
+                            <widget class="QComboBox" name="comboBox_avstand_hc">
+                             <property name="minimumSize">
+                              <size>
+                               <width>50</width>
+                               <height>0</height>
+                              </size>
+                             </property>
+                            </widget>
                            </item>
                            <item>
                             <widget class="QLineEdit" name="lineEdit_avstand_hc"/>
@@ -3704,7 +3726,14 @@
                          <item row="1" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_11">
                            <item>
-                            <widget class="QComboBox" name="comboBox_ank_stigning"/>
+                            <widget class="QComboBox" name="comboBox_ank_stigning">
+                             <property name="minimumSize">
+                              <size>
+                               <width>50</width>
+                               <height>0</height>
+                              </size>
+                             </property>
+                            </widget>
                            </item>
                            <item>
                             <widget class="QLineEdit" name="lineEdit_ank_stigning"/>
@@ -3719,7 +3748,20 @@
                           </widget>
                          </item>
                          <item row="2" column="1">
-                          <widget class="QComboBox" name="comboBox_byggningstype"/>
+                          <widget class="QComboBox" name="comboBox_byggningstype">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <property name="minimumSize">
+                            <size>
+                             <width>150</width>
+                             <height>0</height>
+                            </size>
+                           </property>
+                          </widget>
                          </item>
                          <item row="3" column="0">
                           <widget class="QLabel" name="label_21">
@@ -3730,6 +3772,12 @@
                          </item>
                          <item row="3" column="1">
                           <widget class="QComboBox" name="comboBox_rampe">
+                           <property name="minimumSize">
+                            <size>
+                             <width>150</width>
+                             <height>0</height>
+                            </size>
+                           </property>
                            <item>
                             <property name="text">
                              <string/>
@@ -3755,7 +3803,14 @@
                           </widget>
                          </item>
                          <item row="4" column="1">
-                          <widget class="QComboBox" name="comboBox_dortype"/>
+                          <widget class="QComboBox" name="comboBox_dortype">
+                           <property name="minimumSize">
+                            <size>
+                             <width>150</width>
+                             <height>0</height>
+                            </size>
+                           </property>
+                          </widget>
                          </item>
                          <item row="5" column="0">
                           <widget class="QLabel" name="label_5">
@@ -3767,7 +3822,14 @@
                          <item row="5" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_6">
                            <item>
-                            <widget class="QComboBox" name="comboBox_dorbredde"/>
+                            <widget class="QComboBox" name="comboBox_dorbredde">
+                             <property name="minimumSize">
+                              <size>
+                               <width>50</width>
+                               <height>0</height>
+                              </size>
+                             </property>
+                            </widget>
                            </item>
                            <item>
                             <widget class="QLineEdit" name="lineEdit_dorbredde"/>
@@ -3784,7 +3846,14 @@
                          <item row="6" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_16">
                            <item>
-                            <widget class="QComboBox" name="comboBox_terskel"/>
+                            <widget class="QComboBox" name="comboBox_terskel">
+                             <property name="minimumSize">
+                              <size>
+                               <width>50</width>
+                               <height>0</height>
+                              </size>
+                             </property>
+                            </widget>
                            </item>
                            <item>
                             <widget class="QLineEdit" name="lineEdit_terskel"/>
@@ -3799,7 +3868,14 @@
                           </widget>
                          </item>
                          <item row="7" column="1">
-                          <widget class="QComboBox" name="comboBox_kontrast"/>
+                          <widget class="QComboBox" name="comboBox_kontrast">
+                           <property name="minimumSize">
+                            <size>
+                             <width>150</width>
+                             <height>0</height>
+                            </size>
+                           </property>
+                          </widget>
                          </item>
                         </layout>
                        </item>
@@ -3892,7 +3968,14 @@
                            <item row="2" column="1">
                             <layout class="QHBoxLayout" name="horizontalLayout_3">
                              <item>
-                              <widget class="QComboBox" name="comboBox_handliste"/>
+                              <widget class="QComboBox" name="comboBox_handliste">
+                               <property name="minimumSize">
+                                <size>
+                                 <width>150</width>
+                                 <height>0</height>
+                                </size>
+                               </property>
+                              </widget>
                              </item>
                             </layout>
                            </item>
@@ -3957,59 +4040,73 @@
                       </widget>
                      </item>
                      <item>
-                      <layout class="QVBoxLayout" name="verticalLayout_11">
+                      <layout class="QVBoxLayout" name="verticalLayout_10">
                        <item>
-                        <layout class="QVBoxLayout" name="verticalLayout_10">
-                         <item>
-                          <widget class="QLabel" name="label_24">
+                        <widget class="QLabel" name="label_24">
+                         <property name="text">
+                          <string>Tilgjengelighet</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="Line" name="line_8">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <layout class="QFormLayout" name="formLayout_3">
+                         <item row="0" column="0">
+                          <widget class="QLabel" name="label_12">
                            <property name="text">
-                            <string>Tilgjengelighet</string>
+                            <string>Manuell Rullestol</string>
                            </property>
                           </widget>
                          </item>
-                         <item>
-                          <widget class="Line" name="line_8">
-                           <property name="orientation">
-                            <enum>Qt::Horizontal</enum>
+                         <item row="0" column="1">
+                          <widget class="QComboBox" name="comboBox_manuell_rullestol">
+                           <property name="minimumSize">
+                            <size>
+                             <width>150</width>
+                             <height>0</height>
+                            </size>
                            </property>
                           </widget>
                          </item>
-                         <item>
-                          <layout class="QFormLayout" name="formLayout_3">
-                           <property name="fieldGrowthPolicy">
-                            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                         <item row="1" column="0">
+                          <widget class="QLabel" name="label_11">
+                           <property name="text">
+                            <string>Elektrisk Rullestol</string>
                            </property>
-                           <item row="0" column="0">
-                            <widget class="QLabel" name="label_12">
-                             <property name="text">
-                              <string>Manuell Rullestol</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item row="0" column="1">
-                            <widget class="QComboBox" name="comboBox_manuell_rullestol"/>
-                           </item>
-                           <item row="1" column="0">
-                            <widget class="QLabel" name="label_11">
-                             <property name="text">
-                              <string>Elektrisk Rullestol</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item row="1" column="1">
-                            <widget class="QComboBox" name="comboBox_el_rullestol"/>
-                           </item>
-                           <item row="2" column="0">
-                            <widget class="QLabel" name="label_13">
-                             <property name="text">
-                              <string>Synshemmet</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item row="2" column="1">
-                            <widget class="QComboBox" name="comboBox_syn"/>
-                           </item>
-                          </layout>
+                          </widget>
+                         </item>
+                         <item row="1" column="1">
+                          <widget class="QComboBox" name="comboBox_el_rullestol">
+                           <property name="minimumSize">
+                            <size>
+                             <width>150</width>
+                             <height>0</height>
+                            </size>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="0">
+                          <widget class="QLabel" name="label_13">
+                           <property name="text">
+                            <string>Synshemmet</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="1">
+                          <widget class="QComboBox" name="comboBox_syn">
+                           <property name="minimumSize">
+                            <size>
+                             <width>150</width>
+                             <height>0</height>
+                            </size>
+                           </property>
+                          </widget>
                          </item>
                         </layout>
                        </item>
@@ -4153,24 +4250,24 @@ p, li { white-space: pre-wrap; }
                      </item>
                     </layout>
                    </item>
+                   <item>
+                    <widget class="QLabel" name="label_Progress_Inngang">
+                     <property name="font">
+                      <font>
+                       <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>TextLabel</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
                   </layout>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_Progress_Inngang">
-                   <property name="font">
-                    <font>
-                     <pointsize>10</pointsize>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>TextLabel</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
                  </item>
                 </layout>
                 <zorder></zorder>
@@ -4798,6 +4895,9 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
   <zorder></zorder>
+  <zorder></zorder>
+  <zorder>comboBox_dortype</zorder>
+  <zorder>comboBox_rampe</zorder>
  </widget>
  <resources/>
  <connections>

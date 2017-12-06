@@ -298,20 +298,20 @@ class Master:
 
 
         #Creating dock view of second window
-        self.dock = TableDialog()
-        self.obdockwidget=QDockWidget("Seartch Results" , self.iface.mainWindow() )
-        self.obdockwidget.setObjectName("Results")
-        self.obdockwidget.setWidget(self.dock)
-        self.obdockwidget.hide()
+        self.dock = TableDialog(self.iface.mainWindow())
+        #self.obdockwidget=QDockWidget("Search Results" , self.iface.mainWindow() )
+        #self.obdockwidget.setObjectName("Results")
+        #self.obdockwidget.setWidget(self.dock)
+        #self.obdockwidget.hide()
         self.dock.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows) #select entire row in table
         self.dock.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers) #Making table unediteble
 
         #create widget for relevant information
-        self.infoWidget = infoWidgetDialog()
-        self.obj_info_dockwidget=QDockWidget("Info" , self.iface.mainWindow() )
-        self.obj_info_dockwidget.setObjectName("Object Info")
-        self.obj_info_dockwidget.setWidget(self.infoWidget)
-        self.obj_info_dockwidget.hide()
+        self.infoWidget = infoWidgetDialog(self.iface.mainWindow())
+        #self.obj_info_dockwidget=QDockWidget("Info" , self.iface.mainWindow() )
+        #self.obj_info_dockwidget.setObjectName("Object Info")
+        #self.obj_info_dockwidget.setWidget(self.infoWidget)
+        #self.obj_info_dockwidget.hide()
         self.infoWidget.pushButton_Select_Object.setCheckable(True)
         self.infoWidget.pushButton_Select_Object.toggled.connect(self.toolButtonSelect)
         self.infoWidget.pushButton_exporter.clicked.connect(self.open_export_layer_dialog)
@@ -336,6 +336,10 @@ class Master:
         fylker_cmb_changed.currentIndexChanged.connect(self.fylke_valgt) #Filling cityes from county
         self.dlg.comboBox_komuner.currentIndexChanged.connect(lambda x: self.dlg.lineEdit_navn_paa_sok_inngang.setText("Inngangbygg: " + self.dlg.comboBox_komuner.currentText())) #seting name for search to city chosen
         self.dlg.comboBox_komuner.currentIndexChanged.connect(self.komune_valgt)
+        self.fylker = GuiAttribute("fylker")
+        self.fylker.setComboBox(self.dlg.comboBox_fylker)
+        self.kommuner = GuiAttribute("komune")
+        self.kommuner.setComboBox(self.dlg.comboBox_komuner)
 
 
         #Create attributes object
@@ -425,6 +429,7 @@ class Master:
         self.sourceMapTool = IdentifyGeometry(self.canvas, self.infoWidget, pickMode='selection')
 
         #hide gui options test
+
         self.dlg.label_rampe_boxs.setVisible(False)
 
         self.dlg.lineEdit_rmp_stigning.setVisible(False)
@@ -1168,7 +1173,7 @@ class Master:
 
             current_object = current_object + 1
         self.dock.tableWidget.setSortingEnabled(True) #enabeling sorting
-        self.iface.addDockWidget( Qt.BottomDockWidgetArea , self.obdockwidget ) #adding seartch result Widget
+        self.iface.addDockWidget( Qt.BottomDockWidgetArea , self.dock ) #adding seartch result Widget
 
 
     def fill_fylker(self):
@@ -1331,18 +1336,13 @@ class Master:
         print("Filtering Start")
         #layer = self.layers[1]
         sok_metode = ""
-        if len(QgsMapLayerRegistry.instance().mapLayers()) > 0:
-            try:
-                print(self.iface.activeLayer().id())
-                #print(self.iface.activeLayer().id() in self.search_history)
-            except (RuntimeError, AttributeError) as e:
-                print(str(e))
+
 
         self.current_seartch_layer = filtering_layer
         
         layers = QgsMapLayerRegistry.instance().mapLayers()
-        for name, layer in layers.iteritems():
-             print("MapRegistry", layer.id(), layer.name())
+        #for name, layer in layers.iteritems():
+        #     print("MapRegistry", layer.id(), layer.name())
 
 
         #self.tempLayer
@@ -1491,7 +1491,7 @@ class Master:
             query = "SELECT * FROM " + base_layer_name + " " + where
             #print(query)
             self.current_seartch_layer = QgsVectorLayer("?query=%s" % (query), layer_name_text, "virtual" )
-            print(self.current_seartch_layer.isValid())
+            #print(self.current_seartch_layer.isValid())
             if self.current_seartch_layer.featureCount() > 0:
                 if len(QgsMapLayerRegistry.instance().mapLayersByName(layer_name_text)) > 0:
                     #self.search_history.pop(layer_name_text, None)
@@ -1507,7 +1507,7 @@ class Master:
                 #self.current_seartch_layer = vLayer
                 QgsMapLayerRegistry.instance().addMapLayer(self.current_seartch_layer)
                 self.canvas.setExtent(self.current_seartch_layer.extent())
-                self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
+                self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.infoWidget )
                 self.showResults(self.current_seartch_layer) #rampeverdi ikke med i tabell
                 self.sourceMapTool.setLayer(self.current_seartch_layer)
                 #self.dock.tabWidget_main.setCurrentIndex(1) #for tettsted
@@ -1518,9 +1518,11 @@ class Master:
                 self.search_history[layer_name_text] = SavedSearch(layer_name_text, self.current_seartch_layer, layer_name, self.dlg.tabWidget_main.currentIndex(), self.dlg.tabWidget_friluft.currentIndex(), self.dlg.tabWidget_tettsted.currentIndex())
                 for attribute in attributes:
                     self.search_history[layer_name_text].add_attribute(attribute, int(attribute.getComboBox().currentIndex()), attribute.getLineEditText())
-                    print(layer_name_text)
-                    print(attribute.getComboBox().currentIndex())
-                    print(type(attribute.getComboBox().currentIndex()))
+                    #print(layer_name_text)
+                    #print(attribute.getComboBox().currentIndex())
+                    #print(type(attribute.getComboBox().currentIndex()))
+                self.search_history[layer_name_text].add_attribute(self.fylker, int(self.fylker.getComboBox().currentIndex()), None)
+                self.search_history[layer_name_text].add_attribute(self.kommuner, int(self.kommuner.getComboBox().currentIndex()), None)
                 if self.infoWidget.comboBox_search_history.findText(layer_name_text) == -1:
                 	self.infoWidget.comboBox_search_history.addItem(layer_name_text)
                 
@@ -1585,7 +1587,7 @@ class Master:
                 self.canvas.setExtent(self.filtering_layer.extent())
                 self.canvas.refresh()
                 tempLayer.triggerRepaint()
-                self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
+                self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.infoWidget )
                 self.sourceMapTool.setLayer(self.filtering_layer)
                 self.showResults(self.filtering_layer) #rampeverdi ikke med i tabell
                 self.dock.tabWidget_main.setCurrentIndex(1) #for tettsted
@@ -1675,9 +1677,9 @@ class Master:
         #for id in self.search_history:
         #    print id
 
-        for i in self.search_history:
-            print(i)
-            print(self.search_history[i].get_attributes())
+        # for i in self.search_history:
+        #     print(i)
+        #     print(self.search_history[i].get_attributes())
 
         print("Filtering End")
         

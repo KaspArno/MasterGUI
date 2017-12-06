@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>291</width>
+    <width>485</width>
     <height>656</height>
    </rect>
   </property>
@@ -226,22 +226,32 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Filterer tidligere lag:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBox_search_history">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <property name="text">
-            <string/>
-           </property>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Filterer tidligere lag:</string>
+            </property>
+           </widget>
           </item>
-         </widget>
+          <item>
+           <widget class="QComboBox" name="comboBox_search_history">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>0</height>
+             </size>
+            </property>
+            <item>
+             <property name="text">
+              <string/>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_filtre_tidligere">
@@ -252,22 +262,11 @@
         </item>
        </layout>
       </item>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
      </layout>
     </item>
    </layout>
+   <zorder>pushButton_exporter</zorder>
+   <zorder>comboBox_search_history</zorder>
   </widget>
  </widget>
  <resources/>
