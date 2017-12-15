@@ -106,50 +106,18 @@ class Master:
 
         #Globale Variabler
         #Combobox filling
-        self.uspesifisert = ""
+        self.uspesifisert = "" #For tomme comboboxser og lineEdtis
         self.mer = ">" #for combobokser linket til mer eller mindre enn iteratsjoner
         self.mindre = "<"
         self.mer_eller_lik = ">="
         self.mindre_eller_lik = "<="
 
-        #Attributter Inngangbygg
-        # self.att_bygg = "funksjon" #"bygg_funksjon"
-        # self.att_dor = "dørtype" #"dortype"
-        # self.att_hand = "håndlist" #"handlist"
-
-        # self.att_avst_hc = "avstandHC" #"avstand_hc_park"
-        # self.att_ank_stig = "stigningAdkomstvei" #"adko_stig_grad"
-        # self.att_dortype = "dørtyoe" #"dortype"
-        # self.att_dorbredde = "inngangBredde" #"inngang_bredde"
-        # self.att_dorapner = "døråpner" #"dorapner"
-        # self.att_ringeklokke = "ringeklokke"
-        # self.att_ringeklokke_hoyde = "ringeklokkeHøyde" #"ringekl_hoyde"
-        # self.att_terslelhoyde = "terskelHøyde" #"terskel_hoyde"
-        # self.att_kontrast = "kontrast"
-        # self.att_rampe = "rampe"
-        # self.att_rmp_stigning = "rampeStigning" # "rampe_stigning"
-        # self.att_rmp_bredde = "rampeBredde" #"rampe_bredde"
-        # self.att_hand1 = "handlistHøyde1" #"hand_hoy_1"
-        # self.att_hand2 = "handlistHøyde2" #"hand_hoy_2"
-        # self.att_info_list = [self.att_avst_hc, self.att_bygg, self.att_ank_stig, self.att_dor, self.att_dorapner, self.att_ringeklokke, self.att_ringeklokke_hoyde, self.att_terslelhoyde, self.att_dorbredde, self.att_kontrast, self.att_rampe]
-
-        #Attributter Tilgjengelighet
-        # self.att_rulle = "t_rulle_auto"
-        # self.att_el_rulle = "el_ruelle_auto"
-        # self.att_syn = "t_syn"
-
-        #Annet
-        self.feature_id = {} #gather feature id to set selected
-
+        #layers and search
         self.layers = [] #gather all layers
         self.layername = [] #gather all layer name (dict?)
-        self.layer_inngang = None #initiate layer inngang
-        self.layer_vei_tettsted = None
-        self.layer_hcparkering = None
-        self.layer_pomrade = None
-        self.current_seartch_layer = None
-        self.search_history = {}
-        self.previus_search_method = None
+
+        self.current_seartch_layer = None #The last searched layer
+        self.search_history = {} #history of all search
 
         #to hide layers
         self.ltv = self.iface.layerTreeView()
@@ -230,7 +198,7 @@ class Master:
         """
 
         # Create the dialog (after translation) and keep reference
-        self.dlg = MasterDialog()
+        self.dlg = MasterDialog() #main dialig
 
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
@@ -265,77 +233,44 @@ class Master:
             callback=self.run,
             parent=self.iface.mainWindow())
 
-        #Connect and create source layer
-        #self.uri = self.connect_database()
-        #inngangbygg = self.add_layers()
-        #inngangbygg = self.vlayer
-        # inngangbygg = self.layers['TettstedInngangBygg']
 
-        # #fill comboboxes
-        # self.fill_fylker()
-        # self.fill_combobox(inngangbygg, "bygg_funksjon", self.dlg.comboBox_byggningstype)
-        # self.fill_combobox(inngangbygg, "dortype", self.dlg.comboBox_dortype)
-        # self.fill_combobox(inngangbygg, "handlist", self.dlg.comboBox_handliste)
-        # self.fill_combobox(inngangbygg, "t_rulle", self.dlg.comboBox_manuell_rullestol)
-        # self.fill_combobox(inngangbygg, "t_el_rulle_auto", self.dlg.comboBox_el_rullestol)
-        # self.fill_combobox(inngangbygg, "t_syn", self.dlg.comboBox_syn)
-        # self.fill_combobox(inngangbygg, "kontrast", self.dlg.comboBox_kontrast)
-        # self.integer_valg_list = [self.dlg.comboBox_avstand_hc, self.dlg.comboBox_ank_stigning, self.dlg.comboBox_dorbredde, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_bredde, self.dlg.comboBox_hand1, self.dlg.comboBox_hand2, self.dlg.comboBox_terskel]
-        # for cmbBox in self.integer_valg_list:
-        #     self.fill_combobox_mer_mindre(cmbBox)
+        #main window
+        self.dlg.tabWidget_main.currentChanged.connect(self.change_search_name) #change search name based on tab
+        self.dlg.tabWidget_friluft.currentChanged.connect(self.change_search_name)
+        self.dlg.tabWidget_tettsted.currentChanged.connect(self.change_search_name)
 
-        # remove source layer
-        #QgsMapLayerRegistry.instance().removeMapLayer( inngangbygg.id() )
+        self.dlg.pushButton_reset.clicked.connect(self.reset) #resett all choses
 
-        #Set push functions
-        # filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
-        # filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
-        self.export_layer = exportLayerDialog()
-        self.export_layer.pushButton_bla.clicked.connect(self.OpenBrowse)
-        self.export_layer.pushButton_lagre.clicked.connect(self.lagre_lag)
-        self.export_layer.pushButton_lagre.clicked.connect(lambda x: self.export_layer.close())
-        self.export_layer.pushButton_avbryt.clicked.connect(lambda x: self.export_layer.close())
-
-
-        #Creating dock view of second window
+        #table window
         self.dock = TableDialog(self.iface.mainWindow())
-        #self.obdockwidget=QDockWidget("Search Results" , self.iface.mainWindow() )
-        #self.obdockwidget.setObjectName("Results")
-        #self.obdockwidget.setWidget(self.dock)
-        #self.obdockwidget.hide()
         self.dock.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows) #select entire row in table
         self.dock.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers) #Making table unediteble
 
-        #create widget for relevant information
+        self.dock.tableWidget.itemClicked.connect(self.table_item_clicked) #what happens when an item is clicked in table
+
+        #info window
         self.infoWidget = infoWidgetDialog(self.iface.mainWindow())
-        #self.obj_info_dockwidget=QDockWidget("Info" , self.iface.mainWindow() )
-        #self.obj_info_dockwidget.setObjectName("Object Info")
-        #self.obj_info_dockwidget.setWidget(self.infoWidget)
-        #self.obj_info_dockwidget.hide()
         self.infoWidget.pushButton_Select_Object.setCheckable(True)
         self.infoWidget.pushButton_Select_Object.toggled.connect(self.toolButtonSelect)
         self.infoWidget.pushButton_exporter.clicked.connect(self.open_export_layer_dialog)
-        self.infoWidget.pushButton_filtrer.clicked.connect(lambda x: self.dlg.show())
-        self.infoWidget.pushButton_filtre_tidligere.clicked.connect(self.get_previus_search)
+        self.infoWidget.pushButton_filtrer.clicked.connect(lambda x: self.dlg.show()) #open main window
+        self.infoWidget.pushButton_filtre_tidligere.clicked.connect(self.get_previus_search) #open main window with prev search options
 
-        
+        self.sourceMapTool = IdentifyGeometry(self.canvas, self.infoWidget, pickMode='selection')
 
+        #Export window
+        self.export_layer = exportLayerDialog()
+        self.export_layer.pushButton_bla.clicked.connect(self.OpenBrowse)
+        self.export_layer.pushButton_lagre.clicked.connect(self.lagre_lag)
+        self.export_layer.pushButton_lagre.clicked.connect(lambda x: self.export_layer.close()) #close winwo when you have saved layer
+        self.export_layer.pushButton_avbryt.clicked.connect(lambda x: self.export_layer.close())
         
-        #self.dlg.accepted.connect(self.filtrer_inngang) #OK fillterer foreløpig for inngang, burde endres
-        #self.iface.addDockWidget( Qt.BottomDockWidgetArea , self.obdockwidget )
-
-        #Set push functions
-        filtrer_btn_inngang = self.dlg.pushButton_filtrerInngang
-        #filtrer_btn_inngang.clicked.connect(self.filtrer_inngang)
-        
-        self.dock.tableWidget.itemClicked.connect(self.table_item_clicked)
-        self.dlg.pushButton_reset.clicked.connect(self.reset)
 
         #set combobox functions
-        fylker_cmb_changed = self.dlg.comboBox_fylker
-        fylker_cmb_changed.currentIndexChanged.connect(self.fylke_valgt) #Filling cityes from county
-        self.dlg.comboBox_komuner.currentIndexChanged.connect(lambda x: self.dlg.lineEdit_navn_paa_sok_inngang.setText("Inngangbygg: " + self.dlg.comboBox_komuner.currentText())) #seting name for search to city chosen
-        self.dlg.comboBox_komuner.currentIndexChanged.connect(self.komune_valgt)
+        self.dlg.comboBox_fylker.currentIndexChanged.connect(self.fylke_valgt) #Filling cityes from county
+        self.dlg.comboBox_fylker.currentIndexChanged.connect(self.change_search_name) #setting search name based on fylke
+        self.dlg.comboBox_komuner.currentIndexChanged.connect(self.change_search_name) #setting search name based on komune
+
         self.fylker = GuiAttribute("fylker")
         self.fylker.setComboBox(self.dlg.comboBox_fylker)
         self.kommuner = GuiAttribute("komune")
@@ -348,88 +283,41 @@ class Master:
         self.assign_combobox_hc_parkering()
         self.assign_combobox_parkeringsomraade()
 
-        filtrer_btn_inngang.clicked.connect(partial(self.filtrer_inngang, self.attributes_inngang, self.layer_inngang, "inngangbygg"))
-        self.dlg.pushButton_filtrerVei_tettsted.clicked.connect(partial(self.filtrer_inngang, self.attributes_vei, self.layer_vei_tettsted, "vei_tettsted"))
-        self.dlg.pushButton_filtrerHCPark.clicked.connect(partial(self.filtrer_inngang, self.attributes_hcparkering, self.layer_hcparkering, "hcparkering"))
-        self.dlg.pushButton_filtrerParkOmrade.clicked.connect(partial(self.filtrer_inngang, self.attributes_pomrade, self.layer_pomrade, "parkeringsomrade"))
-        #fill GUI
-        self.get_wfs_layer()
+        self.dlg.pushButton_filtrer.clicked.connect(self.filtrer)
+
         
 
     def assign_combobox_inngang(self):
-        self.avstandHC = GuiAttribute("avstandHC")
-        self.avstandHC.setComboBox(self.dlg.comboBox_avstand_hc)
-        self.avstandHC.setLineEdit(self.dlg.lineEdit_avstand_hc)
-
-        self.ank_stigning = GuiAttribute("stigningAdkomstvei")
-        self.ank_stigning.setComboBox(self.dlg.comboBox_ank_stigning)
-        self.ank_stigning.setLineEdit(self.dlg.lineEdit_ank_stigning)
-
-        self.byggningstype = GuiAttribute("funksjon")
-        self.byggningstype.setComboBox(self.dlg.comboBox_byggningstype)
-
-        self.rampe = GuiAttribute("rampe", {"" : "", "Ja" : "1", "Nei" : "1"})
-        self.rampe.setComboBox(self.dlg.comboBox_rampe)
-
-        #self.dortype = GuiAttribute("dørtype")
-        self.dortype = GuiAttribute(u'd\xf8rtype')
-        self.dortype.setComboBox(self.dlg.comboBox_dortype)
-
-        self.dorbredde = GuiAttribute("InngangBredde")
-        self.dorbredde.setComboBox(self.dlg.comboBox_dorbredde)
-        self.dorbredde.setLineEdit(self.dlg.lineEdit_dorbredde)
-
-        #self.terskel = GuiAttribute("terskelHøyde")
-        self.terskel = GuiAttribute(u'terskelH\xf8yde')
-        self.terskel.setComboBox(self.dlg.comboBox_terskel)
-        self.terskel.setLineEdit(self.dlg.lineEdit_terskel)
-
-        self.kontrast = GuiAttribute("kontrast")
-        self.kontrast.setComboBox(self.dlg.comboBox_kontrast)
-
-        self.rampe_stigning = GuiAttribute("rampeStigning")
-        self.rampe_stigning.setComboBox(self.dlg.comboBox_rmp_stigning)
-        self.rampe_stigning.setLineEdit(self.dlg.lineEdit_rmp_stigning)
-
-        self.rampe_bredde = GuiAttribute("rampeBredde")
-        self.rampe_bredde.setComboBox(self.dlg.comboBox_rmp_bredde)
-        self.rampe_bredde.setLineEdit(self.dlg.lineEdit_rmp_bredde)
-
-        self.handlist = GuiAttribute("håndlist")
-        self.handlist = GuiAttribute(u'h\xe5ndlist')
-        self.handlist.setComboBox(self.dlg.comboBox_handliste)
         
-        #self.handlist1 = GuiAttribute("håndlistHøyde1")
-        self.handlist1 = GuiAttribute(u'h\xe5ndlistH\xf8yde1')
-        self.handlist1.setComboBox(self.dlg.comboBox_hand1)
-        self.handlist1.setLineEdit(self.dlg.lineEdit_hand1)
+        self.avstandHC = GuiAttribute("avstandHC", self.dlg.comboBox_avstand_hc, self.dlg.lineEdit_avstand_hc)
+        self.ank_stigning = GuiAttribute("stigningAdkomstvei", self.dlg.comboBox_ank_stigning, self.dlg.lineEdit_ank_stigning)
+        self.byggningstype = GuiAttribute("funksjon", self.dlg.comboBox_byggningstype)
+        self.rampe = GuiAttribute("rampe", self.dlg.comboBox_rampe, comboBoxText={"" : "", "Ja" : "1", "Nei" : "0"})
+        self.dortype = GuiAttribute(u'd\xf8rtype', self.dlg.comboBox_dortype)
+        self.dorapner = GuiAttribute(u'd\xf8r\xe5pner', self.dlg.comboBox_dorapner)
+        self.man_hoyde = GuiAttribute(u'man\xe5verknappH\xf8yde', self.dlg.comboBox_man_hoyde, self.dlg.lineEdit_man_hoyde)
+        self.dorbredde = GuiAttribute("InngangBredde", self.dlg.comboBox_dorbredde, self.dlg.lineEdit_dorbredde)
+        self.terskel = GuiAttribute(u'terskelH\xf8yde', self.dlg.comboBox_terskel, self.dlg.lineEdit_terskel)
+        self.kontrast = GuiAttribute("kontrast", self.dlg.comboBox_kontrast)
+        self.rampe_stigning = GuiAttribute("rampeStigning", self.dlg.comboBox_rmp_stigning, self.dlg.lineEdit_rmp_stigning)
+        self.rampe_bredde = GuiAttribute("rampeBredde", self.dlg.comboBox_rmp_bredde, self.dlg.lineEdit_rmp_bredde)
+        self.handlist = GuiAttribute(u'h\xe5ndlist', self.dlg.comboBox_handliste)
+        self.handlist1 = GuiAttribute(u'h\xe5ndlistH\xf8yde1', self.dlg.comboBox_hand1, self.dlg.lineEdit_hand1)
+        self.handlist2 = GuiAttribute(u'h\xe5ndlistH\xf8yde2', self.dlg.comboBox_hand2, self.dlg.lineEdit_hand2)
+        self.rmp_tilgjengelig = GuiAttribute("rampeTilgjengelig", self.dlg.comboBox_rmp_tilgjengelig)
+        self.manuellRullestol = GuiAttribute("tilgjengvurderingRullestol", self.dlg.comboBox_manuell_rullestol)
+        self.elektriskRullestol = GuiAttribute("tilgjengvurderingElRull", self.dlg.comboBox_el_rullestol)
+        self.synshemmet = GuiAttribute("tilgjengvurderingSyn", self.dlg.comboBox_syn)
 
-        #self.handlist2 = GuiAttribute("håndlistHøyde2")
-        self.handlist2 = GuiAttribute(u'h\xe5ndlistH\xf8yde2')
-        self.handlist2.setComboBox(self.dlg.comboBox_hand2)
-        self.handlist2.setLineEdit(self.dlg.lineEdit_hand2)
+        self.attributes_inngang = [self.avstandHC, self.ank_stigning, self.byggningstype, self.rampe, self.dortype, self.dorapner, self.man_hoyde, self.dorbredde, self.terskel, self.kontrast, self.rampe_stigning, self.rampe_bredde, self.handlist, self.handlist1, self.handlist2, self.rmp_tilgjengelig, self.manuellRullestol, self.elektriskRullestol, self.synshemmet]
+        self.attributes_inngang_gui = [self.byggningstype, self.dortype, self.dorapner, self.kontrast, self.handlist, self.rmp_tilgjengelig, self.manuellRullestol, self.elektriskRullestol, self.synshemmet]
+        self.attributes_inngang_mer_mindre = [self.avstandHC, self.ank_stigning, self.man_hoyde, self.dorbredde, self.terskel, self.rampe_stigning, self.rampe_bredde, self.handlist1, self.handlist2]
 
-        self.manuellRullestol = GuiAttribute(self.to_unicode("tilgjengvurderingRullestol"))
-        self.manuellRullestol.setComboBox(self.dlg.comboBox_manuell_rullestol)
-        
-        self.elektriskRullestol = GuiAttribute(self.to_unicode("tilgjengvurderingElRull"))
-        self.elektriskRullestol.setComboBox(self.dlg.comboBox_el_rullestol)
-        
-        self.synshemmet = GuiAttribute(self.to_unicode("tilgjengvurderingSyn"))
-        self.synshemmet.setComboBox(self.dlg.comboBox_syn)
-
-        self.attributes_inngang = [self.avstandHC, self.ank_stigning, self.byggningstype, self.rampe, self.dortype, self.dorbredde, self.terskel, self.kontrast, self.rampe_stigning, self.rampe_bredde, self.handlist, self.handlist1, self.handlist2, self.manuellRullestol, self.elektriskRullestol, self.synshemmet]
-        self.attributes_inngang_gui = [self.byggningstype, self.dortype, self.kontrast, self.handlist, self.manuellRullestol, self.elektriskRullestol, self.synshemmet]
-        self.attributes_inngang_mer_mindre = [self.avstandHC, self.ank_stigning, self.dorbredde, self.terskel, self.rampe_stigning, self.rampe_bredde, self.handlist1, self.handlist2]
-
-        self.inngangSok = GuiAttribute("Navn På Søk")
-        self.inngangSok.setLineEdit(self.dlg.lineEdit_navn_paa_sok_inngang)
 
         #selection test
-        self.sourceMapTool = IdentifyGeometry(self.canvas, self.infoWidget, pickMode='selection')
+        #self.sourceMapTool = IdentifyGeometry(self.canvas, self.infoWidget, pickMode='selection')
 
         #hide gui options test
-
         self.dlg.label_rampe_boxs.setVisible(False)
 
         self.dlg.lineEdit_rmp_stigning.setVisible(False)
@@ -450,6 +338,9 @@ class Master:
         self.dlg.lineEdit_hand2.setVisible(False)
         self.dlg.comboBox_hand2.setVisible(False)
         self.dlg.label_hand2.setVisible(False)
+
+        self.dlg.comboBox_rmp_tilgjengelig.setVisible(False)
+        self.dlg.label_rmp_tilgjengelig.setVisible(False)
 
         self.dlg.line_4.setVisible(False)
         self.dlg.line.setVisible(False)
@@ -596,15 +487,13 @@ class Master:
         del self.toolbar
 
 
+    def get_temppath(self, filename):
+        tmpdir = os.path.join(tempfile.gettempdir(),'masterGUI')
+        if not os.path.exists(tmpdir):
+            os.makedirs(tmpdir)
+        tmpfile= os.path.join(tmpdir, filename)
+        return tmpfile
 
-    # def add_layers(self):
-    #     layerList = QgsMapLayerRegistry.instance().mapLayersByName("inngangbygg")
-
-    #     try:
-    #         inngangbygg = layerList[0]
-    #         return inngangbygg
-    #     except IndexError:
-    #         print("inngangbygg not a layer")
 
     def to_unicode(self, in_string):
         if isinstance(in_string,str):
@@ -616,24 +505,8 @@ class Master:
         return out_string
 
 
-    def get_temppath(self, filename):
-        tmpdir = os.path.join(tempfile.gettempdir(),'masterGUI')
-        if not os.path.exists(tmpdir):
-            os.makedirs(tmpdir)
-        tmpfile= os.path.join(tmpdir, filename)
-        return tmpfile
-
-
     def updateDataReadProgress(self, bytesRead, totalBytes):
-        
-        #value = bytesRead/totalBytes*100
-        #print(totalBytes)
-        #self.dlg.progressBar.setMaximum(totalBytes)
-        #self.dlg.progressBar.setValue(bytesRead)
-        #self.dlg.progressBar.setValue(value)
-        #print(totalBytes)
-        #self.dlg.lblMessage.setText("Please wait while downloading - {0} Bytes downloaded!".format(str(bytesRead)))
-        self.dlg.label_Progress.setText("Vent mens data laster ned, data nedlastet: " + str(bytesRead))
+        self.dlg.label_Progress.setText("Laster inn data: " + self.featuretype.getFeatureType())
 
     def httpRequestStartet(self):
         print("The Request has started!")
@@ -746,43 +619,6 @@ class Master:
                                     self.fill_combobox(self.layers[-1], att.getAttribute(), att.getComboBox())
                                 for att in self.attributes_pomrade_mer_mindre:
                                     self.fill_combobox_mer_mindre(att.getComboBox())
-                                # print("if statement enterd")
-                                # inngangbygg = self.layers[-1]
-                                # self.fill_fylker()
-                                # self.fill_combobox(inngangbygg, "funksjon", self.dlg.comboBox_byggningstype)
-                                # self.fill_combobox(inngangbygg, "dørtype", self.dlg.comboBox_dortype)
-                                # self.fill_combobox(inngangbygg, "håndlist", self.dlg.comboBox_handliste)
-                                # self.fill_combobox(inngangbygg, "tilgjengvurderingRullestol", self.dlg.comboBox_manuell_rullestol)
-                                # self.fill_combobox(inngangbygg, "tilgjengvurderingElRull", self.dlg.comboBox_el_rullestol)
-                                # self.fill_combobox(inngangbygg, "tilgjengvurderingSyn", self.dlg.comboBox_syn)
-                                # self.fill_combobox(inngangbygg, "kontrast", self.dlg.comboBox_kontrast)
-                                # self.integer_valg_list = [self.dlg.comboBox_avstand_hc, self.dlg.comboBox_ank_stigning, self.dlg.comboBox_dorbredde, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_stigning, self.dlg.comboBox_rmp_bredde, self.dlg.comboBox_hand1, self.dlg.comboBox_hand2, self.dlg.comboBox_terskel]
-                                # for cmbBox in self.integer_valg_list:
-                                #     self.fill_combobox_mer_mindre(cmbBox)
-
-                            # vlayer = self.layers[-1]
-                            # expr = QgsExpression( "\"kommune\"=104 AND \"avstandHC\"<=25" )
-                            # it = vlayer.getFeatures( QgsFeatureRequest( expr ) )
-                            # ids = [i.id() for i in it]
-                            # vlayer.setSelectedFeatures( ids )
-                            # selectedFeatures = vlayer.selectedFeatures()
-                            # print("selectedFeatures: ", type(selectedFeatures))
-                            # #selectedFeatures = []
-                            # #WFSlayer = QgsVectorLayer(uri, "layerName", "WFS")
-                            # features1 = self.layers[-1].selectedFeatures() # this layer is the layer the user or code selects in the map
-
-                            #for WFSfeature in WFSlayer.getFeatures():
-                            #  for f in features1:
-                            #    if WFSfeature.geometry().intersects(f.geometry()):
-                            #      selectedFeatures.append(WFSfeature)
-                            # create temp layer, eg use LineString geometry
-                            # tempLayer = QgsVectorLayer("Point?crs=epsg:4326", "tempLayer", "memory")
-                            # QgsMapLayerRegistry.instance().addMapLayer(tempLayer)
-                            # temp_data = tempLayer.dataProvider()
-                            # attr = self.layers[-1].dataProvider().fields().toList()
-                            # temp_data.addAttributes(attr)
-                            # tempLayer.updateFields()
-                            # temp_data.addFeatures(selectedFeatures)
 
                             self.featuretype.next()
                             if self.featuretype.getFeatureType():
@@ -790,8 +626,9 @@ class Master:
                             else:
                                 #print("self.layers: ", len(self.layers))
                                 #print(dir(self.dlg.label_Progress))
-                                self.dlg.label_Progress_Inngang.setVisible(False)
-                                self.dlg.label_Progress_Vei.setVisible(False)
+                                #self.dlg.label_Progress_Inngang.setVisible(False)
+                                #self.dlg.label_Progress_Vei.setVisible(False)
+                                self.dlg.label_Progress.setVisible(False)
                                 #print(self.dlg.progressBar.value())
                                 for baselayer in self.layers:
                                     QgsMapLayerRegistry.instance().addMapLayer(baselayer)
@@ -800,51 +637,6 @@ class Master:
 
                                 print("doen")
 
-
-    def get_wfs_layer(self):
-        print("hent_wfs_layer kalt")
-        # online_resource = "https://wfs.geonorge.no/skwms1/wfs.tilgjengelighettettsted"
-
-        #feature_type = ['app:TettstedHCparkering', 'app:TettstedInngangBygg', u'app:TettstedParkeringsomr\xe5de', u'app:TettstedParkeringsomr\xe5deGr', 'app:TettstedVei']
-        self.featuretype = FeatureType()
-        # nsmap = {'gml': 'http://www.opengis.net/gml', 'app': 'http://skjema.geonorge.no/SOSI/produktspesifikasjon/TilgjengelighetTettsted/4.5', 'xlink': 'http://www.w3.org/1999/xlink', 'ows': 'http://www.opengis.net/ows/1.1', 'xsd': 'http://www.w3.org/2001/XMLSchema', 'wfs': 'http://www.opengis.net/wfs/2.0', 'xsi': 'http://www.w3.org/2001/XMLSchema-instance', 'gml32': 'http://www.opengis.net/gml/3.2', 'ogc': 'http://www.opengis.net/ogc', 'fes': 'http://www.opengis.net/fes/2.0'}
-        # namespace = "http://skjema.geonorge.no/SOSI/produktspesifikasjon/TilgjengelighetTettsted/4.5"
-        # namespace_prefix = "app"
-        # titlelist = ['app:TettstedHCparkering', 'app:TettstedInngangBygg', u'app:TettstedParkeringsomr\xe5de', u'app:TettstedParkeringsomr\xe5deGr', 'app:TettstedVei']
-
-        # # lowercorner_east = 0
-        # # lowercorner_south = 0
-        # # uppercorner_west = 0
-        # # uppercorner_north = 0
-
-        # #Do I use these?
-        # request = "{0}{1}{2}".format(online_resource, "?", "{0}service=WFS&acceptversions=2.0.0&request=GetCapabilities".format("&"))
-        # response = urllib2.urlopen(request, None, 10)
-
-        # buf = response.read()
-        # root = ElementTree.fromstring(buf)
-
-        # nswfs = "{http://www.opengis.net/wfs/2.0}"
-        # nsows = "{http://www.opengis.net/ows/1.1}"
-
-        # for target in root.findall("{0}FeatureTypeList/{0}FeatureType".format(nswfs)):
-        #     for name in target.findall("{0}Name".format(nswfs)):
-        #         for bbox in target.findall("{0}WGS84BoundingBox".format(nsows)):
-        #                     for lowercorner in bbox.findall("{0}LowerCorner".format(nsows)):
-        #                         if float(lowercorner.text.split(' ')[0]) < lowercorner_east:
-        #                             lowercorner_east = lowercorner.text.split(' ')[0]
-        #                         if float(lowercorner.text.split(' ')[1]) > lowercorner_south:
-        #                             uppercorner_north = lowercorner.text.split(' ')[1]
-        #                     for uppercorner in bbox.findall("{0}UpperCorner".format(nsows)):
-        #                         if float(uppercorner.text.split(' ')[0]) < uppercorner_west:
-        #                             uppercorner_west = uppercorner.text.split(' ')[0]
-        #                         if float(lowercorner.text.split(' ')[1]) > uppercorner_north:
-        #                             uppercorner_north = uppercorner.text.split(' ')[1]
-
-        #Get Features
-        #for feature in feature_type:
-        #    self.getFeatures(feature, namespace, namespace_prefix, online_resource)
-        self.getFeatures()
 
     def getFeatures(self):
         namespace = "http://skjema.geonorge.no/SOSI/produktspesifikasjon/TilgjengelighetTettsted/4.5"
@@ -866,7 +658,7 @@ class Master:
 
         self.http.requestStarted.connect(self.httpRequestStartet)
         self.http.requestFinished.connect(self.httpRequestFinished)
-        #self.http.dataReadProgress.connect(self.updateDataReadProgress)
+        self.http.dataReadProgress.connect(self.updateDataReadProgress)
 
 
         layername="wfs{0}".format(''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(6)))
@@ -892,34 +684,6 @@ class Master:
         #print("httpGetId", self.httpGetId)
         
 
-    # def connect_database(self):
-    #     uri = QgsDataSourceURI()
-    #     uri.setConnection("localhost","5432","tilgjengelig","postgres","postgres")
-    #     #uri.setConnection("46.101.4.130","5432","webinar","webinar","webinar")
-    #     sql = "(select * from tilgjengelighet.t_inngangbygg)"
-    #     #sql = "(select * from kasper_master.t_inngangbygg)"
-    #     uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-    #     self.vlayer = QgsVectorLayer(uri.uri(),"inngangbygg","postgres")
-    #     QgsMapLayerRegistry.instance().addMapLayer(self.vlayer)
-
-    #     return uri
-
-
-    # def mapToolInit(self):
-
-    #     if self.mapToolAction.isChecked() is False:
-    #         self.canvas.unsetMapTool(self.mapTool)
-    #         return
-    #     self.mapToolAction.setChecked( True )
-    #     self.mapTool = IdentifyGeometry(canvas)
-    #     QObject.connect(self.mapTool , SIGNAL("geomIdentified") , self.doSometing )
-    #     canvas.setMapTool(self.mapTool)
-    #     QObject.connect( canvas, SIGNAL( "mapToolSet(QgsMapTool *)" ), self.mapToolChanged)
-     
-    # def doSomething(self, layer, feature):
-    #     print("doSomething")
-    #   # do something
-
     def toolButtonSelect(self, checked):
         print("toolButtonSelect Activated")
         # If the toolButton is checked
@@ -931,10 +695,8 @@ class Master:
         else:
             self.oldMapTool = self.canvas.mapTool()
 
-    # Method run when a feature in layer is identified by featIdentTool
-    def toolButtonAction(self, layer, feature):
 
-        # Do something with identified feature
+    def toolButtonAction(self, layer, feature):
         if isinstance(layer, QgsVectorLayer) and isinstance(feature, QgsFeature):
             self.featIdentTool.doWhatEver(feature)
 
@@ -974,6 +736,9 @@ class Master:
             self.dlg.comboBox_hand2.setVisible(True)
             self.dlg.label_hand2.setVisible(True)
 
+            self.dlg.comboBox_rmp_tilgjengelig.setVisible(True)
+            self.dlg.label_rmp_tilgjengelig.setVisible(True)
+
             self.dlg.line_4.setVisible(True)
             self.dlg.line.setVisible(True)
         else:
@@ -997,6 +762,10 @@ class Master:
             self.dlg.lineEdit_hand2.setVisible(False)
             self.dlg.comboBox_hand2.setVisible(False)
             self.dlg.label_hand2.setVisible(False)
+
+            self.dlg.comboBox_rmp_tilgjengelig.setVisible(False)
+            self.dlg.label_rmp_tilgjengelig.setVisible(False)
+
 
             self.dlg.line_4.setVisible(False)
             self.dlg.line.setVisible(False)
@@ -1035,21 +804,11 @@ class Master:
 
 
     def get_previus_search(self):
-        # for key, value in self.search_history.items():
-        #     print(key)
-        #     print(value)
-        #     for att, item in value.attributes.items():
-        #         print(att)
-        #         print("att current index; ", att.getComboBox().currentIndex())
-        #         print("Value: ", item[0])
         layer_name = self.infoWidget.comboBox_search_history.currentText()
         if layer_name != "":
             try:
-                print("search_history len: ", len(self.search_history))
                 pre_search = self.search_history[layer_name]
                 for key, value in pre_search.attributes.iteritems():
-                    print(key.getComboBox())
-                    print(value[0])
                     key.getComboBox().setCurrentIndex(int(value[0]))
                     if value[1]:
                         key.getLineEdit().setText(value[1])
@@ -1136,8 +895,15 @@ class Master:
         
 
     def showResults(self, layer):
+        #reset table
+        self.dock.tableWidget.setRowCount(0)
+        self.dock.tableWidget.setColumnCount(0)
+
+        #Create data providers
         prov = layer.dataProvider()
         feat = layer.getFeatures()
+        
+        #Create colums
         self.nrColumn = len(prov.fields())
         self.dock.tableWidget.setColumnCount(len(prov.fields())) #creating colums
 
@@ -1211,59 +977,26 @@ class Master:
                     self.dlg.comboBox_komuner.addItem(self.komm_dict_nr[komune_nr])
             except Exception as e:
                 print(str(e))
-        self.dlg.lineEdit_navn_paa_sok_inngang.setText("Inngangbygg: " + fylke)
-        self.dlg.lineEdit_navn_paa_sok_vei_tettsted.setText("Vei: " + fylke)
-        self.dlg.lineEdit_navn_paa_sok_hcpark.setText("HC-Park: " + fylke)
-        self.dlg.lineEdit_navn_paa_sok_pomrade.setText(self.to_unicode("P-Område: ") + fylke)
 
     def komune_valgt(self):
-        self.dlg.lineEdit_navn_paa_sok_inngang.setText("Inngangbygg: " + self.dlg.comboBox_komuner.currentText())
-        self.dlg.lineEdit_navn_paa_sok_vei_tettsted.setText("Vei: " + self.dlg.comboBox_komuner.currentText())
-        self.dlg.lineEdit_navn_paa_sok_hcpark.setText("HC-Park: " + self.dlg.comboBox_komuner.currentText())
-        self.dlg.lineEdit_navn_paa_sok_pomrade.setText(self.to_unicode("P-Område: ") + self.dlg.comboBox_komuner.currentText())
-
-    # def fill_komuner(self):
-    #     self.dlg.comboBox_komuner.clear()
-    #     self.dlg.comboBox_komuner.addItem(self.uspesifisert)
-
-    #     #filename = 'C:\Users\kaspa_000\.qgis2\python\plugins\MasterGUI\komm.txt'
-    #     filename = self.plugin_dir + "\komm.txt"
-
-    #     self.komm_dict = {}
-    #     self.fylke_dict = {}
-    #     with io.open(filename,'r',encoding='utf-8') as f:
-    #         for line in f:
-    #             komm_nr, komune, fylke = line.rstrip('\n').split(("\t"))
-    #             komm_nr = self.to_unicode(komm_nr)
-    #             komune = self.to_unicode(komune)
-    #             fylke = self.to_unicode(fylke)
-    #             self.komm_dict[komune] = [komm_nr, fylke]
-    #             #self.dlg.comboBox_komuner.addItem(komune)
-    #             #print(komune)
-    #             if not fylke in self.fylke_dict:
-    #                 self.fylke_dict[fylke] = []
-    #                 self.dlg.comboBox_komuner.addItem(fylke)
-    #             self.fylke_dict[fylke].append(komm_nr)
-    #             self.dlg.comboBox_komuner.addItem("    " + komune)
-    #     #print(self.fylke_dict)
-
-    #     #print(komm_nr)
+        if self.dlg.comboBox_komuner.currentText() != "":
+            self.dlg.lineEdit_navn_paa_sok.setText(self.dlg.lineEdit_navn_paa_sok.text() + ": " + self.dlg.comboBox_komuner.currentText())
+        else:
+            self.dlg.lineEdit_navn_paa_sok.setText(self.dlg.lineEdit_navn_paa_sok.text() + ": " + self.dlg.comboBox_fylker.currentText())
 
 
-    # def fylke_valgt(self):
-    #     fylke = self.dlg.comboBox_byggningstype.currentText()
-    #     for komune in self.fylke_dict[fylke]:
-    #         self.dlg.comboBox_komuner.addItem()
-        # print("something")
+    def change_search_name(self):
+        self.dlg.lineEdit_navn_paa_sok.setText(self.dlg.tabWidget_main.tabText(self.dlg.tabWidget_main.currentIndex()))
+        if self.dlg.tabWidget_main.currentIndex() == 0:
+            self.dlg.lineEdit_navn_paa_sok.setText(self.dlg.lineEdit_navn_paa_sok.text() + " " + self.dlg.tabWidget_friluft.tabText(self.dlg.tabWidget_friluft.currentIndex()))
+        else:
+            self.dlg.lineEdit_navn_paa_sok.setText(self.dlg.lineEdit_navn_paa_sok.text() + " " + self.dlg.tabWidget_tettsted.tabText(self.dlg.tabWidget_tettsted.currentIndex()))
+        if self.dlg.comboBox_fylker.currentText() != "Norge":
+            if self.dlg.comboBox_komuner.currentText() != "":
+                self.dlg.lineEdit_navn_paa_sok.setText(self.dlg.lineEdit_navn_paa_sok.text() + ": " + self.dlg.comboBox_komuner.currentText())
+            else:
+                self.dlg.lineEdit_navn_paa_sok.setText(self.dlg.lineEdit_navn_paa_sok.text() + ": " + self.dlg.comboBox_fylker.currentText())
 
-
-    # def create_where_statement(self, attribute, value, opperator, where):
-    #     if value != self.uspesifisert:
-    #         if len(where) == 0:
-    #             where = "where " + attribute + " " + opperator +" '" + value + "'"
-    #         else: 
-    #             where = where + " and " + attribute + " " + opperator +" '" + value + "'"
-    #     return where
 
     def create_expr_statement(self, attribute, expr_string):
         if attribute.getLineEdit() is None:
@@ -1278,14 +1011,6 @@ class Master:
                     expr_string = "\"%s\"%s\'%s\' " % (attribute.getAttribute(), attribute.getComboBoxCurrentText(), attribute.getLineEditText())
                 else:
                     expr_string = expr_string + " AND " + "\"%s\"%s\'%s\' " % (attribute.getAttribute(), attribute.getComboBoxCurrentText(), attribute.getLineEditText())
-        # if value != self.uspesifisert:
-        #     if len(expr_string) == 0:
-        #         #expr_string = "\"{0}\"=\'{1}\'".format(attribute, value)
-        #         expr_string = "\"%s\"=\'%s\' " % (attribute, value)
-        #     else:
-        #         #expr_string = expr_string + " AND \"{0}\"=\'{1}\'".format(attribute, value)
-        #         expr_string = expr_string + " AND " + "\"%s\"=\'%s\' " % (self.to_unicode(attribute), value)
-        #print("expr: " + expr_string)
         return expr_string
 
     def create_where_statement(self,attribute, where):
@@ -1294,9 +1019,7 @@ class Master:
         if attribute.getLineEdit() is None:
             if attribute.getComboBoxCurrentText() != self.uspesifisert:
                 if len(where) == 0:
-                    #print(attribute.getAttribute())
                     where = "WHERE %s = '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText())
-                    #where = "WHERE " + attribute.getAttribute() + " = " + "'" + attribute.getComboBoxCurrentText() + "'"
                 else:
                     where =  where + " AND " + "%s = '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText())
         else:
@@ -1306,7 +1029,6 @@ class Master:
                 else:
                     where = where + " AND " +  "%s %s '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText(), attribute.getLineEditText())
 
-        #print("where: " + where)
         return where
 
     def create_where_statement2(self,attribute, where):
@@ -1315,9 +1037,7 @@ class Master:
         if attribute.getLineEdit() is None:
             if attribute.getComboBoxCurrentText() != self.uspesifisert:
                 if len(where) == 0:
-                    #print(attribute.getAttribute())
                     where = "\"%s\" = '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText())
-                    #where = "WHERE " + attribute.getAttribute() + " = " + "'" + attribute.getComboBoxCurrentText() + "'"
                 else:
                     where =  where + " AND " + "\"%s\" = '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText())
         else:
@@ -1327,209 +1047,93 @@ class Master:
                 else:
                     where = where + " AND " +  "\"%s\" %s '%s'" % (attribute.getAttribute(), attribute.getComboBoxCurrentText(), attribute.getLineEditText())
 
-        #print("where: " + where)
         return where
 
 
 
-    def filtrer_inngang(self, attributes, filtering_layer, search_type, newLayer = False):
+    def filtrer(self, attributes):
         print("Filtering Start")
-        #layer = self.layers[1]
-        sok_metode = ""
+    
+        sok_metode = self.dlg.comboBox_sok_metode.currentText() #henter hvilke metode som benyttes(virtuelt eller memory)
+        layer_name = self.dlg.lineEdit_navn_paa_sok #setter navn på laget
+        search_type = self.dlg.tabWidget_tettsted.tabText(self.dlg.tabWidget_tettsted.currentIndex()) #henter hvilke søk som blir gjort (må spesifisere esenere for tettsted eller friluft)
+        search_type_pomrade = self.dlg.tabWidget_tettsted.tabText(3) #setter egen for pområde pga problemer med norske bokstaver
 
-
-        self.current_seartch_layer = filtering_layer
-        
-        layers = QgsMapLayerRegistry.instance().mapLayers()
-        #for name, layer in layers.iteritems():
-        #     print("MapRegistry", layer.id(), layer.name())
-
-
-        #self.tempLayer
-        self.previus_search_method = search_type
-
-        if search_type == "vei_tettsted":
-            #baselayer = self.layers[3]
+        #setter baselayre basert på søketypen
+        if search_type == "Vei":
             baselayer = QgsMapLayerRegistry.instance().mapLayersByName('TettstedVei')[0]
-            sok_metode = self.dlg.comboBox_sok_metode_vei.currentText()
-            layer_name = self.dlg.lineEdit_navn_paa_sok_vei_tettsted
-        elif search_type == "inngangbygg":
-            #baselayer = self.layers[1]
+            attributes = self.attributes_vei
+        elif search_type == "Inngang":
             baselayer = QgsMapLayerRegistry.instance().mapLayersByName('TettstedInngangBygg')[0]
-            sok_metode = self.dlg.comboBox_sok_metode.currentText()
-            layer_name = self.dlg.lineEdit_navn_paa_sok_inngang
-
-        elif search_type == "hcparkering":
-            #baselayer = self.layers[0]
+            attributes = self.attributes_inngang
+        elif search_type == "HC-Parkering":
             baselayer = QgsMapLayerRegistry.instance().mapLayersByName('TettstedHCparkering')[0]
-            sok_metode = self.dlg.comboBox_sok_metode_hcpark.currentText()
-            layer_name = self.dlg.lineEdit_navn_paa_sok_hcpark
-
-        elif search_type == "parkeringsomrade":
-            #baselayer = self.layers[2]
+            attributes = self.attributes_hcparkering
+        elif search_type == search_type_pomrade:
             baselayer = QgsMapLayerRegistry.instance().mapLayersByName('TettstedParkeringsomr\xc3\xa5de')[0]
-            sok_metode = self.dlg.comboBox_sok_metode_pomrade.currentText()
-            layer_name = self.dlg.lineEdit_navn_paa_sok_pomrade
-
-        #if not newLayer and self.previus_search_method == search_type:
-        #print(layer_name)
-
-        
-
-        # layers = (QgsMapLayerRegistry.instance().mapLayersByName(self.to_unicode(layer_name)))
-        # for layer in layers:
-        #     print("laryers like layername", layer.name())
-        # if len(QgsMapLayerRegistry.instance().mapLayersByName(self.to_unicode(layer_name))) > 0:
-        #     try:
-        #         QgsMapLayerRegistry.instance().removeMapLayer( QgsMapLayerRegistry.instance().mapLayersByName(self.to_unicode(layer_name)[0].id()) )
-        #     except (RuntimeError, AttributeError) as e:
-        #         print(str(e))
+            attributes = self.attributes_pomrade
 
         fylke = self.dlg.comboBox_fylker.currentText()
         komune = self.dlg.comboBox_komuner.currentText()
-        searchdata = []
 
-        if len(self.iface.legendInterface().layers()) > 0:
-            #print("legendInterface length: ", self.iface.legendInterface().layers())
-            try:
-                activeLayer_id = self.iface.activeLayer().id()
-            except Exception as e:
-                activeLayer_id = None
-                print(str(e))
-        else:
-            activeLayer_id = None
-
-
-        # byggningstype = self.dlg.comboBox_byggningstype.currentText()
-        # dortype = self.dlg.comboBox_dortype.currentText()
-        # handliste = self.dlg.comboBox_handliste.currentText()
-        # m_rullestol = self.dlg.comboBox_manuell_rullestol.currentText()
-        # el_rullestol = self.dlg.comboBox_el_rullestol.currentText()
-        # syn = self.dlg.comboBox_syn.currentText()
-        # kontrast = self.dlg.comboBox_kontrast.currentText()
-
-        # byggningstype = self.to_unicode(byggningstype)
-        # #byggningstype = byggningstype.decode('iso-8859-1')
-        # dortype = self.to_unicode(dortype)
-        # handliste = self.to_unicode(handliste)
-        # m_rullestol = self.to_unicode(m_rullestol)
-        # el_rullestol = self.to_unicode(el_rullestol)
-        # syn = self.to_unicode(syn)
-        # kontrast = self.to_unicode(kontrast)
-
-        # ing_atr_combobox = {self.att_bygg : byggningstype, self.att_dor :  dortype, self.att_hand :  handliste, self.att_rulle : m_rullestol, self.att_el_rulle : el_rullestol, self.att_syn : syn, self.att_kontrast : kontrast}
-
-        # avstand_hc = self.dlg.lineEdit_avstand_hc.text()
-        # ank_stigning = self.dlg.lineEdit_ank_stigning.text()
-        # dorbredde = self.dlg.lineEdit_dorbredde.text()
-        # rmp_stigning = self.dlg.lineEdit_rmp_stigning.text()
-        # rmp_bredde = self.dlg.lineEdit_rmp_bredde.text()
-        # hand1 = self.dlg.lineEdit_hand1.text()
-        # hand2 = self.dlg.lineEdit_hand2.text()
-        # ing_atr_lineedit_list = {self.dlg.lineEdit_avstand_hc : self.dlg.comboBox_avstand_hc, self.dlg.lineEdit_ank_stigning : self.dlg.comboBox_ank_stigning, self.dlg.lineEdit_dorbredde : self.dlg.comboBox_dorbredde, self.dlg.lineEdit_rmp_stigning : self.dlg.comboBox_rmp_stigning, self.dlg.lineEdit_rmp_bredde : self.dlg.comboBox_rmp_bredde, self.dlg.lineEdit_hand1 : self.dlg.comboBox_hand1, self.dlg.lineEdit_hand2 : self.dlg.comboBox_hand2}
-        # ing_atr_lineedit = {self.att_avst_hc : [avstand_hc, self.dlg.comboBox_avstand_hc.currentText()], self.att_ank_stig : [ank_stigning, self.dlg.comboBox_ank_stigning.currentText()], self.att_dorbredde : [dorbredde, self.dlg.comboBox_dorbredde.currentText()], self.att_rmp_stigning : [rmp_stigning, self.dlg.comboBox_rmp_stigning.currentText()], self.att_rmp_bredde : [rmp_bredde, self.dlg.comboBox_rmp_bredde.currentText()], self.att_hand1 : [hand1, self.dlg.comboBox_hand1.currentText()], self.att_hand2 : [hand2, self.dlg.comboBox_hand2.currentText()]}
-
-
-        #Ny metode med WFS
-        #expr_string = "\"kommune\"=104 AND \"avstandHC\"<=25"
-        #expr = QgsExpression(expr_string)
+        #genererer express string og where spørringer med komuner
         expr_string = ""
         if fylke != "Norge":
             if komune == self.uspesifisert:
                 expr_string = expr_string + " (\"kommune\"={0}".format(self.fylke_dict[fylke][0])
                 for komune_nr in range(1, len(self.fylke_dict[fylke])-1):
                     expr_string = expr_string + " OR \"kommune\"={0}".format(self.fylke_dict[fylke][komune_nr])
-                    #where = where + " or komm = " + self.fylke_dict[fylke][komune_nr]
                 expr_string = expr_string + ")"
             else:
                 expr_string = expr_string + " \"kommune\"={0}".format(self.komm_dict_nm[komune])
-                    #where = "where komm = " + self.komm_dict_nm[komune]
         where = "WHERE lokalId > 0"
         if fylke != "Norge":
             if komune == self.uspesifisert:
-                #where = "WHERE " + "kommune = '{0}'".format(self.fylke_dict[fylke][0])
                 where = where + " AND " + "(kommune = '{0}'".format(self.fylke_dict[fylke][0])
                 for komune_nr in range(1, len(self.fylke_dict[fylke])-1):
                     where = where + " OR kommune = '{0}'".format(self.fylke_dict[fylke][komune_nr])
-                    #where = where + " or komm = " + self.fylke_dict[fylke][komune_nr]
                 where = where + ")"
             else:
-                #where = "WHERE " + "kommune = '{0}'".format(self.komm_dict_nm[komune])
                 where = where + " AND " + "kommune = '{0}'".format(self.komm_dict_nm[komune])
-                    #where = "where komm = " + self.komm_dict_nm[komune]
 
-
+        #genererer express string og where spørringer basert på tilstndte attributter
         for attribute in attributes:
-            #print("attribute: ", attribute.getAttribute())
             where = self.create_where_statement(attribute, where)
             expr_string = self.create_where_statement2(attribute, expr_string)
-            searchdata.append(attribute)
-        #print("where: " + where)
-        #print("espr: " + expr_string)
-        # for atr, value in ing_atr_combobox.iteritems():
-        #     expr_string = self.create_expr_statement(atr, value, "=", expr_string)
 
-        # for atr, value in ing_atr_lineedit.iteritems():
-        #     opperator = ">"
-        #     if value[1] == self.mindre:
-        #         opperator = "<"
-        #     where = self.create_expr_statement(atr, value[0], opperator, where)
-        #print("sok_metode: ", sok_metode)
-        if sok_metode == "virtual": #if self.dlg.comboBox_sok_metode.currentText() == "visual":
-            layer_name_text = layer_name.text() + "Virtual"
+        #Genererer lag basert på virtuell metode eller memory metode
+        if sok_metode == "virtual":
             
-            #QgsMapLayerRegistry.instance().addMapLayer(baselayer)
-            #self.hideLayer(baselayer)
-            #self.iface.legendInterface().setLayerVisible(baselayer, False)
-            #tempLayer = QgsVectorLayer("Point?crs=epsg:4326", "Norge" + "Memory", "memory")
-            #temp_data = tempLayer.dataProvider()
+            layer_name_text = layer_name.text() + "Virtual"
             base_layer_name = baselayer.name()
-            #attr = self.layers[-1].dataProvider().fields().toList()
-            #temp_data.addAttributes(attr)
-            #vLayer = QgsVectorLayer("?query=SELECT * FROM " + layer_name, self.dlg.lineEdit_navn_paa_sok_inngang.text() + "Virtual", "virtual" )
-            #print(base_layer_name)
             query = "SELECT * FROM " + base_layer_name + " " + where
-            #print(query)
             self.current_seartch_layer = QgsVectorLayer("?query=%s" % (query), layer_name_text, "virtual" )
-            #print(self.current_seartch_layer.isValid())
-            if self.current_seartch_layer.featureCount() > 0:
+
+            if self.current_seartch_layer.featureCount() > 0: #Lager lag hvis noen objecter er funnet
                 if len(QgsMapLayerRegistry.instance().mapLayersByName(layer_name_text)) > 0:
-                    #self.search_history.pop(layer_name_text, None)
                     try:
-                        QgsMapLayerRegistry.instance().removeMapLayer( QgsMapLayerRegistry.instance().mapLayersByName(layer_name_text)[0].id() )
+                        QgsMapLayerRegistry.instance().removeMapLayer( QgsMapLayerRegistry.instance().mapLayersByName(layer_name_text)[0].id() ) #Fjerner lag med samme navn, for å ungå duplicates
                     except (RuntimeError, AttributeError) as e:
                         print(str(e))
 
-                # try:
-                #     QgsMapLayerRegistry.instance().removeMapLayer( self.iface.activeLayer() )
-                # except (RuntimeError, AttributeError):
-                #     pass
-                #self.current_seartch_layer = vLayer
-                QgsMapLayerRegistry.instance().addMapLayer(self.current_seartch_layer)
-                self.canvas.setExtent(self.current_seartch_layer.extent())
-                self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.infoWidget )
-                self.showResults(self.current_seartch_layer) #rampeverdi ikke med i tabell
-                self.sourceMapTool.setLayer(self.current_seartch_layer)
-                #self.dock.tabWidget_main.setCurrentIndex(1) #for tettsted
-                #self.dock.tabWidget_tettsted.setCurrentIndex(1) #for inngangbygg
-                #self.infoWidget.tabWidget.setCurrentIndex(1)
-                #self.current_seartch_layer = self.activeLayer()
+                QgsMapLayerRegistry.instance().addMapLayer(self.current_seartch_layer) #Legger inn nytt lag
+                self.canvas.setExtent(self.current_seartch_layer.extent()) #zoomer inn på nytt lag
+                self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.infoWidget ) #legger inn infowidget
+                self.showResults(self.current_seartch_layer) #Legger inn tabell
+                self.sourceMapTool.setLayer(self.current_seartch_layer) #setter nytt lag til å være mål for verktøy
 
-                self.search_history[layer_name_text] = SavedSearch(layer_name_text, self.current_seartch_layer, layer_name, self.dlg.tabWidget_main.currentIndex(), self.dlg.tabWidget_friluft.currentIndex(), self.dlg.tabWidget_tettsted.currentIndex())
-                for attribute in attributes:
+                self.search_history[layer_name_text] = SavedSearch(layer_name_text, self.current_seartch_layer, layer_name, self.dlg.tabWidget_main.currentIndex(), self.dlg.tabWidget_friluft.currentIndex(), self.dlg.tabWidget_tettsted.currentIndex()) #lagerer søkets tab indes, lagnavn og lag referanse
+                for attribute in attributes: #lagrer valg av attributter
                     self.search_history[layer_name_text].add_attribute(attribute, int(attribute.getComboBox().currentIndex()), attribute.getLineEditText())
-                    #print(layer_name_text)
-                    #print(attribute.getComboBox().currentIndex())
-                    #print(type(attribute.getComboBox().currentIndex()))
-                self.search_history[layer_name_text].add_attribute(self.fylker, int(self.fylker.getComboBox().currentIndex()), None)
+
+                self.search_history[layer_name_text].add_attribute(self.fylker, int(self.fylker.getComboBox().currentIndex()), None) #lagerer valg og fylter og komuner
                 self.search_history[layer_name_text].add_attribute(self.kommuner, int(self.kommuner.getComboBox().currentIndex()), None)
-                if self.infoWidget.comboBox_search_history.findText(layer_name_text) == -1:
+                if self.infoWidget.comboBox_search_history.findText(layer_name_text) == -1: #Legger til ikke existerende søk i søk historien
                 	self.infoWidget.comboBox_search_history.addItem(layer_name_text)
+                self.dlg.close() #lukker hovedvindu for enklere se resultater
                 
             else:
-                self.show_message("Søket fullførte uten at noen objecter ble funnet", "ingen Objecter funnet", msg_info=None, msg_details=None, msg_type=None)
-            #QgsMapLayerRegistry.instance().removeMapLayer( self.layers[-1] )
-        #QgsMapLayerRegistry.instance().removeMapLayer( self.layers[-1].id() )
+                self.show_message("Søket fullførte uten at noen objecter ble funnet", "ingen Objecter funnet", msg_info=None, msg_details=None, msg_type=None) #Melding som vises om søket feilet
         
         if sok_metode == "memory": #self.dlg.comboBox_sok_metode.currentText() == "memory":
             try:
@@ -1598,89 +1202,8 @@ class Master:
             else:
                 self.show_message("Søket fullførte uten at noen objecter ble funnet", "ingen Objecter funnet", msg_info=None, msg_details=None, msg_type=None)
                 QgsMapLayerRegistry.instance().removeMapLayer( tempLayer.id() )
-            #self.layers[-1].removeSelection()
             
-            #tempLayer.selectAll()
-            #self.canvas.zoomToSelected()
-            #tempLayer.removeSelection()
-            #self.iface.legendInterface().setLayerVisible(tempLayer, False)
-            #self.iface.legendInterface().setLayerVisible(tempLayer, True)
-
-
-        # sql = "select * from tilgjengelighet.t_inngangbygg"
-        # #sql = "select * from kasper_master.t_inngangbygg"
-        # where = "".decode('utf-8')
-
-        # if fylke != "Norge":
-        #     if komune == self.uspesifisert:
-        #         where = "where komm = " + self.fylke_dict[fylke][0]
-        #         for komune_nr in range(1, len(self.fylke_dict[fylke])-1):
-        #             where = where + " or komm = " + self.fylke_dict[fylke][komune_nr]
-        #     else:
-        #         where = "where komm = " + self.komm_dict_nm[komune]
-
-        # # if komune != self.uspesifisert:
-        # #     if komune[0:4] == "    ": #If a city is chosen, and not a county
-        # #         where = "where komm = " + self.komm_dict[komune[4:len(komune)]][0] + ""
-        # #     else: #If a county is chosen
-        # #         where = "where komm = " + self.fylke_dict[komune][0]
-        # #         for kommnr in range(1,len(self.fylke_dict[komune])-1): #iterate throu the rest of the cityes in the county
-        # #             where = where + " or komm = " + self.fylke_dict[komune][kommnr]
-
-        # for atr, value in ing_atr_combobox.iteritems():
-        #     where = self.create_where_statement(atr, value, "like", where)
-        #     #print(where)
-
-        # for atr, value in ing_atr_lineedit.iteritems():
-        #     opperator = ">"
-        #     if value[1] == self.mindre:
-        #         opperator = "<"
-        #     where = self.create_where_statement(atr, value[0], opperator, where)
-
-        # sql = "(" + sql + " " + where + ")"
-
-        # #print(sql)
         
-        # self.uri.setDataSource("",sql,"wkb_geometry","","ogc_fid")
-        # try:
-        #     QgsMapLayerRegistry.instance().removeMapLayer(self.layer_inngang.id())
-        # except Exception, e:
-        #     print(str(e))
-
-
-        # #self.layer_inngang = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
-        # if len(self.dlg.lineEdit_navn_paa_sok_inngang.text()) > 0:
-        #     self.layer_inngang = QgsVectorLayer(self.uri.uri(),self.dlg.lineEdit_navn_paa_sok_inngang.text(),"postgres")
-        # else:
-        #     self.layer_inngang = QgsVectorLayer(self.uri.uri(),"inngangbygg_filtrert","postgres")
-        
-        # #QgsMapLayerRegistry.instance().removeMapLayer( inngangbygg.id() )
-        # QgsMapLayerRegistry.instance().addMapLayer(self.layer_inngang)
-
-
-        # if not self.layer_inngang.isValid():
-        #     print("layer failed to load")
-        #     self.show_message("søket ga ingen teff", "Advarsel", msg_type=QMessageBox.Warning)
-        # else:
-        #     print("layer succeeded to load")
-        #     self.showResults(self.layer_inngang)
-        #     self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.obj_info_dockwidget )
-
-
-        # infoWidget_label_list = [self.infoWidget.label_avstand_hc_text, self.infoWidget.label_byggningstype_text, self.infoWidget.label_ank_vei_stigning_text, self.infoWidget.label_dortype_text, self.infoWidget.label_dorapner_text, self.infoWidget.label_ringeklokke_text, self.infoWidget.label_ringeklokke_hoyde_text, self.infoWidget.label_terskelhoyde_text, self.infoWidget.label_inngang_bredde_text, self.infoWidget.label_kontrast_text, self.infoWidget.label_rampe_text]
-
-        # thread = SelectThread(infoWidget_label_list, self.att_info_list)
-        # thread.start()
-        #if not newLayer:
-        #    self.search_history.pop(activeLayer_id, None)
-        #self.search_history[activeLayer_id] = searchdata
-        #for id in self.search_history:
-        #    print id
-
-        # for i in self.search_history:
-        #     print(i)
-        #     print(self.search_history[i].get_attributes())
-
         print("Filtering End")
         
 
@@ -1714,8 +1237,6 @@ class Master:
 
     def OpenBrowse(self):        
         filename1 = QFileDialog.getSaveFileName()
-        #QFileDialog.setFileMode(QFileDialog.Directory())
-        #filename1 = QFileDialog.directory()
         self.export_layer.lineEdit.setText(filename1)
 
     def lagre_lag(self):
@@ -1727,12 +1248,11 @@ class Master:
         for cmb in comboBoxes:
             cmb.setCurrentIndex(0)
 
-        lineEdits = [self.dlg.lineEdit_avstand_hc, self.dlg.lineEdit_ank_stigning, self.dlg.lineEdit_dorbredde, self.dlg.lineEdit_terskel, self.dlg.lineEdit_rmp_stigning, self.dlg.lineEdit_rmp_bredde, self.dlg.lineEdit_hand1, self.dlg.lineEdit_hand2, self.dlg.lineEdit_navn_paa_sok_inngang]
+        lineEdits = [self.dlg.lineEdit_avstand_hc, self.dlg.lineEdit_ank_stigning, self.dlg.lineEdit_dorbredde, self.dlg.lineEdit_terskel, self.dlg.lineEdit_rmp_stigning, self.dlg.lineEdit_rmp_bredde, self.dlg.lineEdit_hand1, self.dlg.lineEdit_hand2, self.dlg.lineEdit_navn_paa_sok]
         for le in lineEdits:
             le.setText("")
 
-        for layer in self.layers:
-            QgsMapLayerRegistry.instance().addMapLayer(layer)
+  
 
 
 
@@ -1742,17 +1262,10 @@ class Master:
 
         # show the dialog
         self.dlg.show()
+        self.featuretype = FeatureType()
+        if self.featuretype:
+            self.getFeatures()
         
-        # indexes = self.dock.tableWidget.selectionModel().selectedRows()
-        # for index in sorted(indexes):
-        #     print('Row %d is selected' % index.row()))
-
-        #byggningstyper = self.add_byggningstyper(inngangbygg = inngangbygg)
-        #fyll ut combobosker
-        
-        
-
-
 
         # Run the dialog event loop
         result = self.dlg.exec_()

@@ -28,6 +28,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_Select_Object">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Velg et object for å få inromasjon&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Select Object</string>
           </property>
@@ -211,6 +214,9 @@
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QPushButton" name="pushButton_filtrer">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Åpner filtrerings vindu&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Filtrer</string>
           </property>
@@ -218,6 +224,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_exporter">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Eksporter data&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Eksporter</string>
           </property>
@@ -244,6 +253,9 @@
               <height>0</height>
              </size>
             </property>
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Tidligere søk&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <item>
              <property name="text">
               <string/>
@@ -255,6 +267,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_filtre_tidligere">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Åpner filtreringsvindu med innstillinger fra valgt lag&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Filtrer</string>
           </property>
@@ -265,8 +280,6 @@
      </layout>
     </item>
    </layout>
-   <zorder>pushButton_exporter</zorder>
-   <zorder>comboBox_search_history</zorder>
   </widget>
  </widget>
  <resources/>

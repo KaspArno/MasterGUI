@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1200</width>
-    <height>813</height>
+    <height>853</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,9 +19,9 @@
   <property name="windowTitle">
    <string>Master</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_16">
+  <layout class="QVBoxLayout" name="verticalLayout_15">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_19">
+    <layout class="QVBoxLayout" name="verticalLayout_16">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_12">
        <item>
@@ -3575,82 +3575,6 @@
                      </property>
                     </spacer>
                    </item>
-                   <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_23">
-                     <item>
-                      <widget class="QPushButton" name="pushButton_LastVei">
-                       <property name="text">
-                        <string>Last inn Lag</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <spacer name="horizontalSpacer_4">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_8">
-                       <item>
-                        <widget class="QLabel" name="label_40">
-                         <property name="text">
-                          <string>Navn på Søk</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="lineEdit_navn_paa_sok_vei_tettsted"/>
-                       </item>
-                       <item>
-                        <widget class="QComboBox" name="comboBox_sok_metode_vei">
-                         <item>
-                          <property name="text">
-                           <string>virtual</string>
-                          </property>
-                         </item>
-                         <item>
-                          <property name="text">
-                           <string>memory</string>
-                          </property>
-                         </item>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="pushButton_filtrerVei_tettsted">
-                         <property name="text">
-                          <string>Filtrer</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                    </layout>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_Progress_Vei">
-                     <property name="font">
-                      <font>
-                       <pointsize>10</pointsize>
-                       <weight>75</weight>
-                       <bold>true</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>TextLabel</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignCenter</set>
-                     </property>
-                    </widget>
-                   </item>
                   </layout>
                  </item>
                 </layout>
@@ -3660,13 +3584,13 @@
                 <attribute name="title">
                  <string>Inngang</string>
                 </attribute>
-                <layout class="QVBoxLayout" name="verticalLayout_15">
+                <layout class="QVBoxLayout" name="verticalLayout_14">
                  <item>
                   <layout class="QVBoxLayout" name="verticalLayout_11">
                    <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_25">
+                    <layout class="QHBoxLayout" name="horizontalLayout_13">
                      <item>
-                      <layout class="QVBoxLayout" name="verticalLayout">
+                      <layout class="QVBoxLayout" name="verticalLayout_9">
                        <item>
                         <widget class="QLabel" name="label_22">
                          <property name="text">
@@ -3682,10 +3606,7 @@
                         </widget>
                        </item>
                        <item>
-                        <layout class="QFormLayout" name="formLayout_2">
-                         <property name="fieldGrowthPolicy">
-                          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-                         </property>
+                        <layout class="QFormLayout" name="formLayout">
                          <item row="0" column="0">
                           <widget class="QLabel" name="label">
                            <property name="minimumSize">
@@ -3693,6 +3614,9 @@
                              <width>10</width>
                              <height>10</height>
                             </size>
+                           </property>
+                           <property name="whatsThis">
+                            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Avstand HC &amp;lt;= 25m&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                            </property>
                            <property name="text">
                             <string>Avstand HC parkering</string>
@@ -3813,13 +3737,47 @@
                           </widget>
                          </item>
                          <item row="5" column="0">
+                          <widget class="QLabel" name="label_39">
+                           <property name="text">
+                            <string>Døråpner</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="5" column="1">
+                          <widget class="QComboBox" name="comboBox_dorapner"/>
+                         </item>
+                         <item row="6" column="0">
+                          <widget class="QLabel" name="label_41">
+                           <property name="text">
+                            <string>Manøverkanpp høyde</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="6" column="1">
+                          <layout class="QHBoxLayout" name="horizontalLayout_8">
+                           <item>
+                            <widget class="QComboBox" name="comboBox_man_hoyde">
+                             <property name="minimumSize">
+                              <size>
+                               <width>50</width>
+                               <height>0</height>
+                              </size>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QLineEdit" name="lineEdit_man_hoyde"/>
+                           </item>
+                          </layout>
+                         </item>
+                         <item row="7" column="0">
                           <widget class="QLabel" name="label_5">
                            <property name="text">
                             <string>Dørbredde</string>
                            </property>
                           </widget>
                          </item>
-                         <item row="5" column="1">
+                         <item row="7" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_6">
                            <item>
                             <widget class="QComboBox" name="comboBox_dorbredde">
@@ -3836,14 +3794,14 @@
                            </item>
                           </layout>
                          </item>
-                         <item row="6" column="0">
+                         <item row="8" column="0">
                           <widget class="QLabel" name="label_18">
                            <property name="text">
                             <string>Terskel</string>
                            </property>
                           </widget>
                          </item>
-                         <item row="6" column="1">
+                         <item row="8" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_16">
                            <item>
                             <widget class="QComboBox" name="comboBox_terskel">
@@ -3860,14 +3818,14 @@
                            </item>
                           </layout>
                          </item>
-                         <item row="7" column="0">
+                         <item row="9" column="0">
                           <widget class="QLabel" name="label_17">
                            <property name="text">
                             <string>Kontrast</string>
                            </property>
                           </widget>
                          </item>
-                         <item row="7" column="1">
+                         <item row="9" column="1">
                           <widget class="QComboBox" name="comboBox_kontrast">
                            <property name="minimumSize">
                             <size>
@@ -3886,8 +3844,8 @@
                          </property>
                          <property name="sizeHint" stdset="0">
                           <size>
-                           <width>20</width>
-                           <height>40</height>
+                           <width>388</width>
+                           <height>15</height>
                           </size>
                          </property>
                         </spacer>
@@ -3902,118 +3860,117 @@
                       </widget>
                      </item>
                      <item>
-                      <layout class="QVBoxLayout" name="verticalLayout_14">
+                      <layout class="QVBoxLayout" name="verticalLayout">
                        <item>
-                        <layout class="QVBoxLayout" name="verticalLayout_9">
-                         <item>
-                          <widget class="QLabel" name="label_rampe_boxs">
+                        <widget class="QLabel" name="label_rampe_boxs">
+                         <property name="text">
+                          <string>Rampe</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="Line" name="line_4">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <layout class="QFormLayout" name="formLayout_2">
+                         <item row="0" column="0">
+                          <widget class="QLabel" name="label_rmp_stigning">
                            <property name="text">
-                            <string>Rampe</string>
+                            <string>Rampe Stigning</string>
                            </property>
                           </widget>
                          </item>
-                         <item>
-                          <widget class="Line" name="line_4">
-                           <property name="orientation">
-                            <enum>Qt::Horizontal</enum>
-                           </property>
-                          </widget>
-                         </item>
-                         <item>
-                          <layout class="QFormLayout" name="formLayout">
-                           <property name="fieldGrowthPolicy">
-                            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-                           </property>
-                           <item row="0" column="0">
-                            <widget class="QLabel" name="label_rmp_stigning">
-                             <property name="text">
-                              <string>Rampe Stigning</string>
-                             </property>
-                            </widget>
+                         <item row="0" column="1">
+                          <layout class="QHBoxLayout" name="horizontalLayout_5">
+                           <item>
+                            <widget class="QComboBox" name="comboBox_rmp_stigning"/>
                            </item>
-                           <item row="0" column="1">
-                            <layout class="QHBoxLayout" name="horizontalLayout_5">
-                             <item>
-                              <widget class="QComboBox" name="comboBox_rmp_stigning"/>
-                             </item>
-                             <item>
-                              <widget class="QLineEdit" name="lineEdit_rmp_stigning"/>
-                             </item>
-                            </layout>
-                           </item>
-                           <item row="1" column="0">
-                            <widget class="QLabel" name="label_rmp_bredde">
-                             <property name="text">
-                              <string>Rampe Bredde</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item row="1" column="1">
-                            <layout class="QHBoxLayout" name="horizontalLayout_4">
-                             <item>
-                              <widget class="QComboBox" name="comboBox_rmp_bredde"/>
-                             </item>
-                             <item>
-                              <widget class="QLineEdit" name="lineEdit_rmp_bredde"/>
-                             </item>
-                            </layout>
-                           </item>
-                           <item row="2" column="0">
-                            <widget class="QLabel" name="label_handliste">
-                             <property name="text">
-                              <string>Håndliste</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item row="2" column="1">
-                            <layout class="QHBoxLayout" name="horizontalLayout_3">
-                             <item>
-                              <widget class="QComboBox" name="comboBox_handliste">
-                               <property name="minimumSize">
-                                <size>
-                                 <width>150</width>
-                                 <height>0</height>
-                                </size>
-                               </property>
-                              </widget>
-                             </item>
-                            </layout>
-                           </item>
-                           <item row="3" column="0">
-                            <widget class="QLabel" name="label_hand1">
-                             <property name="text">
-                              <string>Håndliste Høyde 1</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item row="3" column="1">
-                            <layout class="QHBoxLayout" name="horizontalLayout_2">
-                             <item>
-                              <widget class="QComboBox" name="comboBox_hand1"/>
-                             </item>
-                             <item>
-                              <widget class="QLineEdit" name="lineEdit_hand1"/>
-                             </item>
-                            </layout>
-                           </item>
-                           <item row="4" column="0">
-                            <widget class="QLabel" name="label_hand2">
-                             <property name="text">
-                              <string>Håndliste Høyde 2</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item row="4" column="1">
-                            <layout class="QHBoxLayout" name="horizontalLayout">
-                             <item>
-                              <widget class="QComboBox" name="comboBox_hand2"/>
-                             </item>
-                             <item>
-                              <widget class="QLineEdit" name="lineEdit_hand2"/>
-                             </item>
-                            </layout>
+                           <item>
+                            <widget class="QLineEdit" name="lineEdit_rmp_stigning"/>
                            </item>
                           </layout>
+                         </item>
+                         <item row="1" column="0">
+                          <widget class="QLabel" name="label_rmp_bredde">
+                           <property name="text">
+                            <string>Rampe Bredde</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="1" column="1">
+                          <layout class="QHBoxLayout" name="horizontalLayout_4">
+                           <item>
+                            <widget class="QComboBox" name="comboBox_rmp_bredde"/>
+                           </item>
+                           <item>
+                            <widget class="QLineEdit" name="lineEdit_rmp_bredde"/>
+                           </item>
+                          </layout>
+                         </item>
+                         <item row="2" column="0">
+                          <widget class="QLabel" name="label_handliste">
+                           <property name="text">
+                            <string>Håndliste</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="3" column="0">
+                          <widget class="QLabel" name="label_hand1">
+                           <property name="text">
+                            <string>Håndliste Høyde 1</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="3" column="1">
+                          <layout class="QHBoxLayout" name="horizontalLayout_2">
+                           <item>
+                            <widget class="QComboBox" name="comboBox_hand1"/>
+                           </item>
+                           <item>
+                            <widget class="QLineEdit" name="lineEdit_hand1"/>
+                           </item>
+                          </layout>
+                         </item>
+                         <item row="4" column="0">
+                          <widget class="QLabel" name="label_hand2">
+                           <property name="text">
+                            <string>Håndliste Høyde 2</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="4" column="1">
+                          <layout class="QHBoxLayout" name="horizontalLayout">
+                           <item>
+                            <widget class="QComboBox" name="comboBox_hand2"/>
+                           </item>
+                           <item>
+                            <widget class="QLineEdit" name="lineEdit_hand2"/>
+                           </item>
+                          </layout>
+                         </item>
+                         <item row="5" column="0">
+                          <widget class="QLabel" name="label_rmp_tilgjengelig">
+                           <property name="text">
+                            <string>Rampe tilgjengelig</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="5" column="1">
+                          <widget class="QComboBox" name="comboBox_rmp_tilgjengelig"/>
+                         </item>
+                         <item row="2" column="1">
+                          <widget class="QComboBox" name="comboBox_handliste">
+                           <property name="minimumSize">
+                            <size>
+                             <width>150</width>
+                             <height>0</height>
+                            </size>
+                           </property>
+                          </widget>
                          </item>
                         </layout>
                        </item>
@@ -4191,87 +4148,17 @@ p, li { white-space: pre-wrap; }
                      </item>
                     </layout>
                    </item>
-                   <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_26">
-                     <item>
-                      <widget class="QPushButton" name="pushButton_LastInngang">
-                       <property name="text">
-                        <string>Last inn Lag</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <spacer name="horizontalSpacer_3">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_13">
-                       <item>
-                        <widget class="QLabel" name="label_39">
-                         <property name="text">
-                          <string>Navn på Søk</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="lineEdit_navn_paa_sok_inngang"/>
-                       </item>
-                       <item>
-                        <widget class="QComboBox" name="comboBox_sok_metode">
-                         <item>
-                          <property name="text">
-                           <string>virtual</string>
-                          </property>
-                         </item>
-                         <item>
-                          <property name="text">
-                           <string>memory</string>
-                          </property>
-                         </item>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="pushButton_filtrerInngang">
-                         <property name="text">
-                          <string>Filtrer</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                    </layout>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_Progress_Inngang">
-                     <property name="font">
-                      <font>
-                       <pointsize>10</pointsize>
-                       <weight>75</weight>
-                       <bold>true</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>TextLabel</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignCenter</set>
-                     </property>
-                    </widget>
-                   </item>
                   </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_3"/>
                  </item>
                 </layout>
                 <zorder></zorder>
-                <zorder>label_Progress_Inngang</zorder>
+                <zorder>comboBox_rmp_tilgjengelig</zorder>
+                <zorder>label_rmp_tilgjengelig</zorder>
+                <zorder></zorder>
+                <zorder></zorder>
                </widget>
                <widget class="QWidget" name="tab_3">
                 <attribute name="title">
@@ -4526,65 +4413,6 @@ p, li { white-space: pre-wrap; }
                      </property>
                     </spacer>
                    </item>
-                   <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_27">
-                     <item>
-                      <widget class="QPushButton" name="pushButton_LastVei_2">
-                       <property name="text">
-                        <string>Last inn Lag</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <spacer name="horizontalSpacer_6">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_30">
-                       <item>
-                        <widget class="QLabel" name="label_41">
-                         <property name="text">
-                          <string>Navn på Søk</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="lineEdit_navn_paa_sok_hcpark"/>
-                       </item>
-                       <item>
-                        <widget class="QComboBox" name="comboBox_sok_metode_hcpark">
-                         <item>
-                          <property name="text">
-                           <string>virtual</string>
-                          </property>
-                         </item>
-                         <item>
-                          <property name="text">
-                           <string>memory</string>
-                          </property>
-                         </item>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="pushButton_filtrerHCPark">
-                         <property name="text">
-                          <string>Filtrer</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                    </layout>
-                   </item>
                   </layout>
                  </item>
                 </layout>
@@ -4784,65 +4612,6 @@ p, li { white-space: pre-wrap; }
                      </property>
                     </spacer>
                    </item>
-                   <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_35">
-                     <item>
-                      <widget class="QPushButton" name="pushButton_LastInngang_2">
-                       <property name="text">
-                        <string>Last inn Lag</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <spacer name="horizontalSpacer_7">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_36">
-                       <item>
-                        <widget class="QLabel" name="label_42">
-                         <property name="text">
-                          <string>Navn på Søk</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="lineEdit_navn_paa_sok_pomrade"/>
-                       </item>
-                       <item>
-                        <widget class="QComboBox" name="comboBox_sok_metode_pomrade">
-                         <item>
-                          <property name="text">
-                           <string>virtual</string>
-                          </property>
-                         </item>
-                         <item>
-                          <property name="text">
-                           <string>memory</string>
-                          </property>
-                         </item>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="pushButton_filtrerParkOmrade">
-                         <property name="text">
-                          <string>Filtrer</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                    </layout>
-                   </item>
                   </layout>
                  </item>
                 </layout>
@@ -4858,16 +4627,19 @@ p, li { white-space: pre-wrap; }
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_19">
+      <layout class="QHBoxLayout" name="horizontalLayout_110">
        <item>
         <widget class="QPushButton" name="pushButton_reset">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Nullstiller alle valg&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>reset</string>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_5">
+        <spacer name="horizontalSpacer_18">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -4880,58 +4652,96 @@ p, li { white-space: pre-wrap; }
         </spacer>
        </item>
        <item>
-        <widget class="QDialogButtonBox" name="button_box">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="standardButtons">
-          <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_19">
+         <item>
+          <widget class="QLabel" name="label_164">
+           <property name="text">
+            <string>Navn på Søk</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_navn_paa_sok"/>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_sok_metode">
+           <item>
+            <property name="text">
+             <string>virtual</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>memory</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_filtrer">
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Filltrerer og legger til objekter etter valgte attributter&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Filtrer</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_Progress">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Laster inn lag:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
   </layout>
   <zorder></zorder>
+  <zorder>comboBox_byggningstype</zorder>
+  <zorder>label_2</zorder>
+  <zorder>comboBox_kontrast</zorder>
   <zorder></zorder>
+  <zorder>label_17</zorder>
+  <zorder>label_18</zorder>
+  <zorder></zorder>
+  <zorder>label_5</zorder>
+  <zorder>label_39</zorder>
+  <zorder>comboBox_dorapner</zorder>
+  <zorder>label_40</zorder>
+  <zorder>comboBox_70</zorder>
+  <zorder>label_41</zorder>
+  <zorder>comboBox_man_hoyde</zorder>
+  <zorder>lineEdit_man_hoyde</zorder>
   <zorder>comboBox_dortype</zorder>
+  <zorder></zorder>
+  <zorder></zorder>
+  <zorder>label_21</zorder>
+  <zorder>label</zorder>
   <zorder>comboBox_rampe</zorder>
+  <zorder>label_4</zorder>
+  <zorder>label_3</zorder>
+  <zorder></zorder>
+  <zorder></zorder>
+  <zorder>label_Progress</zorder>
+  <zorder>verticalSpacer_6</zorder>
+  <zorder>label_22</zorder>
+  <zorder>line_3</zorder>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>button_box</sender>
-   <signal>accepted()</signal>
-   <receiver>MasterDialogBase</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>button_box</sender>
-   <signal>rejected()</signal>
-   <receiver>MasterDialogBase</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
