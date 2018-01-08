@@ -26,7 +26,7 @@ import io
 
 from qgis.core import QgsDataSourceURI, QgsMapLayerRegistry, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsVectorFileWriter, QgsLayerTreeLayer, QgsLayerTreeGroup, QgsMapLayer, QgsProject
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant, QDateTime, QThread, pyqtSignal, Qt
-from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox, QApplication, QHBoxLayout, QVBoxLayout, QAbstractItemView, QListWidgetItem, QAbstractItemView, QFileDialog
+from PyQt4.QtGui import QAction, QIcon, QDockWidget, QGridLayout, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox, QApplication, QHBoxLayout, QVBoxLayout, QAbstractItemView, QListWidgetItem, QAbstractItemView, QFileDialog, QLabel
 
 # Initialize Qt resources from file resources.py
 import resources
@@ -105,7 +105,6 @@ class Master:
         self.toolbar.setObjectName(u'Master')
 
         #Globale Variabler
-        #Combobox filling
         self.uspesifisert = "" #For tomme comboboxser og lineEdtis
         self.mer = ">" #for combobokser linket til mer eller mindre enn iteratsjoner
         self.mindre = "<"
@@ -114,7 +113,6 @@ class Master:
 
         #layers and search
         self.layers = [] #gather all layers
-        self.layername = [] #gather all layer name (dict?)
 
         self.current_seartch_layer = None #The last searched layer
         self.search_history = {} #history of all search
@@ -293,9 +291,12 @@ class Master:
         self.ank_stigning = GuiAttribute("stigningAdkomstvei", self.dlg.comboBox_ank_stigning, self.dlg.lineEdit_ank_stigning)
         self.byggningstype = GuiAttribute("funksjon", self.dlg.comboBox_byggningstype)
         self.rampe = GuiAttribute("rampe", self.dlg.comboBox_rampe, comboBoxText={"" : "", "Ja" : "1", "Nei" : "0"})
-        self.dortype = GuiAttribute(u'd\xf8rtype', self.dlg.comboBox_dortype)
-        self.dorapner = GuiAttribute(u'd\xf8r\xe5pner', self.dlg.comboBox_dorapner)
-        self.man_hoyde = GuiAttribute(u'man\xe5verknappH\xf8yde', self.dlg.comboBox_man_hoyde, self.dlg.lineEdit_man_hoyde)
+        #self.dortype = GuiAttribute(u'd\xf8rtype', self.dlg.comboBox_dortype)
+        #self.dorapner = GuiAttribute(u'd\xf8r\xe5pner', self.dlg.comboBox_dorapner)
+        self.dortype = GuiAttribute(u'dørtype', self.dlg.comboBox_dortype)
+        self.dorapner = GuiAttribute(u'døråpner', self.dlg.comboBox_dorapner)
+        #self.man_hoyde = GuiAttribute(u'man\xe5verknappH\xf8yde', self.dlg.comboBox_man_hoyde, self.dlg.lineEdit_man_hoyde)
+        self.man_hoyde = GuiAttribute(u'manøverknappHøyde', self.dlg.comboBox_man_hoyde, self.dlg.lineEdit_man_hoyde)
         self.dorbredde = GuiAttribute("InngangBredde", self.dlg.comboBox_dorbredde, self.dlg.lineEdit_dorbredde)
         self.terskel = GuiAttribute(u'terskelH\xf8yde', self.dlg.comboBox_terskel, self.dlg.lineEdit_terskel)
         self.kontrast = GuiAttribute("kontrast", self.dlg.comboBox_kontrast)
@@ -312,10 +313,6 @@ class Master:
         self.attributes_inngang = [self.avstandHC, self.ank_stigning, self.byggningstype, self.rampe, self.dortype, self.dorapner, self.man_hoyde, self.dorbredde, self.terskel, self.kontrast, self.rampe_stigning, self.rampe_bredde, self.handlist, self.handlist1, self.handlist2, self.rmp_tilgjengelig, self.manuellRullestol, self.elektriskRullestol, self.synshemmet]
         self.attributes_inngang_gui = [self.byggningstype, self.dortype, self.dorapner, self.kontrast, self.handlist, self.rmp_tilgjengelig, self.manuellRullestol, self.elektriskRullestol, self.synshemmet]
         self.attributes_inngang_mer_mindre = [self.avstandHC, self.ank_stigning, self.man_hoyde, self.dorbredde, self.terskel, self.rampe_stigning, self.rampe_bredde, self.handlist1, self.handlist2]
-
-
-        #selection test
-        #self.sourceMapTool = IdentifyGeometry(self.canvas, self.infoWidget, pickMode='selection')
 
         #hide gui options test
         self.dlg.label_rampe_boxs.setVisible(False)
@@ -348,55 +345,26 @@ class Master:
         self.dlg.comboBox_rampe.currentIndexChanged.connect(self.hide_show_rampe)
 
     def assign_combobox_vei(self):
-        self.gatetype = GuiAttribute("gatetype")
-        self.gatetype.setComboBox(self.dlg.comboBox_gatetype)
+        self.gatetype = GuiAttribute("gatetype", self.dlg.comboBox_gatetype)
+        self.nedsenkning1 = GuiAttribute("nedsenk1", self.dlg.comboBox_nedsenkning1, self.dlg.lineEdit_nedsenkning1)
+        self.nedsenkning2 = GuiAttribute("nedsenk2", self.dlg.comboBox_nedsenkning2, self.dlg.lineEdit_nedsenkning2)
+        self.dekke_vei_tettsted = GuiAttribute("dekke", self.dlg.comboBox_dekke_vei_tettsted)
+        self.dekkeTilstand_vei_tettsted = GuiAttribute("dekkeTilstand", self.dlg.comboBox_dekkeTilstand_vei_tettsted)
+        self.bredde = GuiAttribute("bredde", self.dlg.comboBox_bredde, self.dlg.lineEdit_bredde)
+        self.stigning = GuiAttribute("stigning", self.dlg.comboBox_stigning, self.dlg.lineEdit_stigning)
+        self.tverfall = GuiAttribute("tverfall", self.dlg.comboBox_tverfall, self.dlg.lineEdit_tverfall)
+        self.ledelinje = GuiAttribute("ledelinje", self.dlg.comboBox_ledelinje)
+        self.ledelinjeKontrast = GuiAttribute("ledelinjeKontrast", self.dlg.comboBox_ledelinjeKontrast)
 
-        self.nedsenkning1 = GuiAttribute("nedsenk1")
-        self.nedsenkning1.setComboBox(self.dlg.comboBox_nedsenkning1)
-        self.nedsenkning1.setLineEdit(self.dlg.lineEdit_nedsenkning1)
-
-        self.nedsenkning2 = GuiAttribute("nedsenk2")
-        self.nedsenkning2.setComboBox(self.dlg.comboBox_nedsenkning2)
-        self.nedsenkning2.setLineEdit(self.dlg.lineEdit_nedsenkning2)
-
-        self.dekke_vei_tettsted = GuiAttribute("dekke")
-        self.dekke_vei_tettsted.setComboBox(self.dlg.comboBox_dekke_vei_tettsted)
-
-        self.dekkeTilstand_vei_tettsted = GuiAttribute("dekkeTilstand")
-        self.dekkeTilstand_vei_tettsted.setComboBox(self.dlg.comboBox_dekkeTilstand_vei_tettsted)
-
-        self.bredde = GuiAttribute("bredde")
-        self.bredde.setComboBox(self.dlg.comboBox_bredde)
-        self.bredde.setLineEdit(self.dlg.lineEdit_bredde)
-
-        self.stigning = GuiAttribute("stigning")
-        self.stigning.setComboBox(self.dlg.comboBox_stigning)
-        self.stigning.setLineEdit(self.dlg.lineEdit_stigning)
-
-        self.tverfall = GuiAttribute("tverfall")
-        self.tverfall.setComboBox(self.dlg.comboBox_tverfall)
-        self.tverfall.setLineEdit(self.dlg.lineEdit_tverfall)
-
-        self.ledelinje = GuiAttribute("ledelinje")
-        self.ledelinje.setComboBox(self.dlg.comboBox_ledelinje)
-        self.nedsenkning1.setLineEdit(self.dlg.lineEdit_nedsenkning1)
-
-        self.ledelinjeKontrast = GuiAttribute("ledelinjeKontrast")
-        self.ledelinjeKontrast.setComboBox(self.dlg.comboBox_ledelinjeKontrast)
-
-        self.manuell_rullestol_vei = GuiAttribute("tilgjengvurderingRullestol")
-        self.manuell_rullestol_vei.setComboBox(self.dlg.comboBox_manuell_rullestol_vei)
-
-        self.electrisk_rullestol_vei = GuiAttribute("tilgjengvurderingElRull")
-        self.electrisk_rullestol_vei.setComboBox(self.dlg.comboBox_electrisk_rullestol_vei)
-        
-        self.syn_vei = GuiAttribute("tilgjengvurderingSyn")
-        self.syn_vei.setComboBox(self.dlg.comboBox_syn_vei)
+        self.manuell_rullestol_vei = GuiAttribute("tilgjengvurderingRullestol", self.dlg.comboBox_manuell_rullestol_vei)
+        self.electrisk_rullestol_vei = GuiAttribute("tilgjengvurderingElRull", self.dlg.comboBox_electrisk_rullestol_vei)
+        self.syn_vei = GuiAttribute("tilgjengvurderingSyn", self.dlg.comboBox_syn_vei)
 
         self.attributes_vei = [self.gatetype, self.nedsenkning1, self.nedsenkning2, self.dekke_vei_tettsted, self.dekkeTilstand_vei_tettsted, self.bredde, self.stigning, self.tverfall, self.ledelinje, self.ledelinjeKontrast, self.manuell_rullestol_vei, self.electrisk_rullestol_vei, self.syn_vei]
         self.attributes_vei_gui = [self.gatetype, self.dekke_vei_tettsted, self.dekkeTilstand_vei_tettsted, self.ledelinje, self.ledelinjeKontrast, self.manuell_rullestol_vei, self.electrisk_rullestol_vei, self.syn_vei]
         self.attributes_vei_mer_mindre = [self.nedsenkning1,self.nedsenkning2,self.bredde,self.stigning,self.tverfall]
 
+        #Hide GUI
         self.dlg.comboBox_nedsenkning1.setVisible(False)
         self.dlg.lineEdit_nedsenkning1.setVisible(False)
         self.dlg.label_nedsenkning1.setVisible(False)
@@ -407,40 +375,23 @@ class Master:
         self.dlg.comboBox_gatetype.currentIndexChanged.connect(self.hide_show_nedsenkning)
 
     def assign_combobox_hc_parkering(self):
-        self.avstandServicebygg = GuiAttribute("avstandServicebygg")
-        self.avstandServicebygg.setComboBox(self.dlg.comboBox_avstandServicebygg)
-        self.avstandServicebygg.setLineEdit(self.dlg.lineEdit_avstandServicebygg)
+        self.avstandServicebygg = GuiAttribute("avstandServicebygg", self.dlg.comboBox_avstandServicebygg, self.dlg.lineEdit_avstandServicebygg)
 
-        self.overbygg = GuiAttribute("overbygg")
-        self.overbygg.setComboBox(self.dlg.comboBox_overbygg)
+        self.overbygg = GuiAttribute("overbygg", self.dlg.comboBox_overbygg, comboBoxText={"" : "", "Ja" : "1", "Nei" : "0"})
+        self.skiltet = GuiAttribute("skiltet", self.dlg.comboBox_skiltet, comboBoxText={"" : "", "Ja" : "1", "Nei" : "0"})
+        self.merket = GuiAttribute("merket", self.dlg.comboBox_merket, comboBoxText={"" : "", "Ja" : "1", "Nei" : "0"})
 
-        self.skiltet = GuiAttribute("skiltet")
-        self.skiltet.setComboBox(self.dlg.comboBox_skiltet)
+        self.bredde_vei = GuiAttribute("bredde", self.dlg.comboBox_bredde_vei, self.dlg.lineEdit_bredde_vei)
+        self.lengde_vei = GuiAttribute("lengde", self.dlg.comboBox_lengde_vei, self.dlg.lineEdit_lengde_vei)
 
-        self.merket = GuiAttribute("merket")
-        self.merket.setComboBox(self.dlg.comboBox_merket)
-
-        self.bredde_vei = GuiAttribute("bredde")
-        self.bredde_vei.setComboBox(self.dlg.comboBox_bredde_vei)
-        self.bredde_vei.setLineEdit(self.dlg.lineEdit_bredde_vei)
-
-        self.lengde_vei = GuiAttribute("lengde")
-        self.lengde_vei.setComboBox(self.dlg.comboBox_lengde_vei)
-        self.lengde_vei.setLineEdit(self.dlg.lineEdit_lengde_vei)
-
-        self.manuell_rullestol_hcparkering = GuiAttribute("tilgjengvurderingRullestol")
-        self.manuell_rullestol_hcparkering.setComboBox(self.dlg.comboBox_manuell_rullestol_hcparkering)
-
-        self.elektrisk_rullestol_hcparkering = GuiAttribute("tilgjengvurderingElRull")
-        self.elektrisk_rullestol_hcparkering.setComboBox(self.dlg.comboBox_elektrisk_rullestol_hcparkering)
-
-        #self.syn_hcparkering = GuiAttribute("tilgjengvurderingSyn")
-        #self.syn_hcparkering.setComboBox(self.dlg.comboBox_syn_hcparkering)
+        self.manuell_rullestol_hcparkering = GuiAttribute("tilgjengvurderingRullestol", self.dlg.comboBox_manuell_rullestol_hcparkering)
+        self.elektrisk_rullestol_hcparkering = GuiAttribute("tilgjengvurderingElRull", self.dlg.comboBox_elektrisk_rullestol_hcparkering)
 
         self.attributes_hcparkering = [self.avstandServicebygg, self.overbygg, self.skiltet, self.merket, self.bredde_vei, self.lengde_vei, self.manuell_rullestol_hcparkering, self.elektrisk_rullestol_hcparkering]
         self.attributes_hcparkering_gui = [self.manuell_rullestol_hcparkering, self.elektrisk_rullestol_hcparkering]
         self.attributes_hcparkering_mer_mindre = [self.avstandServicebygg, self.bredde_vei, self.lengde_vei]
 
+        #Hide GUI
         self.dlg.label_bredde_vei.setVisible(False)
         self.dlg.comboBox_bredde_vei.setVisible(False)
         self.dlg.lineEdit_bredde_vei.setVisible(False)
@@ -451,25 +402,13 @@ class Master:
         self.dlg.comboBox_merket.currentIndexChanged.connect(self.hide_show_merket)
 
     def assign_combobox_parkeringsomraade(self):
-        self.overbygg_pomrade = GuiAttribute("overbygg")
-        self.overbygg_pomrade.setComboBox(self.dlg.comboBox_overbygg_pomrade)
+        self.overbygg_pomrade = GuiAttribute("overbygg", self.dlg.comboBox_overbygg_pomrade, comboBoxText={"" : "", "Ja" : "1", "Nei" : "0"})
+        self.kapasitetPersonbiler = GuiAttribute("kapasitetPersonbiler", self.dlg.comboBox_kapasitetPersonbiler, self.dlg.lineEdit_kapasitetPersonbiler)
+        self.kapasitetUU = GuiAttribute("kapasitetUU", self.dlg.comboBox_kapasitetUU, self.dlg.lineEdit_kapasitetUU)
+        self.dekke_pomrade = GuiAttribute("dekke", self.dlg.comboBox_dekke_pomrade)
+        self.dekkeTilstand_pomrade = GuiAttribute("dekkeTilstand", self.dlg.comboBox_dekkeTilstand_pomrade)
 
-        self.kapasitetPersonbiler = GuiAttribute("kapasitetPersonbiler")
-        self.kapasitetPersonbiler.setComboBox(self.dlg.comboBox_kapasitetPersonbiler)
-        self.kapasitetPersonbiler.setLineEdit(self.dlg.lineEdit_kapasitetPersonbiler)
-
-        self.kapasitetUU = GuiAttribute("kapasitetUU")
-        self.kapasitetUU.setComboBox(self.dlg.comboBox_kapasitetUU)
-        self.kapasitetUU.setLineEdit(self.dlg.lineEdit_kapasitetUU)
-
-        self.dekke_pomrade = GuiAttribute("dekke")
-        self.dekke_pomrade.setComboBox(self.dlg.comboBox_dekke_pomrade)
-
-        self.dekkeTilstand_pomrade = GuiAttribute("dekkeTilstand")
-        self.dekkeTilstand_pomrade.setComboBox(self.dlg.comboBox_dekkeTilstand_pomrade)
-
-        self.manuell_rullestol_pomrade = GuiAttribute("tilgjengvurderingRullestol")
-        self.manuell_rullestol_pomrade.setComboBox(self.dlg.comboBox_manuell_rullestol_pomrade)
+        self.manuell_rullestol_pomrade = GuiAttribute("tilgjengvurderingRullestol", self.dlg.comboBox_manuell_rullestol_pomrade)
 
         self.attributes_pomrade = [self.overbygg_pomrade, self.kapasitetPersonbiler, self.kapasitetUU, self.dekke_pomrade, self.dekkeTilstand_pomrade, self.manuell_rullestol_pomrade]
         self.attributes_pomrade_gui = [self.dekke_pomrade, self.dekkeTilstand_pomrade, self.manuell_rullestol_pomrade]
@@ -565,7 +504,7 @@ class Master:
                             uri += "|subset=" + self.getsubset(geomtypeid)
                         
                         self.layers.append(QgsVectorLayer(uri, qgislayername, "ogr"))
-                        self.layername.append(qgislayername)
+                        #self.layername.append(qgislayername)
                         self.layers[-1].setProviderEncoding("UTF-8")
                         #self.vlayer = QgsVectorLayer(uri, qgislayername, "ogr")
                         #self.layers[qgislayername : self.vlayer]
@@ -845,8 +784,13 @@ class Master:
                 selection = self.current_seartch_layer.selectedFeatures()
                 #print("self.layer_inngang.selectedFeatures(): ", self.layer_inngang.selectedFeatures())
                 #print("selection", selection)
-                # for feature in selection:
-                #     #print("feature", feature)
+                for feature in selection:
+                    for i in range(0, self.infoWidget.gridLayout.rowCount()):
+                        try:
+                            self.infoWidget.gridLayout.itemAtPosition(i, 1).widget().setText(feature[self.to_unicode(self.attributes_inngang[i].getAttribute())])
+                        except Exception as e:
+                            self.infoWidget.gridLayout.itemAtPosition(i, 1).widget().setText("-")
+                #     #print("feature", featur
                 #     for i in range(0, len(infoWidget_label_list)):
                 #         #print("i: ", i)
                 #         try:
@@ -940,6 +884,31 @@ class Master:
             current_object = current_object + 1
         self.dock.tableWidget.setSortingEnabled(True) #enabeling sorting
         self.iface.addDockWidget( Qt.BottomDockWidgetArea , self.dock ) #adding seartch result Widget
+
+    def fill_infoWidget(self, attributes):
+        #for i in range(0, self.infoWidget.formLayout.rowCount()):
+            #self.infoWidget.formLayout.takeAt(i)
+        for i in range(0, self.infoWidget.gridLayout.rowCount()):
+            self.infoWidget.gridLayout.itemAtPosition(i, 0).widget().setText("")
+            self.infoWidget.gridLayout.itemAtPosition(i, 1).widget().setText("")
+            #self.infoWidget.gridLayout.removeWidget(self.entries[row])
+            #self.infoWidget.gridLayout[i].deleteLater()
+            #del self.infoWidget.gridLayout[i].deleteLater()
+        for i in range(0,len(attributes)):
+            #self.infoWidget.formLayout.addRow(QLabel(attributes[i].getAttribute()), QLabel("-"))
+            if i < self.infoWidget.gridLayout.rowCount():
+                self.infoWidget.gridLayout.itemAtPosition(i, 0).widget().setText(attributes[i].getAttribute())
+                self.infoWidget.gridLayout.itemAtPosition(i, 1).widget().setText("-")
+
+                self.infoWidget.gridLayout.itemAtPosition(i, 0).widget().setVisible(True)
+                self.infoWidget.gridLayout.itemAtPosition(i, 1).widget().setVisible(True)
+            else:
+                self.infoWidget.gridLayout.addWidget(QLabel(attributes[i].getAttribute()), i, 0)
+                self.infoWidget.gridLayout.addWidget(QLabel("-"), i, 1)
+        for i in range(len(attributes), self.infoWidget.gridLayout.rowCount()):
+            self.infoWidget.gridLayout.itemAtPosition(i, 0).widget().setVisible(False)
+            self.infoWidget.gridLayout.itemAtPosition(i, 1).widget().setVisible(False)
+
 
 
     def fill_fylker(self):
@@ -1117,6 +1086,7 @@ class Master:
                         print(str(e))
 
                 QgsMapLayerRegistry.instance().addMapLayer(self.current_seartch_layer) #Legger inn nytt lag
+                self.fill_infoWidget(attributes)
                 self.canvas.setExtent(self.current_seartch_layer.extent()) #zoomer inn på nytt lag
                 self.iface.addDockWidget( Qt.LeftDockWidgetArea , self.infoWidget ) #legger inn infowidget
                 self.showResults(self.current_seartch_layer) #Legger inn tabell
